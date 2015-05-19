@@ -23,7 +23,7 @@ char* libraryName = "./libgame.so";
 struct stat libStat;
 
 char* myFunctionName = "game_update_and_render";
-void (*myFancyFunction)(SDL_Renderer *);
+void (*game_update_and_render)(SDL_Renderer *);
 long long creationTime;
 
 internal void closeGame()
@@ -68,21 +68,22 @@ SDL_Error:
 
 void loadEntryPointFunctionAndRun()
 {
-    if (myHandle){
+    printf("loading %s.\n",libraryName);
+	if (myHandle){
         SDL_UnloadObject(myHandle);
     }
     myHandle = SDL_LoadObject(libraryName);
     if (!myHandle){
         printf("couldnt load:%s, error: %s\n",libraryName, SDL_GetError());
     }
-    myFancyFunction = (void (*)(SDL_Renderer *))SDL_LoadFunction(myHandle, myFunctionName);
+    game_update_and_render = (void (*)(SDL_Renderer *))SDL_LoadFunction(myHandle, myFunctionName);
     stat(libraryName, &libStat);
 
     // TODO instead of this long long madness try to handle the timestamp more safely
     creationTime = (long long)libStat.st_mtime;
-    
-    if (myFancyFunction != NULL) {
-        myFancyFunction(renderer);
+
+    if (game_update_and_render != NULL) {
+        game_update_and_render(renderer);
     } else {
         printf("couldnt run: %s, error: %s\n",myFunctionName, SDL_GetError());
     }
@@ -100,10 +101,10 @@ int main(){
         bool quit = false;
         SDL_Event e;
         loadEntryPointFunctionAndRun();
-        
+
         while( !quit )
 		{
-            while( SDL_PollEvent( &e ) != 0 )
+			while( SDL_PollEvent( &e ) != 0 )
             {
                 if( e.type == SDL_QUIT )
                 {
@@ -120,10 +121,8 @@ int main(){
 
                 stat(libraryName, &libStat);
                 if ((long long)libStat.st_mtime != creationTime){
-                    printf("will reload because lib has changed");
                     loadEntryPointFunctionAndRun();
                 }
-                
             }
         }
 	}
