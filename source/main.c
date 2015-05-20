@@ -1,12 +1,13 @@
-
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#include "memory.h"
 #define internal static
 
 const int SCREEN_WIDTH = 640;
@@ -24,8 +25,10 @@ char* libraryName = "./libgame.so";
 struct stat libStat;
 
 char* myFunctionName = "game_update_and_render";
-void (*game_update_and_render)(SDL_Renderer *);
+void (*game_update_and_render)(SDL_Renderer *, Memory *);
 long long creationTime;
+
+Memory mem = {.a = 100};
 
 internal void closeGame()
 {
@@ -60,6 +63,8 @@ internal bool init()
         goto SDL_Error;
     }
 
+
+
     return true;
   SDL_Error:
     printf("Error in %s, SDl_Error: %s\n", __FUNCTION__, SDL_GetError());
@@ -77,18 +82,17 @@ void loadEntryPointFunctionAndRun()
     if (!myHandle) {
         printf("couldnt load:%s, error: %s\n",libraryName, SDL_GetError());
     }
-    game_update_and_render = (void (*)(SDL_Renderer *))SDL_LoadFunction(myHandle, myFunctionName);
+    game_update_and_render = (void (*)(SDL_Renderer *, Memory *))SDL_LoadFunction(myHandle, myFunctionName);
     stat(libraryName, &libStat);
 
     // TODO instead of this long long madness try to handle the timestamp more safely
     creationTime = (long long)libStat.st_mtime;
 
     if (game_update_and_render != NULL) {
-        game_update_and_render(renderer);
+        game_update_and_render(renderer, &mem);
     } else {
         printf("couldnt run: %s, error: %s\n",myFunctionName, SDL_GetError());
     }
-
 }
 
 
@@ -96,6 +100,9 @@ void loadEntryPointFunctionAndRun()
 
 int main()
 {
+
+
+
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
@@ -111,6 +118,10 @@ int main()
                     case SDLK_ESCAPE:
                         quit = true;
                         break;
+                    case SDLK_r:
+                        printf("doing stuff here too you know");
+                        // this just runs the terminal command
+                        system("make game");
                     default:
                         break;
                     }
