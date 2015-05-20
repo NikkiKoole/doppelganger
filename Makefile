@@ -16,11 +16,11 @@ LIB_FILES += $(foreach file, $(LFILES), source/$(file))
 MFILES := main.c
 MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
+# I've hidden the console output in game: with the @ sign
 
 game:
-	# this will build a library (to be loaded by main)
-	$(CC) -c $(COMPILER_FLAGS) -fpic $(LIB_FILES)
-	$(CC) -shared -o $(LIBRARY_NAME) game.o tile.o $(LIBRARY_PATH) $(LD_FLAGS)
+	@($(CC) -c $(COMPILER_FLAGS) -fpic $(LIB_FILES))
+	@($(CC) -shared -o $(LIBRARY_NAME) game.o tile.o $(LIBRARY_PATH) $(LD_FLAGS))
 
 main:
 	# this will build the main application.

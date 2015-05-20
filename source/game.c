@@ -4,9 +4,9 @@
 
 void game_update_and_render(SDL_Renderer *renderer, Memory *memory)
 {
-    SDL_SetRenderDrawColor( renderer, 0xFF, 0x00, 0x00, 0xAA );
+    SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
     SDL_RenderClear( renderer );
     SDL_RenderPresent( renderer );
-    tile_stuff();
-    printf("The adress of the 'memory' you fed me is %p\n", &memory);
+    //tile_stuff();
+    //printf("The adress of the *Memory you fed me is %p\n", &memory);
 }

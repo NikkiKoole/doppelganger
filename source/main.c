@@ -76,7 +76,6 @@ internal bool init()
 
 void loadEntryPointFunctionAndRun()
 {
-    printf("loading %s.\n",libraryName);
 	if (myHandle) {
         SDL_UnloadObject(myHandle);
     }
@@ -93,7 +92,9 @@ void loadEntryPointFunctionAndRun()
     }
 }
 
+void checkForReload(){
 
+}
 
 
 int main()
@@ -128,7 +129,6 @@ int main()
 
             stat(libraryName, &libStat);
             if ((long long)libStat.st_ctime != creationTime) {
-                    stat(libraryName, &libStat);
                     if (libStat.st_nlink > 0 && (intmax_t)libStat.st_size == librarySize){
                         usleep(50); //otherwise the file is not yet 'done' being written on linux ;)
                         creationTime = (long long)libStat.st_ctime;
