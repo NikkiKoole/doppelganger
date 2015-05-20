@@ -7,6 +7,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+
+#include <sys/inotify.h>
+
 #include "memory.h"
 #define internal static
 
@@ -22,6 +25,7 @@ SDL_Renderer* renderer = NULL;
 
 void* myHandle = NULL;
 char* libraryName = "./libgame.so";
+int librarySize;
 struct stat libStat;
 
 char* myFunctionName = "game_update_and_render";
@@ -83,11 +87,8 @@ void loadEntryPointFunctionAndRun()
         printf("couldnt load:%s, error: %s\n",libraryName, SDL_GetError());
     }
     game_update_and_render = (void (*)(SDL_Renderer *, Memory *))SDL_LoadFunction(myHandle, myFunctionName);
-    stat(libraryName, &libStat);
-
-    // TODO instead of this long long madness try to handle the timestamp more safely
-    creationTime = (long long)libStat.st_mtime;
-
+    
+    //printf("size of lib: %d\n", libStat.st_size);
     if (game_update_and_render != NULL) {
         game_update_and_render(renderer, &mem);
     } else {
@@ -100,15 +101,16 @@ void loadEntryPointFunctionAndRun()
 
 int main()
 {
-
-
-
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
         bool quit = false;
         SDL_Event e;
+        stat(libraryName, &libStat);
+        librarySize = (intmax_t)libStat.st_size;
+        creationTime = (long long)libStat.st_ctime;
         loadEntryPointFunctionAndRun();
+
         while( !quit ) {
             while( SDL_PollEvent( &e ) != 0 ) {
                 if( e.type == SDL_QUIT ) {
@@ -120,7 +122,6 @@ int main()
                         break;
                     case SDLK_r:
                         printf("doing stuff here too you know");
-                        // this just runs the terminal command
                         system("make game");
                     default:
                         break;
@@ -129,8 +130,13 @@ int main()
             }
 
             stat(libraryName, &libStat);
-            if ((long long)libStat.st_mtime != creationTime) {
-                loadEntryPointFunctionAndRun();
+            if ((long long)libStat.st_ctime != creationTime) {
+                    stat(libraryName, &libStat);
+                    if (libStat.st_nlink > 0 && (intmax_t)libStat.st_size == librarySize){
+                        usleep(10); //otherwise the file is not yet 'done' being written on linux ;)
+                        creationTime = (long long)libStat.st_ctime;
+                        loadEntryPointFunctionAndRun();
+                    }
             }
         }
     }

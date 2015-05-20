@@ -29,6 +29,7 @@ clean:
 	rm *.o *.so doppel
 
 fswatch:
+	# this will only work on osx, for linux run the separate notify.sh
 	fswatch-run ./source "make game"
 
 all:game main
