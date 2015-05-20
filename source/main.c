@@ -61,7 +61,7 @@ internal bool init()
     }
 
     return true;
-SDL_Error:
+  SDL_Error:
     printf("Error in %s, SDl_Error: %s\n", __FUNCTION__, SDL_GetError());
     return false;
 }
@@ -70,11 +70,11 @@ SDL_Error:
 void loadEntryPointFunctionAndRun()
 {
     printf("loading %s.\n",libraryName);
-	if (myHandle){
+	if (myHandle) {
         SDL_UnloadObject(myHandle);
     }
     myHandle = SDL_LoadObject(libraryName);
-    if (!myHandle){
+    if (!myHandle) {
         printf("couldnt load:%s, error: %s\n",libraryName, SDL_GetError());
     }
     game_update_and_render = (void (*)(SDL_Renderer *))SDL_LoadFunction(myHandle, myFunctionName);
@@ -92,39 +92,36 @@ void loadEntryPointFunctionAndRun()
 }
 
 
+
+
 int main()
 {
-    if( !init() )
-        {
-            printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
-        }
-	else
-        {
-            bool quit = false;
-            SDL_Event e;
-            loadEntryPointFunctionAndRun();
-            while( !quit )
-                {
-                    while( SDL_PollEvent( &e ) != 0 )
-                        {
-                            if( e.type == SDL_QUIT ) {
-                                quit = true;
-                            }  else if (e.type == SDL_KEYDOWN) {
-                                switch(e.key.keysym.sym) {
-                                case SDLK_ESCAPE:
-                                    quit = true;
-                                    break;
-                                default:
-                                    break;
-                                }
-                            }
-                        }
-
-                    stat(libraryName, &libStat);
-                    if ((long long)libStat.st_mtime != creationTime){
-                        loadEntryPointFunctionAndRun();
+    if( !init() ) {
+        printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
+    } else {
+        bool quit = false;
+        SDL_Event e;
+        loadEntryPointFunctionAndRun();
+        while( !quit ) {
+            while( SDL_PollEvent( &e ) != 0 ) {
+                if( e.type == SDL_QUIT ) {
+                    quit = true;
+                }  else if (e.type == SDL_KEYDOWN) {
+                    switch(e.key.keysym.sym) {
+                    case SDLK_ESCAPE:
+                        quit = true;
+                        break;
+                    default:
+                        break;
                     }
                 }
+            }
+
+            stat(libraryName, &libStat);
+            if ((long long)libStat.st_mtime != creationTime) {
+                loadEntryPointFunctionAndRun();
+            }
         }
+    }
 	closeGame();
 }
