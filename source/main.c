@@ -92,40 +92,39 @@ void loadEntryPointFunctionAndRun()
 }
 
 
-int main(){
+int main()
+{
     if( !init() )
-	{
-		printf( "Failed to initialize!\n" );
-	}
+        {
+            printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
+        }
 	else
-	{
-        bool quit = false;
-        SDL_Event e;
-        loadEntryPointFunctionAndRun();
-
-        while( !quit )
-		{
-			while( SDL_PollEvent( &e ) != 0 )
-            {
-                if( e.type == SDL_QUIT )
+        {
+            bool quit = false;
+            SDL_Event e;
+            loadEntryPointFunctionAndRun();
+            while( !quit )
                 {
-                    quit = true;
-                }  else if (e.type == SDL_KEYDOWN) {
-                    switch(e.key.keysym.sym) {
-                    case SDLK_ESCAPE:
-                        quit = true;
-                        break;
-                    default:
-                        break;
+                    while( SDL_PollEvent( &e ) != 0 )
+                        {
+                            if( e.type == SDL_QUIT ) {
+                                quit = true;
+                            }  else if (e.type == SDL_KEYDOWN) {
+                                switch(e.key.keysym.sym) {
+                                case SDLK_ESCAPE:
+                                    quit = true;
+                                    break;
+                                default:
+                                    break;
+                                }
+                            }
+                        }
+
+                    stat(libraryName, &libStat);
+                    if ((long long)libStat.st_mtime != creationTime){
+                        loadEntryPointFunctionAndRun();
                     }
                 }
-
-                stat(libraryName, &libStat);
-                if ((long long)libStat.st_mtime != creationTime){
-                    loadEntryPointFunctionAndRun();
-                }
-            }
         }
-	}
 	closeGame();
 }
