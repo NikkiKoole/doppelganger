@@ -67,8 +67,6 @@ internal bool init()
         goto SDL_Error;
     }
 
-
-
     return true;
   SDL_Error:
     printf("Error in %s, SDl_Error: %s\n", __FUNCTION__, SDL_GetError());
@@ -86,9 +84,8 @@ void loadEntryPointFunctionAndRun()
     if (!myHandle) {
         printf("couldnt load:%s, error: %s\n",libraryName, SDL_GetError());
     }
+
     game_update_and_render = (void (*)(SDL_Renderer *, Memory *))SDL_LoadFunction(myHandle, myFunctionName);
-    
-    //printf("size of lib: %d\n", libStat.st_size);
     if (game_update_and_render != NULL) {
         game_update_and_render(renderer, &mem);
     } else {
@@ -133,7 +130,7 @@ int main()
             if ((long long)libStat.st_ctime != creationTime) {
                     stat(libraryName, &libStat);
                     if (libStat.st_nlink > 0 && (intmax_t)libStat.st_size == librarySize){
-                        usleep(10); //otherwise the file is not yet 'done' being written on linux ;)
+                        usleep(50); //otherwise the file is not yet 'done' being written on linux ;)
                         creationTime = (long long)libStat.st_ctime;
                         loadEntryPointFunctionAndRun();
                     }
