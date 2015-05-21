@@ -17,4 +17,5 @@ Notes to self
 -------------
 
 Compiling in Emacs (while working in the source folder):
-`make all -C =../`
+`make all --directory=../`
+
