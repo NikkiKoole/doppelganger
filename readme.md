@@ -12,3 +12,9 @@ On top of that it's a SDL backed engine based on the 'Lazy Foo tutorials'.
 
 
 - after fswatch is installed I run a `fswatch-run ./source "make game" ` in the root to auto update the lib on changes made.
+
+Notes
+-----
+
+Running compile in emacs, when I am in the source folder and want to build all. The compile command should be:
+`make all --directory=../`

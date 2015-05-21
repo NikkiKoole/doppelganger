@@ -18,7 +18,8 @@ MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
 # I've hidden the console output in game: with the @ sign
 
-game:
+
+libgame:
 	@($(CC) -c $(COMPILER_FLAGS) -fpic $(LIB_FILES))
 	@($(CC) -shared -o $(LIBRARY_NAME) game.o tile.o $(LIBRARY_PATH) $(LD_FLAGS))
 
@@ -30,6 +31,6 @@ clean:
 
 fswatch:
 	# this will only work on osx, for linux run the separate notify.sh
-	fswatch-run ./source "make game"
+	fswatch-run ./source "make libgame"
 
-all:game main
+all:libgame main

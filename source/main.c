@@ -6,11 +6,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
-
-#include <sys/inotify.h>
-
 #include "memory.h"
+
 #define internal static
 
 const int SCREEN_WIDTH = 640;
@@ -23,14 +20,25 @@ internal void closeGame();
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
-void* myHandle = NULL;
-char* libraryName = "./libgame.so";
-int librarySize;
-struct stat libStat;
+typedef struct LibGame
+{
+    void* handle;
+    char* name;
+    long long creation_time;
+    int size;
+    char* fn_name;
+    struct stat stats;
+} LibGame;
 
-char* myFunctionName = "game_update_and_render";
+LibGame libgame = {
+    .handle = NULL,
+    .name = "./libgame.so",
+    .creation_time = 0,
+    .size = 0,
+    .fn_name = "game_update_and_render"
+};
+
 void (*game_update_and_render)(SDL_Renderer *, Memory *);
-long long creationTime;
 
 Memory mem = {.a = 100};
 
@@ -74,28 +82,33 @@ internal bool init()
 }
 
 
-void loadEntryPointFunctionAndRun()
+internal void maybe_load_libgame()
 {
-	if (myHandle) {
-        SDL_UnloadObject(myHandle);
+    stat(libgame.name, &libgame.stats);
+    if (libgame.size == 0) {
+        libgame.size = (intmax_t)libgame.stats.st_size;
     }
-    myHandle = SDL_LoadObject(libraryName);
-    if (!myHandle) {
-        printf("couldnt load:%s, error: %s\n",libraryName, SDL_GetError());
-    }
-
-    game_update_and_render = (void (*)(SDL_Renderer *, Memory *))SDL_LoadFunction(myHandle, myFunctionName);
-    if (game_update_and_render != NULL) {
-        game_update_and_render(renderer, &mem);
-    } else {
-        printf("couldnt run: %s, error: %s\n",myFunctionName, SDL_GetError());
+    if ((long long)libgame.stats.st_ctime != libgame.creation_time) {
+        if (libgame.stats.st_nlink > 0 && (intmax_t)libgame.stats.st_size == libgame.size){
+            usleep(50); //otherwise the file is not yet 'done' being written on linux ;)
+            libgame.creation_time = (long long)libgame.stats.st_ctime;
+            if (libgame.handle) {
+                SDL_UnloadObject(libgame.handle);
+            }
+            libgame.handle = SDL_LoadObject(libgame.name);
+            if (!libgame.handle) {
+                printf("couldnt load:%s, error: %s\n",libgame.name, SDL_GetError());
+            } else {
+                game_update_and_render = (void (*)(SDL_Renderer *, Memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
+                if (game_update_and_render != NULL) {
+                    game_update_and_render(renderer, &mem);
+                } else {
+                    printf("couldnt run: %s, error: %s\n",libgame.fn_name, SDL_GetError());
+                }
+            }
+        }
     }
 }
-
-void checkForReload(){
-
-}
-
 
 int main()
 {
@@ -104,11 +117,7 @@ int main()
     } else {
         bool quit = false;
         SDL_Event e;
-        stat(libraryName, &libStat);
-        librarySize = (intmax_t)libStat.st_size;
-        creationTime = (long long)libStat.st_ctime;
-        loadEntryPointFunctionAndRun();
-
+        maybe_load_libgame();
         while( !quit ) {
             while( SDL_PollEvent( &e ) != 0 ) {
                 if( e.type == SDL_QUIT ) {
@@ -120,21 +129,14 @@ int main()
                         break;
                     case SDLK_r:
                         printf("doing stuff here too you know");
-                        system("make game");
+                        system("make libgame");
                     default:
                         break;
                     }
                 }
             }
-
-            stat(libraryName, &libStat);
-            if ((long long)libStat.st_ctime != creationTime) {
-                    if (libStat.st_nlink > 0 && (intmax_t)libStat.st_size == librarySize){
-                        usleep(50); //otherwise the file is not yet 'done' being written on linux ;)
-                        creationTime = (long long)libStat.st_ctime;
-                        loadEntryPointFunctionAndRun();
-                    }
-            }
+            maybe_load_libgame();
+            //game_update_and_render(renderer, &mem);
         }
     }
 	closeGame();
