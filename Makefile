@@ -10,7 +10,7 @@ CC := gcc
 STD_FLAGS := -std=gnu99
 COMPILER_FLAGS :=  -Wall -Werror
 
-LFILES := game.c tile.c
+LFILES := game.c texture.c
 LIB_FILES += $(foreach file, $(LFILES), source/$(file))
 
 MFILES := main.c
@@ -20,8 +20,9 @@ MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
 
 libgame:
+	#libgame built
 	@($(CC) -c $(COMPILER_FLAGS) -fpic $(LIB_FILES))
-	@($(CC) -shared -o $(LIBRARY_NAME) game.o tile.o $(LIBRARY_PATH) $(LD_FLAGS))
+	@($(CC) -shared -o $(LIBRARY_NAME) game.o texture.o $(LIBRARY_PATH) $(LD_FLAGS))
 
 main:
 	# this will build the main application.

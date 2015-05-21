@@ -1,14 +1,9 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
+#include <sys/mman.h> //mmap
+#include <unistd.h> //usleep
 #include "memory.h"
-
-#define internal static
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -20,27 +15,9 @@ internal void closeGame();
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 
-typedef struct LibGame
-{
-    void* handle;
-    char* name;
-    long long creation_time;
-    int size;
-    char* fn_name;
-    struct stat stats;
-} LibGame;
+void (*game_update_and_render)(SDL_Renderer *, game_memory *);
 
-LibGame libgame = {
-    .handle = NULL,
-    .name = "./libgame.so",
-    .creation_time = 0,
-    .size = 0,
-    .fn_name = "game_update_and_render"
-};
-
-void (*game_update_and_render)(SDL_Renderer *, Memory *);
-
-Memory mem = {.a = 100};
+game_memory GameMemory = {};
 
 internal void closeGame()
 {
@@ -81,6 +58,13 @@ internal bool init()
     return false;
 }
 
+shared_library libgame = {
+    .handle = NULL,
+    .name = "./libgame.so",
+    .creation_time = 0,
+    .size = 0,
+    .fn_name = "game_update_and_render"
+};
 
 internal void maybe_load_libgame()
 {
@@ -88,10 +72,10 @@ internal void maybe_load_libgame()
     if (libgame.size == 0) {
         libgame.size = (intmax_t)libgame.stats.st_size;
     }
-    if ((long long)libgame.stats.st_ctime != libgame.creation_time) {
+    if ((intmax_t)libgame.stats.st_ctime != libgame.creation_time) {
         if (libgame.stats.st_nlink > 0 && (intmax_t)libgame.stats.st_size == libgame.size){
             usleep(50); //otherwise the file is not yet 'done' being written on linux ;)
-            libgame.creation_time = (long long)libgame.stats.st_ctime;
+            libgame.creation_time = (intmax_t)libgame.stats.st_ctime;
             if (libgame.handle) {
                 SDL_UnloadObject(libgame.handle);
             }
@@ -99,9 +83,9 @@ internal void maybe_load_libgame()
             if (!libgame.handle) {
                 printf("couldnt load:%s, error: %s\n",libgame.name, SDL_GetError());
             } else {
-                game_update_and_render = (void (*)(SDL_Renderer *, Memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
+                game_update_and_render = (void (*)(SDL_Renderer *, game_memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
                 if (game_update_and_render != NULL) {
-                    game_update_and_render(renderer, &mem);
+                    game_update_and_render(renderer, &GameMemory);
                 } else {
                     printf("couldnt run: %s, error: %s\n",libgame.fn_name, SDL_GetError());
                 }
@@ -117,7 +101,22 @@ int main()
     } else {
         bool quit = false;
         SDL_Event e;
+
+        void *BaseAddress = (void *) Gigabytes(1);
+
+        GameMemory.PermanentStorageSize = Megabytes(64);
+        GameMemory.TransientStorageSize = Gigabytes(1);
+
+        uint64 TotalStorageSize = GameMemory.PermanentStorageSize + GameMemory.TransientStorageSize;
+        GameMemory.PermanentStorage = mmap(BaseAddress, TotalStorageSize,
+                                           PROT_READ | PROT_WRITE,
+                                           MAP_ANON | MAP_PRIVATE,
+                                           -1, 0);
+        GameMemory.TransientStorage = (uint8*)(GameMemory.PermanentStorage) + GameMemory.PermanentStorageSize;
+        GameMemory.isInitialized = false;
         maybe_load_libgame();
+
+
         while( !quit ) {
             while( SDL_PollEvent( &e ) != 0 ) {
                 if( e.type == SDL_QUIT ) {
@@ -136,7 +135,7 @@ int main()
                 }
             }
             maybe_load_libgame();
-            //game_update_and_render(renderer, &mem);
+            game_update_and_render(renderer, &GameMemory);
         }
     }
 	closeGame();
