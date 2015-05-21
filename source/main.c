@@ -89,10 +89,8 @@ internal void maybe_load_libgame()
                 printf("couldnt load:%s, error: %s\n",libgame.name, SDL_GetError());
             } else {
                 game_update_and_render = (void (*)(SDL_Renderer *, game_memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
-                if (game_update_and_render != NULL) {
-                    game_update_and_render(renderer, &GameMemory);
-                } else {
-                    printf("couldnt run: %s, error: %s\n",libgame.fn_name, SDL_GetError());
+                if (game_update_and_render == NULL) {
+                    printf("couldnt find: %s, error: %s\n",libgame.fn_name, SDL_GetError());
                 }
             }
         }

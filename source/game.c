@@ -43,7 +43,7 @@ void game_update_and_render(SDL_Renderer *Renderer, game_memory *Memory)
     SDL_SetRenderDrawColor( Renderer, 0x00, 0xAA, 0x99, 0xFF );
     SDL_RenderClear( Renderer );
 
-    for (int i = 0; i<200; i+=1) {
+    for (int i = 0; i<100; i+=1) {
         texture_set_color((GameState->tex1), i*2, 0xFF-i, i*7);
         texture_set_alpha((GameState->tex1), i);
         texture_render((GameState->tex1), 100+i, 100+i*2, Renderer);
