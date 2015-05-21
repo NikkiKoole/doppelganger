@@ -13,7 +13,7 @@ COMPILER_FLAGS :=  -Wall -Werror
 LFILES := game.c texture.c
 LIB_FILES += $(foreach file, $(LFILES), source/$(file))
 
-MFILES := main.c
+MFILES := main.c texture.c
 MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
 # I've hidden the console output in game: with the @ sign

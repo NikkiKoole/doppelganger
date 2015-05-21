@@ -2,6 +2,7 @@
 #include "memory.h"
 #include "texture.h"
 
+char texture1[] = "resources/image.png";
 
 #define PushStruct(Arena, type) (type *)PushSize_(Arena, sizeof(type))
 #define PushArray(Arena, count, type) (type *)PushSize_(Arena, (count)*sizeof(type))
@@ -29,15 +30,27 @@ void game_update_and_render(SDL_Renderer *Renderer, game_memory *Memory)
                         Memory->PermanentStorageSize - sizeof(game_state),
                         (uint8 *)Memory->PermanentStorage + sizeof(game_state));
         GameState->tex1 = (texture*) PushStruct(&GameState->WorldArena, texture);
-        init_texture(GameState->tex1);
-        texture_load_from_file((GameState->tex1), "resources/image.png", Renderer);
+        texture_load_from_file((GameState->tex1), texture1, Renderer);
         Memory->isInitialized = true;
     }
 
-    SDL_SetRenderDrawColor( Renderer, 0x00, 0x00, 0xFF, 0xAA );
+    if (Memory->wantsTextureRefresh) {
+        Assert(GameState->tex1);
+        texture_load_from_file((GameState->tex1), texture1, Renderer);
+        Memory->wantsTextureRefresh = false;
+    }
+
+    SDL_SetRenderDrawColor( Renderer, 0x00, 0xAA, 0x99, 0xFF );
     SDL_RenderClear( Renderer );
-    texture_render((GameState->tex1), 210, 130, Renderer);
-    texture_render((GameState->tex1), 10, 30, Renderer);
+
+    for (int i = 0; i<200; i+=1) {
+        texture_set_color((GameState->tex1), i*2, 0xFF-i, i*7);
+        texture_set_alpha((GameState->tex1), i);
+        texture_render((GameState->tex1), 100+i, 100+i*2, Renderer);
+        texture_set_alpha((GameState->tex1), 255-i*3);
+        texture_set_color((GameState->tex1), 0xFF*10*i, 0xFF*10*i, 0xFF);
+        texture_render((GameState->tex1), 10, 0+i, Renderer);
+    }
     SDL_RenderPresent( Renderer );
 
 }

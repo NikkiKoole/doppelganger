@@ -1,7 +1,5 @@
 #!/bin/bash
 while true #run indefinitely
-do 
-#inotifywait -r -e modify,attrib,close_write,move,create,delete ./source && make game
-inotifywait -qq -r -e close_write ./source && make game
-
+do
+inotifywait -qq -r -e close_write ./source && make libgame
 done

@@ -4,9 +4,11 @@
 #include <sys/mman.h> //mmap
 #include <unistd.h> //usleep
 #include "memory.h"
+#include "defines.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
 char* TITLE = "DoppelGangers";
 
 internal bool init();
@@ -114,8 +116,8 @@ int main()
                                            -1, 0);
         GameMemory.TransientStorage = (uint8*)(GameMemory.PermanentStorage) + GameMemory.PermanentStorageSize;
         GameMemory.isInitialized = false;
+        GameMemory.wantsTextureRefresh = false;
         maybe_load_libgame();
-
 
         while( !quit ) {
             while( SDL_PollEvent( &e ) != 0 ) {
@@ -126,9 +128,9 @@ int main()
                     case SDLK_ESCAPE:
                         quit = true;
                         break;
-                    case SDLK_r:
-                        printf("doing stuff here too you know");
-                        system("make libgame");
+                    case SDLK_F5:
+                        GameMemory.wantsTextureRefresh = true;
+                        break;
                     default:
                         break;
                     }

@@ -1,5 +1,4 @@
 #include "texture.h"
-//#include <SDL2/SDL.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL_image.h>
@@ -7,6 +6,7 @@
 bool texture_load_from_file(texture* t, char* path, SDL_Renderer* renderer)
 {
     texture_free(t);
+
     SDL_Texture* new_texture = NULL;
     SDL_Surface* loaded_surface = IMG_Load(path);
     if (loaded_surface == NULL){
@@ -30,6 +30,7 @@ bool texture_load_from_file(texture* t, char* path, SDL_Renderer* renderer)
     return t->tex != NULL;
 }
 
+
 void init_texture(texture* t)
 {
     t->width = 0;
@@ -49,6 +50,20 @@ void texture_free(texture* t)
 void texture_destroy(texture* t)
 {
     texture_free(t);
+}
+
+void texture_set_color(texture* t, uint8 Red, uint8 Green, uint8 Blue)
+{
+    SDL_SetTextureColorMod(t->tex, Red, Green, Blue );
+}
+
+void texture_set_blend_mode(texture* t, SDL_BlendMode mode)
+{
+    SDL_SetTextureBlendMode(t->tex, mode);
+}
+void texture_set_alpha(texture* t, uint8 alpha)
+{
+    SDL_SetTextureAlphaMod(t->tex, alpha);
 }
 
 void texture_render(texture* t, int x,int y, SDL_Renderer* renderer)
