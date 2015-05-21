@@ -4,6 +4,12 @@ Doppelgangers
 
 A simple C engine specifically tailored for my own hobby project.
 
+
+
+![Alt text](/resources/familiars.jpg?raw=true "Witch and her familiars")
+
+
+
 At the basis it follows some principles from 'Handmade Hero';
 - live coding loop.
 - all memory is pre-allocated and at fixed adresses.
