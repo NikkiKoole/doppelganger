@@ -4,7 +4,6 @@
 
 char texture1[] = "resources/image.png";
 
-
 #define PushStruct(Arena, type) (type *)PushSize_(Arena, sizeof(type))
 #define PushArray(Arena, count, type) (type *)PushSize_(Arena, (count)*sizeof(type))
 void* PushSize_(memory_arena *Arena, memory_index Size){
@@ -44,7 +43,7 @@ void game_update_and_render(SDL_Renderer *Renderer, game_memory *Memory)
         Memory->wantsTextureRefresh = false;
     }
 
-    GameState->angle1+= .059;
+    GameState->angle1+= .225;
 
     SDL_SetRenderDrawColor( Renderer, 0x00, 0x11, 0x99, 0xFF );
     SDL_RenderClear( Renderer );

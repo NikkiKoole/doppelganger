@@ -69,15 +69,11 @@ shared_library libgame = {
 
 void stub(SDL_Renderer *Renderer, game_memory *Memory)
 {
-    usleep(10);
-    printf("stub will reload.\n");
+    usleep(10000);
 }
 
 internal void maybe_load_libgame()
 {
-    // this will load libgame when timestamps differ
-    // this happens initially and everytime the libgamne is rewritten.
-
     stat(libgame.name, &libgame.stats);
     if (libgame.stats.st_ino != libgame.id){
         if ((intmax_t)libgame.stats.st_size > 0 && libgame.stats.st_nlink > 0) {
