@@ -70,6 +70,9 @@ shared_library libgame = {
 
 internal void maybe_load_libgame()
 {
+    // this will load libgame when timestamps differ
+    // this happens initially and everytime the libgamne is rewritten.
+
     stat(libgame.name, &libgame.stats);
     if (libgame.size == 0) {
         libgame.size = (intmax_t)libgame.stats.st_size;
@@ -96,6 +99,22 @@ internal void maybe_load_libgame()
     }
 }
 
+void initialize_memory()
+{
+    void *BaseAddress = (void *) Gigabytes(1);
+    GameMemory.PermanentStorageSize = Megabytes(64);
+    GameMemory.TransientStorageSize = Gigabytes(1);
+
+    uint64 TotalStorageSize = GameMemory.PermanentStorageSize + GameMemory.TransientStorageSize;
+    GameMemory.PermanentStorage = mmap(BaseAddress, TotalStorageSize,
+                                       PROT_READ | PROT_WRITE,
+                                       MAP_ANON | MAP_PRIVATE,
+                                       -1, 0);
+    GameMemory.TransientStorage = (uint8*)(GameMemory.PermanentStorage) + GameMemory.PermanentStorageSize;
+    GameMemory.isInitialized = false;
+    GameMemory.wantsTextureRefresh = false;
+}
+
 int main()
 {
     if( !init() ) {
@@ -104,19 +123,7 @@ int main()
         bool quit = false;
         SDL_Event e;
 
-        void *BaseAddress = (void *) Gigabytes(1);
-
-        GameMemory.PermanentStorageSize = Megabytes(64);
-        GameMemory.TransientStorageSize = Gigabytes(1);
-
-        uint64 TotalStorageSize = GameMemory.PermanentStorageSize + GameMemory.TransientStorageSize;
-        GameMemory.PermanentStorage = mmap(BaseAddress, TotalStorageSize,
-                                           PROT_READ | PROT_WRITE,
-                                           MAP_ANON | MAP_PRIVATE,
-                                           -1, 0);
-        GameMemory.TransientStorage = (uint8*)(GameMemory.PermanentStorage) + GameMemory.PermanentStorageSize;
-        GameMemory.isInitialized = false;
-        GameMemory.wantsTextureRefresh = false;
+        initialize_memory();
         maybe_load_libgame();
 
         while( !quit ) {
