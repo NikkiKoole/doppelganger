@@ -21,7 +21,7 @@ MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
 libgame:
 	#libgame built
-	@($(CC) -c $(COMPILER_FLAGS) -fpic $(LIB_FILES))
+	@($(CC) -c $(COMPILER_FLAGS) $(STD_FLAGS) -fpic $(LIB_FILES))
 	@($(CC) -shared -o $(LIBRARY_NAME) game.o texture.o $(LIBRARY_PATH) $(LD_FLAGS))
 
 main:

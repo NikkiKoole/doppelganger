@@ -4,6 +4,7 @@
 
 char texture1[] = "resources/image.png";
 
+
 #define PushStruct(Arena, type) (type *)PushSize_(Arena, sizeof(type))
 #define PushArray(Arena, count, type) (type *)PushSize_(Arena, (count)*sizeof(type))
 void* PushSize_(memory_arena *Arena, memory_index Size){
@@ -20,6 +21,7 @@ void InitializeArena(memory_arena *Arena, memory_index Size, uint8 *Base)
     Arena->Used = 0;
 }
 
+
 void game_update_and_render(SDL_Renderer *Renderer, game_memory *Memory)
 {
     Assert(sizeof(game_state) <= Memory->PermanentStorageSize);
@@ -29,8 +31,10 @@ void game_update_and_render(SDL_Renderer *Renderer, game_memory *Memory)
         InitializeArena(&GameState->WorldArena,
                         Memory->PermanentStorageSize - sizeof(game_state),
                         (uint8 *)Memory->PermanentStorage + sizeof(game_state));
+        GameState->angle1 = 0;
         GameState->tex1 = (texture*) PushStruct(&GameState->WorldArena, texture);
         texture_load_from_file((GameState->tex1), texture1, Renderer);
+        
         Memory->isInitialized = true;
     }
 
@@ -40,17 +44,17 @@ void game_update_and_render(SDL_Renderer *Renderer, game_memory *Memory)
         Memory->wantsTextureRefresh = false;
     }
 
-    SDL_SetRenderDrawColor( Renderer, 0x00, 0xAA, 0x99, 0xFF );
+    GameState->angle1+= .059;
+
+    SDL_SetRenderDrawColor( Renderer, 0x00, 0x11, 0x99, 0xFF );
     SDL_RenderClear( Renderer );
-
-    for (int i = 0; i<100; i+=1) {
-        texture_set_color((GameState->tex1), i*2, 0xFF-i, i*7);
-        texture_set_alpha((GameState->tex1), i);
-        texture_render((GameState->tex1), 100+i, 100+i*2, Renderer);
-        texture_set_alpha((GameState->tex1), 255-i*3);
-        texture_set_color((GameState->tex1), 0xFF*10*i, 0xFF*10*i, 0xFF);
-        texture_render((GameState->tex1), 10, 0+i, Renderer);
-    }
+    texture_set_color((GameState->tex1), 0xFF, 0xF, 0xFF);
+    texture_set_alpha((GameState->tex1), 180);
+    texture_render((GameState->tex1), 100, 100, Renderer);
+    
+    texture_set_color((GameState->tex1), 0x00, 0xAA, 0x00);
+    texture_set_alpha((GameState->tex1), 250);
+    texture_render_ex((GameState->tex1), 400, 100, NULL, GameState->angle1 , NULL, SDL_FLIP_NONE,  Renderer);
     SDL_RenderPresent( Renderer );
-
 }
+

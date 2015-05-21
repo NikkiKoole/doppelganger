@@ -31,7 +31,7 @@ bool texture_load_from_file(texture* t, char* path, SDL_Renderer* renderer)
 }
 
 
-void init_texture(texture* t)
+void texture_init(texture* t)
 {
     t->width = 0;
     t->height = 0;
@@ -70,4 +70,16 @@ void texture_render(texture* t, int x,int y, SDL_Renderer* renderer)
 {
     SDL_Rect render_quad = {x,y, t->width, t->height};
     SDL_RenderCopy(renderer, t->tex, NULL, &render_quad);
+}
+
+void texture_render_ex(texture* t, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Renderer* renderer)
+{
+    SDL_Rect render_quad = {x, y, t->width, t->height};
+    
+    if (clip != NULL){
+        render_quad.w = clip->w;
+        render_quad.h = clip->h;
+    }
+
+    SDL_RenderCopyEx( renderer, t->tex, clip, &render_quad, angle, center, flip );
 }

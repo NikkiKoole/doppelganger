@@ -14,6 +14,7 @@ typedef struct shared_library
     void* handle;
     char* name;
     intmax_t creation_time;
+    int id;
     int size;
     char* fn_name;
     struct stat stats;
@@ -43,6 +44,7 @@ typedef struct memory_arena
 typedef struct game_state
 {
     memory_arena WorldArena;
+    double angle1;
     texture* tex1;
 } game_state;
 
