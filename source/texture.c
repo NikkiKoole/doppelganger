@@ -3,26 +3,41 @@
 #include <stdbool.h>
 #include <SDL2/SDL_image.h>
 
-bool texture_load_from_file(texture* t, char* path, SDL_Renderer* renderer)
+
+bool texture_load_from_file(texture* t, char* path, SDL_Renderer* renderer, SDL_Window* window)
 {
     texture_free(t);
 
     SDL_Texture* new_texture = NULL;
     SDL_Surface* loaded_surface = IMG_Load(path);
+    
     if (loaded_surface == NULL){
         printf("Unable to load image %s! SDL_Error: %s\n", path, SDL_GetError());
     }
     else
     {
-        SDL_SetColorKey(loaded_surface,
-                        SDL_TRUE,
-                        SDL_MapRGB(loaded_surface->format, 0, 0xFF, 0xFF));
-        new_texture = SDL_CreateTextureFromSurface(renderer, loaded_surface);
-        if (new_texture == NULL){
-            printf("Unable to create texture from %s! SDL_Error: %s\n", path, SDL_GetError());
+        SDL_Surface* formatted_surface = SDL_ConvertSurfaceFormat( loaded_surface, SDL_PIXELFORMAT_RGBA8888, 0 );
+        if (formatted_surface == NULL) {
+           printf("Unable to convert loaded surface to display format!, SDL_Error: %s\n", SDL_GetError());
         } else {
-            t->width = loaded_surface->w;
-            t->height = loaded_surface->h;
+            new_texture = SDL_CreateTexture(renderer,
+                                            SDL_PIXELFORMAT_RGBA8888,
+                                            SDL_TEXTUREACCESS_STREAMING,
+                                            formatted_surface->w,
+                                            formatted_surface->h);
+            if (new_texture == NULL) {
+                printf("Unable to create blank texture error: %s\n", SDL_GetError());
+            } else {
+                SDL_SetTextureBlendMode( new_texture, SDL_BLENDMODE_BLEND );
+
+                SDL_LockTexture(new_texture, NULL, &t->pixels, &t->pitch);
+                memcpy(t->pixels, formatted_surface->pixels, formatted_surface->pitch*formatted_surface->h);
+                SDL_UnlockTexture(new_texture);
+                t->pixels = NULL;
+                t->width = formatted_surface->w;
+                t->height = formatted_surface->h;
+            }
+            SDL_FreeSurface(formatted_surface);
         }
         SDL_FreeSurface(loaded_surface);
     }
@@ -83,3 +98,36 @@ void texture_render_ex(texture* t, int x, int y, SDL_Rect* clip, double angle, S
 
     SDL_RenderCopyEx( renderer, t->tex, clip, &render_quad, angle, center, flip );
 }
+
+bool texture_lock(texture* t)
+{
+    bool success = true;
+    if (t->pixels != NULL) {
+        printf("Texture is already locked!\n");
+        success = false;
+    } else {
+        if (SDL_LockTexture(t->tex, NULL, &t->pixels, &t->pitch) != 0) {
+            printf("Unable to lock texture! %s\n", SDL_GetError());
+            success = false;
+        }
+    }
+    return success;
+}
+bool texture_unlock(texture* t) 
+{
+    bool success = true;
+    if (t->pixels == NULL) {
+        printf("Texture is not locked!\n");
+        success = false;
+    } else {
+        SDL_UnlockTexture(t->tex);
+        t->pixels = NULL;
+        t->pitch = 0;
+    }
+    return success;
+}
+
+
+
+
+

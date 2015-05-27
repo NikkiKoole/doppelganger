@@ -1,5 +1,5 @@
-#ifndef MEMORY_H__
-#define MEMORY_H__
+#ifndef MEMORY_H
+#define MEMORY_H
 
 #include <sys/stat.h>   //struct stat
 #include <sys/types.h>  //struct stat
@@ -31,6 +31,8 @@ typedef struct game_memory
     uint32 TransientStorageSize;
 	void *TransientStorage;
 } game_memory;
+
+//extern game_memory* Memory;
 
 typedef struct memory_arena
 {

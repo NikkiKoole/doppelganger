@@ -5,6 +5,7 @@
 #include <unistd.h> //usleep
 #include "memory.h"
 #include "defines.h"
+#include "internals.h"
 
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
@@ -13,19 +14,19 @@ char* TITLE = "DoppelGangers";
 internal bool init();
 internal void closeGame();
 
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
+screen_container global_screen;
+screen_container* screen = &global_screen;
 
-void (*game_update_and_render)(SDL_Renderer *, game_memory *);
+void (*game_update_and_render)(screen_container *, game_memory *);
 
-game_memory GameMemory = {};
+game_memory Memory = {};
 
 internal void closeGame()
 {
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    window = NULL;
-    renderer = NULL;
+    SDL_DestroyRenderer(screen->renderer);
+    SDL_DestroyWindow(screen->window);
+    screen->window = NULL;
+    screen->renderer = NULL;
     IMG_Quit();
     SDL_Quit();
 }
@@ -34,7 +35,7 @@ internal bool init()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) goto SDL_Error;
 
-    window = SDL_CreateWindow( TITLE,
+    SDL_Window* window = SDL_CreateWindow( TITLE,
                                SDL_WINDOWPOS_UNDEFINED,
                                SDL_WINDOWPOS_UNDEFINED,
                                SCREEN_WIDTH,
@@ -42,10 +43,13 @@ internal bool init()
                                SDL_WINDOW_SHOWN);
 
     if (window == NULL) goto SDL_Error;
+    screen->window = window;
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL) goto SDL_Error;
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0xFF, 0xFF);
+    screen->renderer = renderer;
+
+    SDL_SetRenderDrawColor(screen->renderer, 0xFF, 0x00, 0xFF, 0xFF);
 
     int imgFlags = IMG_INIT_PNG;
     if (!(IMG_Init(imgFlags) & imgFlags)) {
@@ -67,7 +71,7 @@ shared_library libgame = {
     .fn_name = "game_update_and_render"
 };
 
-void stub(SDL_Renderer *Renderer, game_memory *Memory)
+void stub(screen_container* Screen, game_memory *Memory)
 {
     usleep(10000);
 }
@@ -88,7 +92,7 @@ internal void maybe_load_libgame()
                 printf("couldnt load:%s, error: %s\n",libgame.name, SDL_GetError());
                 game_update_and_render = stub;
             } else {
-                game_update_and_render = (void (*)(SDL_Renderer *, game_memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
+                game_update_and_render = (void (*)(screen_container *, game_memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
                 if (game_update_and_render == NULL) {
                     printf("couldnt find: %s, error: %s\n",libgame.fn_name, SDL_GetError());
                 } else {
@@ -102,17 +106,17 @@ internal void maybe_load_libgame()
 void initialize_memory()
 {
     void *BaseAddress = (void *) Gigabytes(1);
-    GameMemory.PermanentStorageSize = Megabytes(64);
-    GameMemory.TransientStorageSize = Gigabytes(1);
+    Memory.PermanentStorageSize = Megabytes(64);
+    Memory.TransientStorageSize = Gigabytes(1);
 
-    uint64 TotalStorageSize = GameMemory.PermanentStorageSize + GameMemory.TransientStorageSize;
-    GameMemory.PermanentStorage = mmap(BaseAddress, TotalStorageSize,
+    uint64 TotalStorageSize = Memory.PermanentStorageSize + Memory.TransientStorageSize;
+    Memory.PermanentStorage = mmap(BaseAddress, TotalStorageSize,
                                        PROT_READ | PROT_WRITE,
                                        MAP_ANON | MAP_PRIVATE,
                                        -1, 0);
-    GameMemory.TransientStorage = (uint8*)(GameMemory.PermanentStorage) + GameMemory.PermanentStorageSize;
-    GameMemory.isInitialized = false;
-    GameMemory.wantsTextureRefresh = false;
+    Memory.TransientStorage = (uint8*)(Memory.PermanentStorage) + Memory.PermanentStorageSize;
+    Memory.isInitialized = false;
+    Memory.wantsTextureRefresh = false;
 }
 
 int main()
@@ -136,7 +140,7 @@ int main()
                         quit = true;
                         break;
                     case SDLK_F5:
-                        GameMemory.wantsTextureRefresh = true;
+                        Memory.wantsTextureRefresh = true;
                         break;
                     default:
                         break;
@@ -144,7 +148,7 @@ int main()
                 }
             }
             maybe_load_libgame();
-            game_update_and_render(renderer, &GameMemory);
+            game_update_and_render(screen, &Memory);
 
         }
     }

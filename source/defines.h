@@ -1,5 +1,5 @@
-#ifndef DEFINES_H__
-#define DEFINES_H__
+#ifndef DEFINES_H
+#define DEFINES_H
 
 typedef int8_t int8;
 typedef int16_t int16;
