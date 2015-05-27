@@ -7,14 +7,14 @@ char texture1[] = "resources/image.png";
 #define push_struct(arena, type) (type *)push_size_(arena, sizeof(type))
 #define push_array(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
 
-void* push_size_(MemoryArena *arena, memory_index size){
+void* push_size_(Memory_Arena *arena, memory_index size){
     Assert(arena->used + size <= arena->size);
     void *result = arena->base + arena->used;
     arena->used += size;
     return result;
 }
 
-void initialize_arena(MemoryArena *arena, memory_index size, uint8 *base)
+void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base)
 {
     arena->size = size;
     arena->base = base;
@@ -26,13 +26,13 @@ void game_update_and_render(Screen* screen, Memory *memory)
 {
     SDL_Renderer* renderer = screen->renderer;
     SDL_Window* window = screen->window;
-    Assert(sizeof(GameState) <= memory->permanent_storage_size);
-    GameState *state = (GameState *)memory->permanent_storage;
+    Assert(sizeof(State) <= memory->permanent_storage_size);
+    State *state = (State *)memory->permanent_storage;
 
     if (!memory->is_initialized) {
         initialize_arena(&state->world_arena,
-                        memory->permanent_storage_size - sizeof(GameState),
-                        (uint8 *)memory->permanent_storage + sizeof(GameState));
+                        memory->permanent_storage_size - sizeof(State),
+                        (uint8 *)memory->permanent_storage + sizeof(State));
         state->angle1 = 0;
         state->tex1 = (Texture*) push_struct(&state->world_arena, Texture);
         texture_load_from_file((state->tex1), texture1, renderer, window);

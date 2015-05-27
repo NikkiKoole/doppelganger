@@ -23,6 +23,6 @@ typedef size_t memory_index;
 #define Gigabytes(value) (Megabytes(value)*1024LL)
 #define Terabytes(value) (Gigabytes(value)*1024LL)
 
-#define Assert(expression) if(!(expression)) {printf("\nASSERT FAILED in function %s on line:%d (%s)\n\n",__FUNCTION__, __LINE__, __FILE__);exit(0);}
+#define Assert(expression) if(!(expression)) {printf("\nASSERT FAIL: '%s' in function %s on line:%d (%s)\n\n",#expression, __FUNCTION__, __LINE__, __FILE__);exit(0);}
 
 #endif

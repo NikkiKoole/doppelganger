@@ -62,7 +62,7 @@ internal bool init()
     return false;
 }
 
-SharedLibrary libgame = {
+Shared_Library libgame = {
     .handle = NULL,
     .name = "./libgame.so",
     .creation_time = 0,
@@ -123,6 +123,7 @@ int main()
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
+        Assert(1 + 1 == 3);
         bool quit = false;
         SDL_Event e;
 

@@ -14,7 +14,7 @@ typedef struct Screen
     SDL_Window* window;
 } Screen;
 
-typedef struct SharedLibrary
+typedef struct Shared_Library
 {
     void* handle;
     char* name;
@@ -23,7 +23,7 @@ typedef struct SharedLibrary
     int size;
     char* fn_name;
     struct stat stats;
-} SharedLibrary;
+} Shared_Library;
 
 typedef struct Memory
 {
@@ -37,21 +37,21 @@ typedef struct Memory
 	void *transient_storage;
 } Memory;
 
-typedef struct MemoryArena
+typedef struct Memory_Arena
 {
     memory_index size;
     uint8 *base;
     memory_index used;
-} MemoryArena;
+} Memory_Arena;
 
 
 // TODO : expand this babe to greatness!
-typedef struct GameState
+typedef struct State
 {
-    MemoryArena world_arena;
+    Memory_Arena world_arena;
     double angle1;
     Texture* tex1;
-} GameState;
+} State;
 
 
 #endif
