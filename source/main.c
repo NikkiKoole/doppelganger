@@ -5,23 +5,22 @@
 #include <unistd.h> //usleep
 #include "memory.h"
 #include "defines.h"
-#include "internals.h"
 
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
 char* TITLE = "DoppelGangers";
 
 internal bool init();
-internal void closeGame();
+internal void close_game();
 
-screen_container global_screen;
-screen_container* screen = &global_screen;
+Screen global_screen;
+Screen* screen = &global_screen;
 
-void (*game_update_and_render)(screen_container *, game_memory *);
+void (*game_update_and_render)(Screen *, Memory *);
 
-game_memory Memory = {};
+Memory memory = {};
 
-internal void closeGame()
+internal void close_game()
 {
     SDL_DestroyRenderer(screen->renderer);
     SDL_DestroyWindow(screen->window);
@@ -51,8 +50,8 @@ internal bool init()
 
     SDL_SetRenderDrawColor(screen->renderer, 0xFF, 0x00, 0xFF, 0xFF);
 
-    int imgFlags = IMG_INIT_PNG;
-    if (!(IMG_Init(imgFlags) & imgFlags)) {
+    int img_flags = IMG_INIT_PNG;
+    if (!(IMG_Init(img_flags) & img_flags)) {
         printf("SDL_Image could not initialize");
         goto SDL_Error;
     }
@@ -63,7 +62,7 @@ internal bool init()
     return false;
 }
 
-shared_library libgame = {
+SharedLibrary libgame = {
     .handle = NULL,
     .name = "./libgame.so",
     .creation_time = 0,
@@ -71,7 +70,7 @@ shared_library libgame = {
     .fn_name = "game_update_and_render"
 };
 
-void stub(screen_container* Screen, game_memory *Memory)
+void stub(Screen* screen, Memory *memory)
 {
     usleep(10000);
 }
@@ -89,10 +88,10 @@ internal void maybe_load_libgame()
             if (!libgame.handle) {
                 libgame.handle = NULL;
                 libgame.id = 0;
-                printf("couldnt load:%s, error: %s\n",libgame.name, SDL_GetError());
+                printf("couldnt load:%s, error: %s\n", libgame.name, SDL_GetError());
                 game_update_and_render = stub;
             } else {
-                game_update_and_render = (void (*)(screen_container *, game_memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
+                game_update_and_render = (void (*)(Screen *, Memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
                 if (game_update_and_render == NULL) {
                     printf("couldnt find: %s, error: %s\n",libgame.fn_name, SDL_GetError());
                 } else {
@@ -105,18 +104,18 @@ internal void maybe_load_libgame()
 
 void initialize_memory()
 {
-    void *BaseAddress = (void *) Gigabytes(1);
-    Memory.PermanentStorageSize = Megabytes(64);
-    Memory.TransientStorageSize = Gigabytes(1);
+    void *base_address = (void *) Gigabytes(1);
+    memory.permanent_storage_size = Megabytes(64);
+    memory.transient_storage_size = Gigabytes(1);
 
-    uint64 TotalStorageSize = Memory.PermanentStorageSize + Memory.TransientStorageSize;
-    Memory.PermanentStorage = mmap(BaseAddress, TotalStorageSize,
-                                       PROT_READ | PROT_WRITE,
-                                       MAP_ANON | MAP_PRIVATE,
-                                       -1, 0);
-    Memory.TransientStorage = (uint8*)(Memory.PermanentStorage) + Memory.PermanentStorageSize;
-    Memory.isInitialized = false;
-    Memory.wantsTextureRefresh = false;
+    uint64 total_storage_size = memory.permanent_storage_size + memory.transient_storage_size;
+    memory.permanent_storage = mmap(base_address, total_storage_size,
+                                    PROT_READ | PROT_WRITE,
+                                    MAP_ANON | MAP_PRIVATE,
+                                    -1, 0);
+    memory.transient_storage = (uint8*)(memory.permanent_storage) + memory.permanent_storage_size;
+    memory.is_initialized = false;
+    memory.wants_texture_refresh = false;
 }
 
 int main()
@@ -140,7 +139,7 @@ int main()
                         quit = true;
                         break;
                     case SDLK_F5:
-                        Memory.wantsTextureRefresh = true;
+                        memory.wants_texture_refresh = true;
                         break;
                     default:
                         break;
@@ -148,9 +147,8 @@ int main()
                 }
             }
             maybe_load_libgame();
-            game_update_and_render(screen, &Memory);
-
+            game_update_and_render(screen, &memory);
         }
     }
-	closeGame();
+	close_game();
 }

@@ -4,7 +4,7 @@
 #include <SDL2/SDL_image.h>
 
 
-bool texture_load_from_file(texture* t, char* path, SDL_Renderer* renderer, SDL_Window* window)
+bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer, SDL_Window* window)
 {
     texture_free(t);
 
@@ -46,14 +46,14 @@ bool texture_load_from_file(texture* t, char* path, SDL_Renderer* renderer, SDL_
 }
 
 
-void texture_init(texture* t)
+void texture_init(Texture* t)
 {
     t->width = 0;
     t->height = 0;
     t->tex = NULL;
 }
 
-void texture_free(texture* t)
+void texture_free(Texture* t)
 {
     if (t->tex != NULL){
         SDL_DestroyTexture(t->tex);
@@ -62,32 +62,32 @@ void texture_free(texture* t)
     }
 }
 
-void texture_destroy(texture* t)
+void texture_destroy(Texture* t)
 {
     texture_free(t);
 }
 
-void texture_set_color(texture* t, uint8 Red, uint8 Green, uint8 Blue)
+void texture_set_color(Texture* t, uint8 Red, uint8 Green, uint8 Blue)
 {
     SDL_SetTextureColorMod(t->tex, Red, Green, Blue );
 }
 
-void texture_set_blend_mode(texture* t, SDL_BlendMode mode)
+void texture_set_blend_mode(Texture* t, SDL_BlendMode mode)
 {
     SDL_SetTextureBlendMode(t->tex, mode);
 }
-void texture_set_alpha(texture* t, uint8 alpha)
+void texture_set_alpha(Texture* t, uint8 alpha)
 {
     SDL_SetTextureAlphaMod(t->tex, alpha);
 }
 
-void texture_render(texture* t, int x,int y, SDL_Renderer* renderer)
+void texture_render(Texture* t, int x,int y, SDL_Renderer* renderer)
 {
     SDL_Rect render_quad = {x,y, t->width, t->height};
     SDL_RenderCopy(renderer, t->tex, NULL, &render_quad);
 }
 
-void texture_render_ex(texture* t, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Renderer* renderer)
+void texture_render_ex(Texture* t, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Renderer* renderer)
 {
     SDL_Rect render_quad = {x, y, t->width, t->height};
     
@@ -99,7 +99,7 @@ void texture_render_ex(texture* t, int x, int y, SDL_Rect* clip, double angle, S
     SDL_RenderCopyEx( renderer, t->tex, clip, &render_quad, angle, center, flip );
 }
 
-bool texture_lock(texture* t)
+bool texture_lock(Texture* t)
 {
     bool success = true;
     if (t->pixels != NULL) {
@@ -113,7 +113,7 @@ bool texture_lock(texture* t)
     }
     return success;
 }
-bool texture_unlock(texture* t) 
+bool texture_unlock(Texture* t) 
 {
     bool success = true;
     if (t->pixels == NULL) {

@@ -3,19 +3,19 @@
 
 #include "defines.h"
 
-typedef struct timer
+typedef struct Timer
 {
     uint32 start_ticks;
     uint32 paused_ticks;
     bool paused;
     bool started;
-} timer;
+} Timer;
 
-void timer_init(timer* t);
-void timer_stop(timer* t);
-void timer_start(timer* t);
-void timer_pause(timer* t);
-void timer_unpause(timer* t);
-uint32 timer_get_ticks(timer* t);
+void timer_init(Timer* t);
+void timer_stop(Timer* t);
+void timer_start(Timer* t);
+void timer_pause(Timer* t);
+void timer_unpause(Timer* t);
+uint32 timer_get_ticks(Timer* t);
 
 #endif

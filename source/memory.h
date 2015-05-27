@@ -8,8 +8,13 @@
 #include "texture.h"
 #include "defines.h"
 
+typedef struct Screen
+{
+    SDL_Renderer* renderer;
+    SDL_Window* window;
+} Screen;
 
-typedef struct shared_library
+typedef struct SharedLibrary
 {
     void* handle;
     char* name;
@@ -18,37 +23,35 @@ typedef struct shared_library
     int size;
     char* fn_name;
     struct stat stats;
-} shared_library;
+} SharedLibrary;
 
-typedef struct game_memory
+typedef struct Memory
 {
-    bool isInitialized;
-    bool wantsTextureRefresh;
+    bool is_initialized;
+    bool wants_texture_refresh;
 
-	uint32 PermanentStorageSize;
-    void *PermanentStorage;
+	uint32 permanent_storage_size;
+    void *permanent_storage;
 
-    uint32 TransientStorageSize;
-	void *TransientStorage;
-} game_memory;
+    uint32 transient_storage_size;
+	void *transient_storage;
+} Memory;
 
-//extern game_memory* Memory;
-
-typedef struct memory_arena
+typedef struct MemoryArena
 {
-    memory_index Size;
-    uint8 *Base;
-    memory_index Used;
-} memory_arena;
+    memory_index size;
+    uint8 *base;
+    memory_index used;
+} MemoryArena;
 
 
 // TODO : expand this babe to greatness!
-typedef struct game_state
+typedef struct GameState
 {
-    memory_arena WorldArena;
+    MemoryArena world_arena;
     double angle1;
-    texture* tex1;
-} game_state;
+    Texture* tex1;
+} GameState;
 
 
 #endif
