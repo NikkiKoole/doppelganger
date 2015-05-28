@@ -49,6 +49,7 @@ typedef struct Memory_Arena
 typedef struct State
 {
     Memory_Arena world_arena;
+
     double angle1;
     Texture* tex1;
 } State;
