@@ -19,8 +19,10 @@ void texture_destroy(Texture* t);
 
 bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer);
 
+void texture_render_text(Texture* t, int x, int y, char* text, real32 scale, SDL_Renderer* renderer);
 
 void texture_free(Texture* t);
+
 void texture_render(Texture* t, int x,int y, SDL_Renderer* renderer);
 void texture_render_ex(Texture* t, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Renderer* renderer);
 

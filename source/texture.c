@@ -60,6 +60,30 @@ bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
     return t->tex != NULL;
 }
 
+void texture_render_text(Texture* t, int x, int y, char* text, real32 scale, SDL_Renderer* renderer)
+{
+    // this function assumes you load a 8x8 bitmap font texture
+    // all glyphs alligned in ascii rows, google 'libtcod font image' when unsure.
+
+    int count = strlen(text);
+    int current_x = x;
+    int current_y = y;
+
+    for (int i = 0; i < count; i+=1) {
+        int ascii = (uint8) text[i];
+        if (ascii == 10) {
+            current_x = x;
+            current_y += 8*scale;
+        } else {
+            SDL_Rect src_rect = {(int) (ascii % 16)*8, (int) (ascii / 16)*8, 8, 8};
+            SDL_Rect dest_rect = {current_x, current_y, 8*scale, 8*scale};
+
+            SDL_RenderCopy(renderer, t->tex, &src_rect, &dest_rect);
+            current_x += 8*scale;
+        }
+    }
+}
+
 
 void texture_init(Texture* t)
 {
@@ -98,6 +122,10 @@ void texture_set_alpha(Texture* t, uint8 alpha)
 {
     SDL_SetTextureAlphaMod(t->tex, alpha);
 }
+
+
+
+
 
 void texture_render(Texture* t, int x,int y, SDL_Renderer* renderer)
 {

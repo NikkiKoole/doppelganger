@@ -4,6 +4,7 @@
 #include "texture.h"
 
 char texture1[] = "resources/image.png";
+char terminal8[] = "resources/terminal8.png";
 
 char font1[] = "resources/font.ttf";
 #define push_struct(arena, type) (type *)push_size_(arena, sizeof(type))
@@ -23,13 +24,9 @@ void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base)
     arena->used = 0;
 }
 
-
 void game_update_and_render(Screen* screen, Memory *memory)
 {
-    //printf("%d", sizeof(TTF_Font));
-
     SDL_Renderer* renderer = screen->renderer;
-    //SDL_Window* window = screen->window;
     Assert(sizeof(State) <= memory->permanent_storage_size);
     State *state = (State *)memory->permanent_storage;
 
@@ -40,16 +37,20 @@ void game_update_and_render(Screen* screen, Memory *memory)
         state->angle1 = 0;
         state->tex1 = (Texture*) push_struct(&state->world_arena, Texture);
         texture_load_from_file((state->tex1), texture1, renderer);
+        state->terminal8 = (Texture*) push_struct(&state->world_arena, Texture);
+        texture_load_from_file((state->terminal8), terminal8, renderer);
         memory->is_initialized = true;
     }
 
     if (memory->wants_texture_refresh) {
         Assert(state->tex1);
         texture_load_from_file((state->tex1), texture1, renderer);
+        state->terminal8 = (Texture*) push_struct(&state->world_arena, Texture);
+        texture_load_from_file((state->terminal8), terminal8, renderer);
         memory->wants_texture_refresh = false;
     }
 
-    state->angle1+= .125;
+    state->angle1+= .00125;
 
     SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0x00, 0xFF );
     SDL_RenderClear( renderer );
@@ -62,15 +63,18 @@ void game_update_and_render(Screen* screen, Memory *memory)
     texture_set_alpha((state->tex1), 250);
     texture_render_ex((state->tex1), 200, 100, NULL, state->angle1 , NULL, SDL_FLIP_NONE,  renderer);
 
-    for (int i = 0; i < 18; i+=1) {
+    for (int i = 0; i < 180; i+=1) {
         texture_set_color((state->tex1), 0xFF, 0xFF, 0x00);
         texture_set_alpha((state->tex1), 150-i*10);
         texture_render_ex((state->tex1), 5.0*i, 100, NULL, 360 - state->angle1*i , NULL, SDL_FLIP_NONE,  renderer);
     }
-    for (int i = 0; i < 18; i+=1) {
+    for (int i = 0; i < 180; i+=1) {
         texture_set_color((state->tex1), 0xFF, 0xFF, 0x00);
         texture_set_alpha((state->tex1), 150-i*10);
         texture_render_ex((state->tex1), 5.0*i, 400, NULL, 360 - state->angle1*i , NULL, SDL_FLIP_NONE,  renderer);
     }
+    texture_set_color((state->terminal8), 0x00, 0xaa, 0xff);
+    texture_render_text((state->terminal8), 10, 100, "Here's some text\nLorem ipsum dolor sit amet, ea vix modo\ntantas prodesset, nec ne veri salutandi\nhonestatis, ad nam omittam adipiscing.\nAt modus verterem abhorreant duo.\nNe lorem imperdiet qui.\nAt nam exerci civibus scribentur, \nea per nisl inimicus\nevertitur, ut vocent similique ius.\nSonet deserunt no mea, quo id\nscriptorem signiferumque,\nmel ad unum essent elaboraret.\n", 3, renderer);
+
     SDL_RenderPresent( renderer );
 }
