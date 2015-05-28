@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 #include <sys/mman.h> //mmap
 #include <unistd.h> //usleep
 #include "memory.h"
@@ -56,10 +55,7 @@ internal bool init()
         printf("SDL_Image could not initialize");
         goto SDL_Error;
     }
-    if( TTF_Init() == -1 ) {
-        printf( "SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError() );
-        goto SDL_Error;
-    }
+
 
     return true;
   SDL_Error:
@@ -126,7 +122,6 @@ void initialize_memory()
 
 int main()
 {
-    printf("%d", sizeof(TTF_Font));
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {

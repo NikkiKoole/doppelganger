@@ -60,26 +60,6 @@ bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
     return t->tex != NULL;
 }
 
-#ifdef _SDL_TTF_H
-bool texture_load_from_rendered_text(Texture* t,char* text, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer)
-{
-    texture_free(t);
-    SDL_Surface* text_surface = TTF_RenderText_Solid( font, text, color );
-    if (text_surface != NULL) {
-        t->tex = SDL_CreateTextureFromSurface(renderer, text_surface);
-        if (t->tex == NULL) {
-            SDL_WARN("Unable to create texture from rendered text");
-        } else {
-            t->width = text_surface->w;
-            t->height = text_surface->h;
-        }
-        SDL_FreeSurface(text_surface);
-    } else {
-        printf("Unable to render text surface! TTF_Error: %s\n", TTF_GetError());
-    }
-    return (t->tex != NULL);
-}
-#endif
 
 void texture_init(Texture* t)
 {

@@ -19,9 +19,6 @@ void texture_destroy(Texture* t);
 
 bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer);
 
-#ifdef _SDL_TTF_H
-bool texture_load_from_rendered_text(Texture* t,char* text, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
-#endif
 
 void texture_free(Texture* t);
 void texture_render(Texture* t, int x,int y, SDL_Renderer* renderer);
