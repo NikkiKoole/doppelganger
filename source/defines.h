@@ -1,6 +1,9 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+#include <stdint.h>     // int8_t et al.
+#include <stdlib.h>     // size_t
+
 typedef int8_t int8;
 typedef int16_t int16;
 typedef int32_t int32;

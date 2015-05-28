@@ -197,3 +197,8 @@ bool texture_create_blank(Texture* t, int width, int height, SDL_TextureAccess a
     }
     return (t->tex != NULL);
 }
+
+void texture_set_as_rendertarget(Texture* t, SDL_Renderer* renderer)
+{
+	SDL_SetRenderTarget( renderer, t->tex );
+}

@@ -10,10 +10,10 @@ CC := gcc
 STD_FLAGS := -std=gnu99
 COMPILER_FLAGS :=  -Wall -Werror
 
-LFILES := game.c texture.c
+LFILES := game.c texture.c timer.c
 LIB_FILES += $(foreach file, $(LFILES), source/$(file))
 
-MFILES := main.c texture.c
+MFILES := main.c texture.c timer.c
 MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
 # I've hidden the console output in game: with the @ sign
@@ -22,7 +22,7 @@ MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 libgame:
 	#libgame built
 	@($(CC) -c $(COMPILER_FLAGS) $(STD_FLAGS) -fpic $(LIB_FILES))
-	@($(CC) -shared -o $(LIBRARY_NAME) game.o texture.o $(LIBRARY_PATH) $(LD_FLAGS))
+	@($(CC) -shared -o $(LIBRARY_NAME) game.o texture.o timer.o $(LIBRARY_PATH) $(LD_FLAGS))
 
 main:
 	# this will build the main application.

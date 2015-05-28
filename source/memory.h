@@ -3,10 +3,10 @@
 
 #include <sys/stat.h>   //struct stat
 #include <sys/types.h>  //struct stat
-#include <stdint.h>     //int8_t et al.
 
 #include "texture.h"
 #include "defines.h"
+#include "timer.h"
 
 typedef struct Screen
 {
@@ -52,6 +52,8 @@ typedef struct State
     double angle1;
     Texture* tex1;
     Texture* terminal8;
+    Texture* render_target;
+    Timer* timer;
 } State;
 
 
