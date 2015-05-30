@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "texture.h"
 #include "timer.h"
+#include "animate.h"
 #include <time.h>
 
 char texture1[] = "resources/image.png";
@@ -25,13 +26,6 @@ void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base)
     arena->base = base;
     arena->used = 0;
 }
-
-//float total_frames = 0;
-
-//clock_t start = clock() ;
-//do_some_work() ;
-//clock_t end = clock() ;
-//double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ;
 
 int last_time;
 int current_time;
@@ -56,8 +50,10 @@ void game_update_and_render(Screen* screen, Memory *memory)
         texture_create_blank(state->render_target, 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
         state->timer = (Timer*) push_struct(&state->world_arena, Timer);
         timer_init(state->timer);
-        //texture_create_blank(state->render_target, 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
         timer_start(state->timer);
+        state->animation1 = (Animation*) push_struct(&state->world_arena, Animation);
+        printf("sizeof Animation (Bytes) %d \n", sizeof(Animation));
+
         memory->is_initialized = true;
     }
 

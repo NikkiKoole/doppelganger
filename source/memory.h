@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "defines.h"
 #include "timer.h"
+#include "animate.h"
 
 typedef struct Screen
 {
@@ -54,6 +55,7 @@ typedef struct State
     Texture* terminal8;
     Texture* render_target;
     Timer* timer;
+    Animation* animation1;
 } State;
 
 
