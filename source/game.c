@@ -3,7 +3,7 @@
 #include "memory.h"
 #include "texture.h"
 #include "timer.h"
-#include "animate.h"
+#include "animation.h"
 #include <time.h>
 
 char texture1[] = "resources/image.png";
@@ -14,7 +14,7 @@ char font1[] = "resources/font.ttf";
 #define push_array(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
 
 void* push_size_(Memory_Arena *arena, memory_index size){
-    Assert(arena->used + size <= arena->size);
+    assert(arena->used + size <= arena->size);
     void *result = arena->base + arena->used;
     arena->used += size;
     return result;
@@ -34,7 +34,7 @@ void game_update_and_render(Screen* screen, Memory *memory)
 {
     current_time = SDL_GetTicks();
     SDL_Renderer* renderer = screen->renderer;
-    Assert(sizeof(State) <= memory->permanent_storage_size);
+    assert(sizeof(State) <= memory->permanent_storage_size);
     State *state = (State *)memory->permanent_storage;
 
     if (!memory->is_initialized) {
@@ -55,13 +55,11 @@ void game_update_and_render(Screen* screen, Memory *memory)
         printf("sizeof Animation (Bytes) %d \n", sizeof(Animation));
 
         memory->is_initialized = true;
+        last_time = current_time-1; // to remove the initial big difference
     }
-
-
-
-
+    
     if (memory->wants_texture_refresh) {
-        Assert(state->tex1);
+        assert(state->tex1);
         texture_load_from_file((state->tex1), texture1, renderer);
         state->terminal8 = (Texture*) push_struct(&state->world_arena, Texture);
         texture_load_from_file((state->terminal8), terminal8, renderer);
@@ -105,13 +103,14 @@ void game_update_and_render(Screen* screen, Memory *memory)
         texture_set_alpha((state->tex1), 150-i*10);
         texture_render_ex((state->tex1), 5.0*i, 400, NULL, 360 - state->angle1*i , NULL, SDL_FLIP_NONE,  renderer);
     }
-    texture_set_color((state->terminal8), 0x00, 0xaa, 0xff);
+    texture_set_color((state->terminal8), 0xff, 0xaa, 0xff);
     texture_render_text((state->terminal8), 10, 100, "Here's some text\nLorem ipsum dolor sit amet, ea vix modo\ntantas prodesset, nec ne veri salutandi\nhonestatis, ad nam omittam adipiscing.\nAt modus verterem abhorreant duo.\nNe lorem imperdiet qui.\nAt nam exerci civibus scribentur, \nea per nisl inimicus\nevertitur, ut vocent similique ius.\nSonet deserunt no mea, quo id\nscriptorem signiferumque,\nmel ad unum essent elaboraret.\n", 3, renderer);
     int fps = 1000/(current_time - last_time);
     char buf[256];
     snprintf(buf, sizeof buf, "%d %s", fps, "FPS");
+    texture_set_color((state->terminal8), 0x00, 0x00, 0x00);
+
     texture_render_text((state->terminal8), 10, 10, buf, 1, renderer);
     SDL_RenderPresent( renderer );
-    //++total_frames;
     last_time = current_time;
 }

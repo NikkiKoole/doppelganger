@@ -7,7 +7,7 @@
 #include "texture.h"
 #include "defines.h"
 #include "timer.h"
-#include "animate.h"
+#include "animation.h"
 
 typedef struct Screen
 {

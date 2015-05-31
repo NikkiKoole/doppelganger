@@ -21,11 +21,11 @@ typedef size_t memory_index;
 
 #define internal static
 
-#define Kilobytes(value) ((value)*1024LL)
-#define Megabytes(value) (Kilobytes(value)*1024LL)
-#define Gigabytes(value) (Megabytes(value)*1024LL)
-#define Terabytes(value) (Gigabytes(value)*1024LL)
+#define kilobytes(value) ((value)*1024LL)
+#define megabytes(value) (kilobytes(value)*1024LL)
+#define gigabytes(value) (megabytes(value)*1024LL)
+#define terabytes(value) (gigabytes(value)*1024LL)
 
-#define Assert(expression) if(!(expression)) {printf("\nASSERT FAIL: '%s' in function %s on line:%d (%s)\n\n",#expression, __FUNCTION__, __LINE__, __FILE__);exit(0);}
+#define assert(expression) if(!(expression)) {printf("\nASSERT FAIL: '%s' in function %s on line:%d (%s)\n\n",#expression, __FUNCTION__, __LINE__, __FILE__);exit(0);}
 
 #endif

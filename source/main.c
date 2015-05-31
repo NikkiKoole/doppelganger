@@ -5,7 +5,6 @@
 #include <unistd.h> //usleep
 #include "memory.h"
 #include "defines.h"
-#include "timer.h"
 
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
@@ -107,9 +106,9 @@ internal void maybe_load_libgame()
 
 void initialize_memory()
 {
-    void *base_address = (void *) Gigabytes(1);
-    memory.permanent_storage_size = Megabytes(64);
-    memory.transient_storage_size = Gigabytes(1);
+    void *base_address = (void *) gigabytes(1);
+    memory.permanent_storage_size = megabytes(64);
+    memory.transient_storage_size = gigabytes(1);
 
     uint64 total_storage_size = memory.permanent_storage_size + memory.transient_storage_size;
     memory.permanent_storage = mmap(base_address, total_storage_size,
@@ -123,6 +122,7 @@ void initialize_memory()
 
 int main()
 {
+    
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {

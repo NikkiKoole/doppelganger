@@ -1,5 +1,5 @@
-#ifndef ANIMATE_H
-#define ANIMATE_H
+#ifndef ANIMATION_H
+#define ANIMATION_H
 
 #define MAX_FRAMES_PER_ANIMATION 128
 

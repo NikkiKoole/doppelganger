@@ -5,28 +5,26 @@ LIBRARY_PATH := -L/usr/local/include
 LIBRARIES := SDL2 SDL2_image
 LD_FLAGS += $(foreach library, $(LIBRARIES),-l$(library))
 
-
 CC := gcc
 STD_FLAGS := -std=gnu99
 COMPILER_FLAGS :=  -Wall -Werror
 
-LFILES := game.c texture.c timer.c animate.c
-LIB_FILES += $(foreach file, $(LFILES), source/$(file))
+LFILES := game texture timer animation
+LIB_FILES += $(foreach file, $(LFILES), source/$(file).c)
+LIB_O_FILES += $(foreach file, $(LFILES), $(file).o)
 
-MFILES := main.c texture.c timer.c
+MFILES := main.c
 MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
-
-# I've hidden the console output in game: with the @ sign
-
 
 libgame:
 	#libgame built
 	@($(CC) -c $(COMPILER_FLAGS) $(STD_FLAGS) -fpic $(LIB_FILES))
-	@($(CC) -shared -o $(LIBRARY_NAME) game.o texture.o timer.o animate.o $(LIBRARY_PATH) $(LD_FLAGS))
+	@($(CC) -shared -o $(LIBRARY_NAME) $(LIB_O_FILES) $(LIBRARY_PATH) $(LD_FLAGS))
 
 main:
 	# this will build the main application.
 	$(CC) $(COMPILER_FLAGS)  $(STD_FLAGS) $(MAIN_FILES) -o $(PROGRAM_NAME) $(LIBRARY_PATH) $(LD_FLAGS)
+
 clean:
 	rm *.o *.so doppel
 
