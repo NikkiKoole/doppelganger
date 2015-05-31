@@ -4,6 +4,7 @@
 #include "texture.h"
 #include "timer.h"
 #include "animation.h"
+#include "keyboard.h"
 #include <time.h>
 
 char texture1[] = "resources/image.png";
@@ -30,7 +31,7 @@ void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base)
 int last_time;
 int current_time;
 
-void game_update_and_render(Screen* screen, Memory *memory)
+void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard)
 {
     current_time = SDL_GetTicks();
     SDL_Renderer* renderer = screen->renderer;
@@ -53,17 +54,22 @@ void game_update_and_render(Screen* screen, Memory *memory)
         timer_start(state->timer);
         state->animation1 = (Animation*) push_struct(&state->world_arena, Animation);
         printf("sizeof Animation (Bytes) %d \n", sizeof(Animation));
-
+        animation_init(state->animation1);
+        animation_add_frame(state->animation1, 0, 200, NULL);
+        animation_add_frame(state->animation1, 1, 200, NULL);
+        animation_add_frame(state->animation1, 2, 200, NULL);
+        animation_add_frame(state->animation1, 3, 200, NULL);
+        printf("animation framecount: %d\n ", state->animation1->n_frames);
         memory->is_initialized = true;
         last_time = current_time-1; // to remove the initial big difference
     }
-    
-    if (memory->wants_texture_refresh) {
+
+    if (key_pressed(keyboard,KB_F5)){
         assert(state->tex1);
         texture_load_from_file((state->tex1), texture1, renderer);
         state->terminal8 = (Texture*) push_struct(&state->world_arena, Texture);
         texture_load_from_file((state->terminal8), terminal8, renderer);
-        memory->wants_texture_refresh = false;
+        printf("reloaded textures! \n");
     }
     
     state->angle1+= .00125;

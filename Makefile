@@ -9,11 +9,11 @@ CC := gcc
 STD_FLAGS := -std=gnu99
 COMPILER_FLAGS :=  -Wall -Werror
 
-LFILES := game texture timer animation
+LFILES := game texture timer animation sprite keyboard
 LIB_FILES += $(foreach file, $(LFILES), source/$(file).c)
 LIB_O_FILES += $(foreach file, $(LFILES), $(file).o)
 
-MFILES := main.c
+MFILES := main.c keyboard.c
 MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
 libgame:

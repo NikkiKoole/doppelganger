@@ -5,6 +5,7 @@
 #include <unistd.h> //usleep
 #include "memory.h"
 #include "defines.h"
+#include "keyboard.h"
 
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
@@ -15,10 +16,14 @@ internal void close_game();
 
 Screen global_screen;
 Screen* screen = &global_screen;
-
-void (*game_update_and_render)(Screen *, Memory *);
+Keyboard global_keyboard;
+Keyboard* keyboard = &global_keyboard;
 
 Memory memory = {};
+
+
+void (*game_update_and_render)(Screen *, Memory *, Keyboard *);
+
 
 internal void close_game()
 {
@@ -72,7 +77,7 @@ Shared_Library libgame = {
     .fn_name = "game_update_and_render"
 };
 
-void stub(Screen* screen, Memory *memory)
+void stub(Screen* screen, Memory* memory, Keyboard* keyboard)
 {
     usleep(10000);
 }
@@ -93,7 +98,7 @@ internal void maybe_load_libgame()
                 printf("couldnt load:%s, error: %s\n", libgame.name, SDL_GetError());
                 game_update_and_render = stub;
             } else {
-                game_update_and_render = (void (*)(Screen *, Memory *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
+                game_update_and_render = (void (*)(Screen *, Memory *, Keyboard *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
                 if (game_update_and_render == NULL) {
                     printf("couldnt find: %s, error: %s\n",libgame.fn_name, SDL_GetError());
                 } else {
@@ -117,12 +122,10 @@ void initialize_memory()
                                     -1, 0);
     memory.transient_storage = (uint8*)(memory.permanent_storage) + memory.permanent_storage_size;
     memory.is_initialized = false;
-    memory.wants_texture_refresh = false;
 }
 
 int main()
 {
-    
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
@@ -134,23 +137,11 @@ int main()
 
         while( !quit ) {
             while( SDL_PollEvent( &e ) != 0 ) {
-                if( e.type == SDL_QUIT ) {
-                    quit = true;
-                }  else if (e.type == SDL_KEYDOWN) {
-                    switch(e.key.keysym.sym) {
-                    case SDLK_ESCAPE:
-                        quit = true;
-                        break;
-                    case SDLK_F5:
-                        memory.wants_texture_refresh = true;
-                        break;
-                    default:
-                        break;
-                    }
-                }
+                keyboard->keys = SDL_GetKeyboardState( NULL );
+                if( e.type == SDL_QUIT || key_pressed(keyboard,KB_ESC) ){quit = true;}
             }
             maybe_load_libgame();
-            game_update_and_render(screen, &memory);
+            game_update_and_render(screen, &memory, keyboard);
         }
     }
 	close_game();

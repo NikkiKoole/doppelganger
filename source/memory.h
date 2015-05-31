@@ -29,7 +29,6 @@ typedef struct Shared_Library
 typedef struct Memory
 {
     bool is_initialized;
-    bool wants_texture_refresh;
 
 	uint32 permanent_storage_size;
     void *permanent_storage;

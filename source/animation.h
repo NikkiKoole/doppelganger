@@ -27,4 +27,8 @@ typedef struct Animation
     
 } Animation;
 
+void animation_init(Animation* a);
+
+void animation_add_frame(Animation* a, int index, int duration, void* data);
+
 #endif
