@@ -6,6 +6,7 @@
 typedef struct Sprite
 {
     Texture* texture;
+    SDL_Rect clip;
     int frame_width;
     int frame_height;
     int current_frame;

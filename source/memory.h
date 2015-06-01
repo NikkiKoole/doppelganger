@@ -26,6 +26,14 @@ typedef struct Shared_Library
     struct stat stats;
 } Shared_Library;
 
+typedef struct FrameTime
+{
+    int duration;
+    char fps_string[64];
+
+} FrameTime;
+
+
 typedef struct Memory
 {
     bool is_initialized;

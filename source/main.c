@@ -7,8 +7,8 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const int SCREEN_WIDTH = 1024;
-const int SCREEN_HEIGHT = 768;
+const int SCREEN_WIDTH = 1024*2;
+const int SCREEN_HEIGHT = 768*2;
 char* TITLE = "DoppelGangers";
 
 internal bool init();
@@ -19,10 +19,16 @@ Screen* screen = &global_screen;
 Keyboard global_keyboard;
 Keyboard* keyboard = &global_keyboard;
 
+
+
+FrameTime global_frame_time;
+FrameTime* frame_time = &global_frame_time;
+
+
 Memory memory = {};
 
 
-void (*game_update_and_render)(Screen *, Memory *, Keyboard *);
+void (*game_update_and_render)(Screen *, Memory *, Keyboard *, FrameTime*);
 
 
 internal void close_game()
@@ -77,7 +83,7 @@ Shared_Library libgame = {
     .fn_name = "game_update_and_render"
 };
 
-void stub(Screen* screen, Memory* memory, Keyboard* keyboard)
+void stub(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
     usleep(10000);
 }
@@ -98,7 +104,7 @@ internal void maybe_load_libgame()
                 printf("couldnt load:%s, error: %s\n", libgame.name, SDL_GetError());
                 game_update_and_render = stub;
             } else {
-                game_update_and_render = (void (*)(Screen *, Memory *, Keyboard *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
+                game_update_and_render = (void (*)(Screen *, Memory *, Keyboard *, FrameTime *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
                 if (game_update_and_render == NULL) {
                     printf("couldnt find: %s, error: %s\n",libgame.fn_name, SDL_GetError());
                 } else {
@@ -124,8 +130,13 @@ void initialize_memory()
     memory.is_initialized = false;
 }
 
+
+
 int main()
 {
+    int last_time;
+    int current_time;
+
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
@@ -136,12 +147,21 @@ int main()
         maybe_load_libgame();
 
         while( !quit ) {
+            current_time = SDL_GetTicks();
+
             while( SDL_PollEvent( &e ) != 0 ) {
                 keyboard->keys = SDL_GetKeyboardState( NULL );
                 if( e.type == SDL_QUIT || key_pressed(keyboard,KB_ESC) ){quit = true;}
             }
+
             maybe_load_libgame();
-            game_update_and_render(screen, &memory, keyboard);
+            frame_time->duration = (current_time - last_time);
+
+            int fps = 1000/frame_time->duration;
+            snprintf(frame_time->fps_string, sizeof frame_time->fps_string, "%d %s", fps, "FPS");
+            last_time = current_time;
+            game_update_and_render(screen, &memory, keyboard, frame_time);
+
         }
     }
 	close_game();

@@ -28,12 +28,8 @@ void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base)
     arena->used = 0;
 }
 
-int last_time;
-int current_time;
-
-void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard)
+void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
-    current_time = SDL_GetTicks();
     SDL_Renderer* renderer = screen->renderer;
     assert(sizeof(State) <= memory->permanent_storage_size);
     State *state = (State *)memory->permanent_storage;
@@ -53,7 +49,7 @@ void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard)
         timer_init(state->timer);
         timer_start(state->timer);
         state->animation1 = (Animation*) push_struct(&state->world_arena, Animation);
-        printf("sizeof Animation (Bytes) %d \n", sizeof(Animation));
+        //printf("sizeof Animation (Bytes) %d \n", sizeof(Animation));
         animation_init(state->animation1);
         animation_add_frame(state->animation1, 0, 200, NULL);
         animation_add_frame(state->animation1, 1, 200, NULL);
@@ -61,7 +57,6 @@ void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard)
         animation_add_frame(state->animation1, 3, 200, NULL);
         printf("animation framecount: %d\n ", state->animation1->n_frames);
         memory->is_initialized = true;
-        last_time = current_time-1; // to remove the initial big difference
     }
 
     if (key_pressed(keyboard,KB_F5)){
@@ -71,7 +66,7 @@ void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard)
         texture_load_from_file((state->terminal8), terminal8, renderer);
         printf("reloaded textures! \n");
     }
-    
+
     state->angle1+= .00125;
     SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
     SDL_RenderClear( renderer );
@@ -79,7 +74,7 @@ void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard)
     texture_set_as_rendertarget(state->render_target, renderer);
     SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
     SDL_RenderClear( renderer );
-    
+
 
     texture_set_color((state->tex1), 0xFF, 0xFF, 0xFF);
     texture_set_alpha((state->tex1), 180);
@@ -104,19 +99,16 @@ void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard)
         texture_set_alpha((state->tex1), 150-i*10);
         texture_render_ex((state->tex1), 5.0*i, 100, NULL, 360 - state->angle1*i , NULL, SDL_FLIP_NONE,  renderer);
     }
-    for (int i = 0; i < 13; i+=1) {
+    for (int i = 0; i < 130; i+=1) {
         texture_set_color((state->tex1), 0xFF, 0xFF, 0x00);
         texture_set_alpha((state->tex1), 150-i*10);
         texture_render_ex((state->tex1), 5.0*i, 400, NULL, 360 - state->angle1*i , NULL, SDL_FLIP_NONE,  renderer);
     }
     texture_set_color((state->terminal8), 0xff, 0xaa, 0xff);
     texture_render_text((state->terminal8), 10, 100, "Here's some text\nLorem ipsum dolor sit amet, ea vix modo\ntantas prodesset, nec ne veri salutandi\nhonestatis, ad nam omittam adipiscing.\nAt modus verterem abhorreant duo.\nNe lorem imperdiet qui.\nAt nam exerci civibus scribentur, \nea per nisl inimicus\nevertitur, ut vocent similique ius.\nSonet deserunt no mea, quo id\nscriptorem signiferumque,\nmel ad unum essent elaboraret.\n", 3, renderer);
-    int fps = 1000/(current_time - last_time);
-    char buf[256];
-    snprintf(buf, sizeof buf, "%d %s", fps, "FPS");
-    texture_set_color((state->terminal8), 0x00, 0x00, 0x00);
 
-    texture_render_text((state->terminal8), 10, 10, buf, 1, renderer);
+
+
+    texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);
     SDL_RenderPresent( renderer );
-    last_time = current_time;
 }
