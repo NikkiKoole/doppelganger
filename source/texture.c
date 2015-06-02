@@ -42,7 +42,8 @@ bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
                 int pixel_count = (t->pitch / 4) * t->height;
                 uint32 color_key = SDL_MapRGB(formatted_surface->format, 0, 0xFF, 0xFF);
                 uint32 transparent = SDL_MapRGBA(formatted_surface->format, 0x00, 0xFF,0xFF, 0x00);
-                for( int i = 0; i < pixel_count; ++i ) {
+                int i = 0;
+                for( i = 0; i < pixel_count; ++i ) {
 					if( pixels[i] == color_key ){
 						pixels[i] = transparent;
 					}
@@ -60,7 +61,7 @@ bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
     return t->tex != NULL;
 }
 
-void texture_render_text(Texture* t, int x, int y, char* text, real32 scale, SDL_Renderer* renderer)
+void texture_render_text(Texture* t, int x, int y,const char* text, real32 scale, SDL_Renderer* renderer)
 {
     // this function assumes you load a 8x8 bitmap font texture
     // all glyphs alligned in ascii rows, google 'libtcod font image' when unsure.
@@ -68,8 +69,8 @@ void texture_render_text(Texture* t, int x, int y, char* text, real32 scale, SDL
     int count = strlen(text);
     int current_x = x;
     int current_y = y;
-
-    for (int i = 0; i < count; i+=1) {
+    int i = 0;
+    for (i = 0; i < count; i+=1) {
         int ascii = (uint8) text[i];
         if (ascii == 10) {
             current_x = x;
@@ -179,6 +180,7 @@ void texture_copy_pixels(Texture* t, void* pixels)
         memcpy(t->pixels, pixels, t->pitch*t->height);
     }
 }
+
 
 uint32 texture_get_pixel32(Texture* t, uint16 x, uint16 y)
 {

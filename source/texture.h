@@ -18,7 +18,7 @@ void texture_init(Texture* t);
 void texture_destroy(Texture* t);
 
 bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer);
-void texture_render_text(Texture* t, int x, int y, char* text, real32 scale, SDL_Renderer* renderer);
+void texture_render_text(Texture* t, int x, int y, const char* text, real32 scale, SDL_Renderer* renderer);
 
 void texture_free(Texture* t);
 
@@ -33,9 +33,14 @@ bool texture_lock(Texture* t);
 bool texture_unlock(Texture* t);
 
 void texture_copy_pixels(Texture* t, void* pixels);
-uint32 texture_get_pixel_32(Texture* t, uint16 x, uint16 y);
+uint32 texture_get_pixel32(Texture* t, uint16 x, uint16 y);
 
 bool texture_create_blank(Texture* t, int width, int height, SDL_TextureAccess access,  SDL_Renderer* renderer);
 void texture_set_as_rendertarget(Texture* t, SDL_Renderer* renderer);
 
 #endif
+
+
+
+
+

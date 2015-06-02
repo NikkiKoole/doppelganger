@@ -7,29 +7,25 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const int SCREEN_WIDTH = 1024*2;
-const int SCREEN_HEIGHT = 768*2;
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
 char* TITLE = "DoppelGangers";
 
-internal bool init();
-internal void close_game();
+internal bool init(void);
+internal void close_game(void);
+internal void maybe_load_libgame(void);
+internal void initialize_memory(void);
 
 Screen global_screen;
 Screen* screen = &global_screen;
 Keyboard global_keyboard;
 Keyboard* keyboard = &global_keyboard;
-
-
-
 FrameTime global_frame_time;
 FrameTime* frame_time = &global_frame_time;
 
+Memory memory;
 
-Memory memory = {};
-
-
-void (*game_update_and_render)(Screen *, Memory *, Keyboard *, FrameTime*);
-
+void (*func)(Screen *, Memory *, Keyboard *, FrameTime*);
 
 internal void close_game()
 {
@@ -83,7 +79,8 @@ Shared_Library libgame = {
     .fn_name = "game_update_and_render"
 };
 
-void stub(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
+
+internal void stub(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
     usleep(10000);
 }
@@ -102,10 +99,10 @@ internal void maybe_load_libgame()
                 libgame.handle = NULL;
                 libgame.id = 0;
                 printf("couldnt load:%s, error: %s\n", libgame.name, SDL_GetError());
-                game_update_and_render = stub;
+                func = stub;
             } else {
-                game_update_and_render = (void (*)(Screen *, Memory *, Keyboard *, FrameTime *))SDL_LoadFunction(libgame.handle, libgame.fn_name);
-                if (game_update_and_render == NULL) {
+                func = (void (*)(Screen *, Memory *, Keyboard *, FrameTime *)) SDL_LoadFunction(libgame.handle, libgame.fn_name);
+                if (func == NULL) {
                     printf("couldnt find: %s, error: %s\n",libgame.fn_name, SDL_GetError());
                 } else {
                     printf("succes loading libgame\n");
@@ -115,7 +112,7 @@ internal void maybe_load_libgame()
     }
 }
 
-void initialize_memory()
+internal void initialize_memory()
 {
     void *base_address = (void *) gigabytes(1);
     memory.permanent_storage_size = megabytes(64);
@@ -132,9 +129,9 @@ void initialize_memory()
 
 
 
-int main()
+int main(void)
 {
-    int last_time;
+    int last_time = SDL_GetTicks();
     int current_time;
 
     if( !init() ) {
@@ -156,13 +153,13 @@ int main()
 
             maybe_load_libgame();
             frame_time->duration = (current_time - last_time);
-
             int fps = 1000/frame_time->duration;
             snprintf(frame_time->fps_string, sizeof frame_time->fps_string, "%d %s", fps, "FPS");
+            
+            func(screen, &memory, keyboard, frame_time);
             last_time = current_time;
-            game_update_and_render(screen, &memory, keyboard, frame_time);
-
         }
     }
 	close_game();
+    return 1;
 }

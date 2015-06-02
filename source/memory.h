@@ -8,6 +8,8 @@
 #include "defines.h"
 #include "timer.h"
 #include "animation.h"
+#include "sprite.h"
+#include "keyboard.h"
 
 typedef struct Screen
 {
@@ -61,9 +63,13 @@ typedef struct State
     Texture* tex1;
     Texture* terminal8;
     Texture* render_target;
+    Texture* zelda;
     Timer* timer;
     Animation* animation1;
+    Sprite* link1;
 } State;
 
+// this is the function thats being called from main, offered up by the gamelib.so file.
+void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime);
 
 #endif

@@ -7,9 +7,21 @@ LD_FLAGS += $(foreach library, $(LIBRARIES),-l$(library))
 
 CC := gcc
 STD_FLAGS := -std=gnu99
-COMPILER_FLAGS :=  -Wall -Werror
+LAX_STRICT =  -Wall -Werror
+SUPERSTRICT = -Werror -Wall -Wextra -pedantic-errors -Wformat=2 -Wno-import \
+		   -Wimplicit -Wmain -Wchar-subscripts -Wsequence-point -Wmissing-braces \
+		   -Wparentheses -Winit-self -Wswitch-enum -Wstrict-aliasing=2 -Wundef \
+		   -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align \
+		   -Wwrite-strings -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes \
+		   -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline \
+		   -Wdisabled-optimization -Wunused-macros -Wno-unused
 
-LFILES := game texture timer animation sprite keyboard
+STRICT = -Wall -Werror -Wextra -std=c89 -pedantic -Wmissing-prototypes -Wstrict-prototypes \
+    -Wold-style-definition
+
+WARNINGS = $(LAX_STRICT)
+
+LFILES := game texture timer animation keyboard sprite
 LIB_FILES += $(foreach file, $(LFILES), source/$(file).c)
 LIB_O_FILES += $(foreach file, $(LFILES), $(file).o)
 
@@ -18,12 +30,12 @@ MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
 libgame:
 	#libgame built
-	@($(CC) -c $(COMPILER_FLAGS) $(STD_FLAGS) -fpic $(LIB_FILES))
-	@($(CC) -shared -o $(LIBRARY_NAME) $(LIB_O_FILES) $(LIBRARY_PATH) $(LD_FLAGS))
+	($(CC) -c $(WARNINGS) $(STD_FLAGS) -fpic $(LIB_FILES))
+	($(CC) -shared -o $(LIBRARY_NAME) $(LIB_O_FILES) $(LIBRARY_PATH) $(LD_FLAGS))
 
 main:
 	# this will build the main application.
-	$(CC) $(COMPILER_FLAGS)  $(STD_FLAGS) $(MAIN_FILES) -o $(PROGRAM_NAME) $(LIBRARY_PATH) $(LD_FLAGS)
+	$(CC) $(WARNINGS)  $(STD_FLAGS) $(MAIN_FILES) -o $(PROGRAM_NAME) $(LIBRARY_PATH) $(LD_FLAGS)
 
 clean:
 	rm *.o *.so doppel
