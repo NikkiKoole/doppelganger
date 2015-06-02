@@ -18,7 +18,7 @@ SUPERSTRICT = -Werror -Wall -Wextra -pedantic-errors -Wformat=2 -Wno-import \
 		   -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline \
 		   -Wdisabled-optimization -Wunused-macros -Wno-unused
 
-WARNINGS = $(SIMPLESTRICT)
+WARNINGS = $(SUPERSTRICT)
 
 LFILES := game texture timer animation keyboard sprite
 LIB_FILES += $(foreach file, $(LFILES), source/$(file).c)

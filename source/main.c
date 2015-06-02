@@ -80,9 +80,9 @@ Shared_Library libgame = {
 };
 
 
-internal void stub(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
+internal void stub(Screen* screen1, Memory* memory1, Keyboard* keyboard1, FrameTime* frametime1)
 {
-    UNUSED(screen);  UNUSED(memory);  UNUSED(keyboard);  UNUSED(frametime);
+    UNUSED(screen1);  UNUSED(memory1);  UNUSED(keyboard1);  UNUSED(frametime1);
     usleep(10000);
 }
 

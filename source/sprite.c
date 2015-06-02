@@ -14,5 +14,5 @@ void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  int frame_width, int f
 
 void sprite_play_animation(Sprite* spr, Animation* anim)
 {
-
+    
 }
