@@ -63,8 +63,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->link1 = (Sprite*) push_struct(&state->world_arena, Sprite);
         SDL_Rect clip = {.x=0, .y=26*5, .w=10*24, .h=26 };
         sprite_init(state->link1, state->zelda, clip, 24, 26);
-        test();
-        printf("animation framecount: %d\n ", state->animation1->n_frames);
+        sprite_play_animation(state->link1, state->animation1);
+        //printf("animation framecount: %d\n ", state->animation1->n_frames);
         memory->is_initialized = true;
     }
 
@@ -103,12 +103,12 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
 
 #if 0
-    for (int i = 0; i < 13; i+=1) {
+    for (int i = 0; i < 3; i+=1) {
         texture_set_color((state->tex1), 0xFF, 0xFF, 0x00);
         texture_set_alpha((state->tex1), 150-i*10);
         texture_render_ex((state->tex1), 5.0*i, 100, NULL, 360 - state->angle1*i , NULL, SDL_FLIP_NONE,  renderer);
     }
-    for (int i = 0; i < 13; i+=1) {
+    for (int i = 0; i < 3; i+=1) {
         texture_set_color((state->tex1), 0xFF, 0xFF, 0x00);
         texture_set_alpha((state->tex1), 150-i*10);
         texture_render_ex((state->tex1), 5.0*i, 400, NULL, 360 - state->angle1*i , NULL, SDL_FLIP_NONE,  renderer);

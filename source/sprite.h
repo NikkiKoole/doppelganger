@@ -2,6 +2,7 @@
 #define SPRITE_H
 
 #include "texture.h"
+#include "animation.h"
 
 typedef struct Sprite
 {
@@ -14,6 +15,5 @@ typedef struct Sprite
 } Sprite;
 
 void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  int frame_width, int frame_height);
-void test(void);
-
+void sprite_play_animation(Sprite* spr, Animation* anim);
 #endif
