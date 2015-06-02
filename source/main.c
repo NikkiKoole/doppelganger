@@ -9,7 +9,7 @@
 
 const int SCREEN_WIDTH = 1024;
 const int SCREEN_HEIGHT = 768;
-char* TITLE = "DoppelGangers";
+const char* TITLE = "DoppelGangers";
 
 internal bool init(void);
 internal void close_game(void);
@@ -27,7 +27,7 @@ Memory memory;
 
 void (*func)(Screen *, Memory *, Keyboard *, FrameTime*);
 
-internal void close_game()
+internal void close_game(void)
 {
     SDL_DestroyRenderer(screen->renderer);
     SDL_DestroyWindow(screen->window);
@@ -37,7 +37,7 @@ internal void close_game()
     SDL_Quit();
 }
 
-internal bool init()
+internal bool init(void)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) goto SDL_Error;
 
@@ -82,10 +82,11 @@ Shared_Library libgame = {
 
 internal void stub(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
+    UNUSED(screen);  UNUSED(memory);  UNUSED(keyboard);  UNUSED(frametime);
     usleep(10000);
 }
 
-internal void maybe_load_libgame()
+internal void maybe_load_libgame(void)
 {
     stat(libgame.name, &libgame.stats);
     if (libgame.stats.st_ino != libgame.id){
@@ -112,7 +113,7 @@ internal void maybe_load_libgame()
     }
 }
 
-internal void initialize_memory()
+internal void initialize_memory(void)
 {
     void *base_address = (void *) gigabytes(1);
     memory.permanent_storage_size = megabytes(64);

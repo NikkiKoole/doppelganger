@@ -20,11 +20,11 @@ typedef struct Screen
 typedef struct Shared_Library
 {
     void* handle;
-    char* name;
+    const char* name;
     intmax_t creation_time;
-    int id;
-    int size;
-    char* fn_name;
+    uint32 id;
+    int32 size;
+    const char* fn_name;
     struct stat stats;
 } Shared_Library;
 

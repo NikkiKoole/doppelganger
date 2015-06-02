@@ -28,4 +28,6 @@ typedef size_t memory_index;
 
 #define assert(expression) if(!(expression)) {printf("\nASSERT FAIL: '%s' in function %s on line:%d (%s)\n\n",#expression, __FUNCTION__, __LINE__, __FILE__);exit(0);}
 
+#define UNUSED(x) (void)(x)
+
 #endif

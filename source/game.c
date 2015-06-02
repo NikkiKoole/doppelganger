@@ -13,7 +13,7 @@ char terminal8[] = "resources/terminal8.png";
 char zelda[] = "resources/link.png"; //24x26 pixels
 char font1[] = "resources/font.ttf";
 #define push_struct(arena, type) (type *)push_size_(arena, sizeof(type))
-#define push_array(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
+//#define push_array(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
 
 internal void* push_size_(Memory_Arena *arena, memory_index size){
     assert(arena->used + size <= arena->size);
