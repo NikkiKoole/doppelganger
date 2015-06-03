@@ -80,9 +80,9 @@ Shared_Library libgame = {
 };
 
 
-internal void stub(Screen* screen1, Memory* memory1, Keyboard* keyboard1, FrameTime* frametime1)
+internal void stub(Screen* s, Memory* m, Keyboard* k, FrameTime* f)
 {
-    UNUSED(screen1);  UNUSED(memory1);  UNUSED(keyboard1);  UNUSED(frametime1);
+    UNUSED(s);  UNUSED(m);  UNUSED(k);  UNUSED(f);
     usleep(10000);
 }
 
@@ -156,7 +156,7 @@ int main(void)
             frame_time->duration = (current_time - last_time);
             int fps = 1000/frame_time->duration;
             snprintf(frame_time->fps_string, sizeof frame_time->fps_string, "%d %s", fps, "FPS");
-            
+
             func(screen, &memory, keyboard, frame_time);
             last_time = current_time;
         }

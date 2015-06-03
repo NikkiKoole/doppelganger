@@ -6,7 +6,7 @@ LIBRARIES := SDL2 SDL2_image
 LD_FLAGS += $(foreach library, $(LIBRARIES),-l$(library))
 
 CC := gcc
-STD_FLAGS := -std=gnu99 -O3
+STD_FLAGS := -std=gnu99 -g3
 
 SIMPLESTRICT = -Werror -Wall
 
