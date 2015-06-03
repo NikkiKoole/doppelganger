@@ -78,14 +78,31 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
     SDL_RenderClear( renderer );
-    SDL_Rect source = {.x=0, .y=0, .w=24, .h=26};
-    SDL_Rect dest = {.x=100, .y=100, .w=24, .h=26};
-    texture_render_part(state->zelda, &source, &dest, renderer);
+    
 
-
-    state->link1->elapsed_time += frametime->duration;
+    printf("A animationto check: %d\n",state->animation1->frames[state->link1->current_frame].duration);
     printf("now the animations elapsed is at %d Millisceonds (duration: %d)\n ", state->link1->elapsed_time, frametime->duration);
-    //sprite_render_current_frame()
+    
+    int32 d = state->animation1->frames[state->link1->current_frame].duration;
+    
+    if (state->link1->elapsed_time > d) {
+        if (state->link1->current_frame < state->animation1->n_frames) {
+            state->link1->current_frame++;
+        }
+        else {
+            state->link1->current_frame = 0;
+        }
+        state->link1->elapsed_time = d - state->link1->elapsed_time;
+    }
+    printf("would like to play frame nr: %d\n", state->link1->current_frame);
+    int xs = state->link1->clip.x + state->link1->frame_width * state->link1->current_frame;
+    int ys = state->link1->clip.y;
+    SDL_Rect source = {.x=xs, .y=ys, .w=24, .h=26};
+    SDL_Rect dest = {.x=100, .y=100, .w=24*4, .h=26*4};
+
+    texture_render_part(state->zelda, &source, &dest, renderer);
+    state->link1->elapsed_time += frametime->duration;
+    
 
 
 #if 0

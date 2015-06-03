@@ -143,6 +143,7 @@ int main(void)
 
         initialize_memory();
         maybe_load_libgame();
+        start = SDL_GetTicks();
 
         while( !quit ) {
             while( SDL_PollEvent( &e ) != 0 ) {

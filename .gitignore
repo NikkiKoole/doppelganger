@@ -1,5 +1,6 @@
 
 doppel.dSYM/
+Info.plist
 .DS_Store
 doppel
 *.so
