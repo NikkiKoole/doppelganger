@@ -26,8 +26,9 @@ typedef size_t memory_index;
 #define gigabytes(value) (megabytes(value)*1024LL)
 #define terabytes(value) (gigabytes(value)*1024LL)
 
-#define assert(expression) if(!(expression)) {printf("\nASSERT FAIL: '%s' in function %s on line:%d (%s)\n\n",#expression, __FUNCTION__, __LINE__, __FILE__);exit(0);}
+#define ASSERT(expression) if(!(expression)) {printf("\nASSERT FAIL: '%s' in function %s on line:%d (%s)\n\n",#expression, __FUNCTION__, __LINE__, __FILE__);exit(0);}
 
 #define UNUSED(x) (void)(x)
+#define SDL_WARN(msg) printf("%s SDL Error: %s \t\t(%s, %s:%d)\n", #msg, SDL_GetError(), __FILE__, __FUNCTION__, __LINE__);
 
 #endif

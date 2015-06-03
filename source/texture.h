@@ -22,6 +22,7 @@ void texture_render_text(Texture* t, int32 x, int32 y, const char* text, real32 
 
 void texture_free(Texture* t);
 
+void texture_render_part(Texture* t, SDL_Rect* source, SDL_Rect* dest, SDL_Renderer* renderer);
 void texture_render(Texture* t, int32 x,int32 y, SDL_Renderer* renderer);
 void texture_render_ex(Texture* t, int32 x, int32 y, SDL_Rect* clip, real32 angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Renderer* renderer);
 

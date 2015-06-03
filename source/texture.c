@@ -3,8 +3,6 @@
 #include <stdbool.h>
 #include <SDL2/SDL_image.h>
 
-#define SDL_WARN(msg) printf("%s SDL Error: %s \t\t(%s, %s:%d)\n", #msg, SDL_GetError(), __FILE__, __FUNCTION__, __LINE__);
-
 
 bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
 {
@@ -125,7 +123,10 @@ void texture_set_alpha(Texture* t, uint8 alpha)
 }
 
 
-
+void texture_render_part(Texture* t, SDL_Rect* source, SDL_Rect* dest, SDL_Renderer* renderer)
+{
+    SDL_RenderCopy(renderer, t->tex, source, dest);
+}
 
 
 void texture_render(Texture* t, int32 x,int32 y, SDL_Renderer* renderer)
