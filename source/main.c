@@ -128,12 +128,12 @@ internal void initialize_memory(void)
     memory.is_initialized = false;
 }
 
-
+#define FRAMERATE 1000/60
 
 int main(void)
 {
-    int32 last_time = SDL_GetTicks();
-    int32 current_time;
+    uint32 now;
+    uint32 start;
 
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
@@ -145,20 +145,23 @@ int main(void)
         maybe_load_libgame();
 
         while( !quit ) {
-            current_time = SDL_GetTicks();
-
             while( SDL_PollEvent( &e ) != 0 ) {
                 keyboard->keys = SDL_GetKeyboardState( NULL );
                 if( e.type == SDL_QUIT || key_pressed(keyboard,KB_ESC) ){quit = true;}
             }
 
             maybe_load_libgame();
-            frame_time->duration = (current_time - last_time);
+            now = SDL_GetTicks();
+
+            if ( now - start < FRAMERATE ) SDL_Delay( FRAMERATE - ( now - start ) );
+            now = SDL_GetTicks();
+
+            frame_time->duration = now - start;
             int32 fps = 1000/frame_time->duration;
             snprintf(frame_time->fps_string, sizeof frame_time->fps_string, "%d %s", fps, "FPS");
 
             func(screen, &memory, keyboard, frame_time);
-            last_time = current_time;
+            start = now;
         }
     }
 	close_game();

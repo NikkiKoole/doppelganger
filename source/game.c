@@ -63,7 +63,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->link1 = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
         SDL_Rect clip = {.x=0, .y=26*5, .w=10*24, .h=26 };
         sprite_init(state->link1, state->zelda, clip, 24, 26);
-        sprite_play_animation(state->link1, state->animation1);
+
+        //sprite_play_animation(state->link1, state->animation1);
         memory->is_initialized = true;
     }
 
@@ -80,6 +81,11 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     SDL_Rect source = {.x=0, .y=0, .w=24, .h=26};
     SDL_Rect dest = {.x=100, .y=100, .w=24, .h=26};
     texture_render_part(state->zelda, &source, &dest, renderer);
+
+
+    state->link1->elapsed_time += frametime->duration;
+    printf("now the animations elapsed is at %d Millisceonds (duration: %d)\n ", state->link1->elapsed_time, frametime->duration);
+    //sprite_render_current_frame()
 
 
 #if 0
