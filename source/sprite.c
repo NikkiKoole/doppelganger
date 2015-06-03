@@ -2,7 +2,7 @@
 #include "sprite.h"
 #include "defines.h"
 
-void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  int frame_width, int frame_height)
+void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  int32 frame_width, int32 frame_height)
 {
     spr->texture = t;
     spr->clip = clip;

@@ -39,10 +39,10 @@ bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
                 t->height = formatted_surface->h;
 
                 uint32* pixels = (uint32*)t->pixels;
-                int pixel_count = (t->pitch / 4) * t->height;
+                int32 pixel_count = (t->pitch / 4) * t->height;
                 uint32 color_key = SDL_MapRGB(formatted_surface->format, 0, 0xFF, 0xFF);
                 uint32 transparent = SDL_MapRGBA(formatted_surface->format, 0x00, 0xFF,0xFF, 0x00);
-                int i = 0;
+                int32 i = 0;
                 for( i = 0; i < pixel_count; ++i ) {
 					if( pixels[i] == color_key ){
 						pixels[i] = transparent;
@@ -61,22 +61,22 @@ bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
     return t->tex != NULL;
 }
 
-void texture_render_text(Texture* t, int x, int y,const char* text, real32 scale, SDL_Renderer* renderer)
+void texture_render_text(Texture* t, int32 x, int32 y,const char* text, real32 scale, SDL_Renderer* renderer)
 {
     // this function assumes you load a 8x8 bitmap font texture
     // all glyphs alligned in ascii rows, google 'libtcod font image' when unsure.
 
-    int count = strlen(text);
-    int current_x = x;
-    int current_y = y;
-    int i = 0;
+    int32 count = strlen(text);
+    int32 current_x = x;
+    int32 current_y = y;
+    int32 i = 0;
     for (i = 0; i < count; i+=1) {
-        int ascii = (uint8) text[i];
+        uint8 ascii = (uint8) text[i];
         if (ascii == 10) {
             current_x = x;
             current_y += 8*scale;
         } else {
-            SDL_Rect src_rect = {(int) (ascii % 16)*8, (int) (ascii / 16)*8, 8, 8};
+            SDL_Rect src_rect = {(uint8) (ascii % 16)*8, (uint8) (ascii / 16)*8, 8, 8};
             SDL_Rect dest_rect = {current_x, current_y, 8*scale, 8*scale};
 
             SDL_RenderCopy(renderer, t->tex, &src_rect, &dest_rect);
@@ -128,13 +128,13 @@ void texture_set_alpha(Texture* t, uint8 alpha)
 
 
 
-void texture_render(Texture* t, int x,int y, SDL_Renderer* renderer)
+void texture_render(Texture* t, int32 x,int32 y, SDL_Renderer* renderer)
 {
     SDL_Rect render_quad = {x,y, t->width, t->height};
     SDL_RenderCopy(renderer, t->tex, NULL, &render_quad);
 }
 
-void texture_render_ex(Texture* t, int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Renderer* renderer)
+void texture_render_ex(Texture* t, int32 x, int32 y, SDL_Rect* clip, real32 angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Renderer* renderer)
 {
     SDL_Rect render_quad = {x, y, t->width, t->height};
 
@@ -182,13 +182,13 @@ void texture_copy_pixels(Texture* t, void* pixels)
 }
 
 
-uint32 texture_get_pixel32(Texture* t, uint16 x, uint16 y)
+uint32 texture_get_pixel32(Texture* t, int32 x, int32 y)
 {
     uint32* pixels = (uint32*)t->pixels;
     return pixels[( y * ( t->pitch / 4 ) ) + x ];
 }
 
-bool texture_create_blank(Texture* t, int width, int height, SDL_TextureAccess access,  SDL_Renderer* renderer)
+bool texture_create_blank(Texture* t, int32 width, int32 height, SDL_TextureAccess access,  SDL_Renderer* renderer)
 {
     t->tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, width, height);
     if(t->tex == NULL) {

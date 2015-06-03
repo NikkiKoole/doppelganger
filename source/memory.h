@@ -23,14 +23,14 @@ typedef struct Shared_Library
     const char* name;
     intmax_t creation_time;
     uint32 id;
-    int32 size;
+    uint32 size;
     const char* fn_name;
     struct stat stats;
 } Shared_Library;
 
 typedef struct FrameTime
 {
-    int duration;
+    uint32 duration;
     char fps_string[64];
 
 } FrameTime;
@@ -59,7 +59,7 @@ typedef struct Memory_Arena
 typedef struct State
 {
     Memory_Arena world_arena;
-    double angle1;
+    real64  angle1;
     Texture* tex1;
     Texture* terminal8;
     Texture* render_target;

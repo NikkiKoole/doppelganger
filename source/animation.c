@@ -7,9 +7,9 @@ void animation_init(Animation* a)
     a->loop_to = -1;
 }
 
-void animation_add_frame(Animation* a, int index, int duration, void* data) 
+void animation_add_frame(Animation* a, int32 index, int32 duration, void* data)
 {
-    int n = a->n_frames;
+    int32 n = a->n_frames;
     if (n < MAX_FRAMES_PER_ANIMATION) {
         a->frames[n].index = index;
         a->frames[n].duration = duration;

@@ -4,16 +4,17 @@
 #include "texture.h"
 #include "animation.h"
 
+
 typedef struct Sprite
 {
     Texture* texture;
     SDL_Rect clip;
-    int frame_width;
-    int frame_height;
-    int current_frame;
-    int elapsed_time;
+    int32 frame_width;
+    int32 frame_height;
+    int32 current_frame;
+    int32 elapsed_time;
 } Sprite;
 
-void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  int frame_width, int frame_height);
+void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  int32 frame_width, int32 frame_height);
 void sprite_play_animation(Sprite* spr, Animation* anim);
 #endif

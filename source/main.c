@@ -7,8 +7,8 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const int SCREEN_WIDTH = 1024;
-const int SCREEN_HEIGHT = 768;
+const int32 SCREEN_WIDTH = 1024;
+const int32 SCREEN_HEIGHT = 768;
 const char* TITLE = "DoppelGangers";
 
 internal bool init(void);
@@ -57,7 +57,7 @@ internal bool init(void)
 
     SDL_SetRenderDrawColor(screen->renderer, 0xFF, 0x00, 0xFF, 0xFF);
 
-    int img_flags = IMG_INIT_PNG;
+    int32 img_flags = IMG_INIT_PNG;
     if (!(IMG_Init(img_flags) & img_flags)) {
         printf("SDL_Image could not initialize");
         goto SDL_Error;
@@ -132,8 +132,8 @@ internal void initialize_memory(void)
 
 int main(void)
 {
-    int last_time = SDL_GetTicks();
-    int current_time;
+    int32 last_time = SDL_GetTicks();
+    int32 current_time;
 
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
@@ -154,7 +154,7 @@ int main(void)
 
             maybe_load_libgame();
             frame_time->duration = (current_time - last_time);
-            int fps = 1000/frame_time->duration;
+            int32 fps = 1000/frame_time->duration;
             snprintf(frame_time->fps_string, sizeof frame_time->fps_string, "%d %s", fps, "FPS");
 
             func(screen, &memory, keyboard, frame_time);
