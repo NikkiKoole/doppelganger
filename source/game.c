@@ -14,7 +14,7 @@ char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 #define PUSH_STRUCT(arena, type) (type *)push_size_(arena, sizeof(type))
-//#define PUSH_ARRAY(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
+#define PUSH_ARRAY(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
 
 
 internal void* push_size_(Memory_Arena *arena, memory_index size){
@@ -37,6 +37,28 @@ internal void world_init(World* world)
     printf("Enough to do for this world! \n");
 }
 
+internal void create_slice(State *state, SDL_Renderer* renderer  ) {
+    SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
+    SDL_RenderClear( renderer );
+    texture_set_as_rendertarget(&state->world_slices[0], renderer);
+    SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+    SDL_RenderClear( renderer );
+    int startX = 30;
+    int startY = 800;
+
+    for (int height = 0; height < 64; height++) {
+        for (int depth = 0; depth< 64; depth++) {
+            for (int width = 0; width < 64; width++) {
+                int index = rand() % 5;
+                SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
+                SDL_Rect dest = {.x=startX+width*16, .y=startY+(depth*8)-(height*16), .w=16, .h=24};
+                texture_render_part(state->blocks, &source, &dest, renderer);
+            }
+        }
+    }
+    SDL_SetRenderTarget( renderer, NULL );
+}
+
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
 
@@ -44,8 +66,6 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     SDL_Renderer* renderer = screen->renderer;
     ASSERT(sizeof(State) <= memory->permanent_storage_size);
     State *state = (State *)memory->permanent_storage;
-
-
 
     if (!memory->is_initialized) {
         initialize_arena(&state->world_arena,
@@ -90,8 +110,17 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
         state->world = (World*) PUSH_STRUCT(&state->world_arena, World);
         world_init(state->world);
-        printf("wordl: %lu\n", sizeof(World));
+        printf("world: %lu\n", sizeof(World));
+        printf("single texture: %lu\n", sizeof(Texture));
+        printf("Arena size before pushing Array: %lu \n", state->world_arena.used);
+        state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, WORLD_DEPTH, Texture);
+        printf("Arena size after pushing Array: %lu \n", state->world_arena.used);
 
+        texture_create_blank( &state->world_slices[0], 1024*2, 768*2, SDL_TEXTUREACCESS_TARGET, renderer);
+        texture_create_blank( &state->world_slices[1], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
+        texture_create_blank( &state->world_slices[2], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
+        printf("the third blank texture, living in world_slices:{ w:%d, h:%d } \n",state->world_slices[2].width, state->world_slices[2].height);
+        create_slice(state, renderer);
         memory->is_initialized = true;
     }
 
@@ -103,22 +132,25 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         printf("reloaded textures! \n");
     }
 
+    if (key_pressed(keyboard, KB_W)) {
+        create_slice(state, renderer);
+    }
+
     SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
     SDL_RenderClear( renderer );
 
-    int startX = 30;
-    int startY = 400;
+    //texture_set_color((state->tex1), 0xFF, 0x00, 0xFF);
+    //exture_set_alpha((state->tex1), 180);
+    //texture_set_alpha((state->tex1), 180);
+    //texture_render((&state->world_slices[2]), 100, 100, renderer);
+    //texture_set_alpha((state->world_slices[0]), 10);
 
-    for (int height = 0; height < 20; height++) {
-        for (int depth = 0; depth< 36; depth++) {
-            for (int width = 0; width < 36; width++) {
-                int index = rand() % 5;
-                SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
-                SDL_Rect dest = {.x=startX+width*16, .y=startY+(depth*8)-(height*16), .w=16, .h=24};
-                texture_render_part(state->blocks, &source, &dest, renderer);
-            }
-        }
+    for (int i = 0; i< WORLD_DEPTH ; i++) {
+        texture_render((&state->world_slices[0]), 0, 0, renderer);
     }
+
+
+
 
 
 #if 0

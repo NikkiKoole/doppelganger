@@ -7,8 +7,8 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const int32 SCREEN_WIDTH = 1024;
-const int32 SCREEN_HEIGHT = 768;
+const int32 SCREEN_WIDTH = 1024*2;
+const int32 SCREEN_HEIGHT = 768*2;
 const char* TITLE = "DoppelGangers";
 
 internal bool init(void);

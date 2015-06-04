@@ -62,9 +62,9 @@ typedef struct Block
     uint8 type;
 } Block;
 
-#define WORLD_WIDTH    16
-#define WORLD_HEIGHT   16
-#define WORLD_DEPTH    16
+#define WORLD_WIDTH    32
+#define WORLD_HEIGHT   32
+#define WORLD_DEPTH    32
 
 typedef struct World
 {
@@ -86,6 +86,7 @@ typedef struct State
     Sprite* walking_right;
 
     World* world;
+    Texture* world_slices;
 
 } State;
 
