@@ -60,6 +60,15 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         animation_add_frame( state->animation1, 1, 200, NULL );
         animation_add_frame( state->animation1, 2, 200, NULL );
         animation_add_frame( state->animation1, 3, 200, NULL );
+        animation_add_frame( state->animation1, 4, 200, NULL );
+        animation_add_frame( state->animation1, 5, 200, NULL );
+        animation_add_frame( state->animation1, 6, 200, NULL );
+        animation_add_frame( state->animation1, 7, 200, NULL );
+        animation_add_frame( state->animation1, 8, 200, NULL );
+        //        animation_add_frame( state->animation1, 9, 200, NULL );
+        
+
+
         state->link1 = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
         SDL_Rect clip = {.x=0, .y=26*5, .w=10*24, .h=26 };
         sprite_init(state->link1, state->zelda, clip, 24, 26);
@@ -79,14 +88,10 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
     SDL_RenderClear( renderer );
     
-
-    printf("A animationto check: %d\n",state->animation1->frames[state->link1->current_frame].duration);
-    printf("now the animations elapsed is at %d Millisceonds (duration: %d)\n ", state->link1->elapsed_time, frametime->duration);
-    
-    int32 d = state->animation1->frames[state->link1->current_frame].duration;
-    
+    int32 current_frame_index = (state->link1->current_frame);
+    int32 d = state->animation1->frames[current_frame_index].duration;
     if (state->link1->elapsed_time > d) {
-        if (state->link1->current_frame < state->animation1->n_frames) {
+        if (current_frame_index < state->animation1->n_frames) {
             state->link1->current_frame++;
         }
         else {
@@ -94,15 +99,17 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         }
         state->link1->elapsed_time = d - state->link1->elapsed_time;
     }
-    printf("would like to play frame nr: %d\n", state->link1->current_frame);
-    int xs = state->link1->clip.x + state->link1->frame_width * state->link1->current_frame;
+    int frame_width = state->link1->frame_width;
+    int xs = state->link1->clip.x + frame_width * state->link1->current_frame;
     int ys = state->link1->clip.y;
-    SDL_Rect source = {.x=xs, .y=ys, .w=24, .h=26};
-    SDL_Rect dest = {.x=100, .y=100, .w=24*4, .h=26*4};
-
-    texture_render_part(state->zelda, &source, &dest, renderer);
+    for (int i = 0; i < 40; i++) {
+        for (int j = 0; j < 30; j++) {
+            SDL_Rect source = {.x=xs, .y=ys, .w=24, .h=26};
+            SDL_Rect dest = {.x= i*24, .y=(j*26), .w=24, .h=26};
+            texture_render_part(state->zelda, &source, &dest, renderer);
+        }
+    }
     state->link1->elapsed_time += frametime->duration;
-    
 
 
 #if 0
