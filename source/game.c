@@ -38,6 +38,9 @@ internal void world_init(World* world)
 }
 
 internal void create_slice(State *state, SDL_Renderer* renderer  ) {
+
+    clock_t start = clock() ;
+
     SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
     SDL_RenderClear( renderer );
     texture_set_as_rendertarget(&state->world_slices[0], renderer);
@@ -52,11 +55,17 @@ internal void create_slice(State *state, SDL_Renderer* renderer  ) {
                 int index = rand() % 5;
                 SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
                 SDL_Rect dest = {.x=startX+width*16, .y=startY+(depth*8)-(height*16), .w=16, .h=24};
-                texture_render_part(state->blocks, &source, &dest, renderer);
+                if (rand() % 100 < 5) {
+                    texture_render_part(state->blocks, &source, &dest, renderer);
+                }
             }
         }
     }
     SDL_SetRenderTarget( renderer, NULL );
+
+    clock_t end = clock() ;
+    double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ;
+    printf("create slice took:  %f\n", elapsed_time);
 }
 
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
