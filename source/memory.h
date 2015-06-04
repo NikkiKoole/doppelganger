@@ -56,6 +56,21 @@ typedef struct Memory_Arena
 
 
 // TODO : expand this babe to greatness!
+
+typedef struct Block
+{
+    uint8 type;
+} Block;
+
+#define WORLD_WIDTH    32
+#define WORLD_HEIGHT   32
+#define WORLD_DEPTH    32
+
+typedef struct World
+{
+    Block blocks[WORLD_WIDTH * WORLD_HEIGHT * WORLD_DEPTH];
+} World;
+
 typedef struct State
 {
     Memory_Arena world_arena;
@@ -64,10 +79,19 @@ typedef struct State
     Texture* terminal8;
     Texture* render_target;
     Texture* zelda;
+    Texture* blocks;
     Timer* timer;
     Animation* animation1;
-    Sprite* link1;
+    Sprite* walking_left;
+    Sprite* walking_right;
+
+    World* world;
+    Texture* world_slices;
+
 } State;
+
+
+
 
 // this is the function thats being called from main, offered up by the gamelib.so file.
 void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime);

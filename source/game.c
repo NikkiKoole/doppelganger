@@ -10,10 +10,12 @@
 
 char texture1[] = "resources/image.png";
 char terminal8[] = "resources/terminal8.png";
-char zelda[] = "resources/link.png"; //24x26 pixels
+char zelda[] = "resources/link.png"; // 24 x 26 px
+char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 #define PUSH_STRUCT(arena, type) (type *)push_size_(arena, sizeof(type))
-//#define push_array(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
+#define PUSH_ARRAY(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
+
 
 internal void* push_size_(Memory_Arena *arena, memory_index size){
     ASSERT(arena->used + size <= arena->size);
@@ -29,8 +31,49 @@ internal void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *ba
     arena->used = 0;
 }
 
+internal void world_init(World* world)
+{
+    UNUSED(world);
+    printf("Enough to do for this world! \n");
+}
+
+internal void create_slice(State *state, SDL_Renderer* renderer  ) {
+
+    clock_t start = clock() ;
+
+    SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
+    SDL_RenderClear( renderer );
+    texture_set_as_rendertarget(&state->world_slices[0], renderer);
+    SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+    SDL_RenderClear( renderer );
+    int startX = 30;
+    int startY = 1000;
+
+    for (int height = 0; height < 64; height++) {
+        for (int depth = 0; depth< 64; depth++) {
+            texture_set_color((state->blocks), 0xFF - height*4, 0xFF - depth*4, 0xFF);
+            for (int width = 0; width < 64; width++) {
+                int index = rand() % 5;
+                SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
+                SDL_Rect dest = {.x=startX+width*16, .y=startY+(depth*8)-(height*16), .w=16, .h=24};
+
+                if (rand() % 100 < 90) {
+                    texture_render_part(state->blocks, &source, &dest, renderer);
+                }
+            }
+        }
+    }
+    SDL_SetRenderTarget( renderer, NULL );
+
+    clock_t end = clock() ;
+    double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ;
+    printf("create slice took:  %f\n", elapsed_time);
+}
+
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
+
+
     SDL_Renderer* renderer = screen->renderer;
     ASSERT(sizeof(State) <= memory->permanent_storage_size);
     State *state = (State *)memory->permanent_storage;
@@ -49,11 +92,13 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->zelda = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file( state->zelda, zelda, renderer);
 
-
+        state->blocks = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
+        texture_load_from_file( state->blocks, blocks, renderer);
 
         state->timer = (Timer*) PUSH_STRUCT(&state->world_arena, Timer);
         timer_init(state->timer);
         timer_start(state->timer);
+
         state->animation1 = (Animation*) PUSH_STRUCT(&state->world_arena, Animation);
         animation_init(state->animation1);
         animation_add_frame( state->animation1, 0, 200, NULL );
@@ -69,11 +114,34 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         
 
 
-        state->link1 = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
-        SDL_Rect clip = {.x=0, .y=26*5, .w=10*24, .h=26 };
-        sprite_init(state->link1, state->zelda, clip, 24, 26);
+        //state->link1 = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
+        //SDL_Rect clip = {.x=0, .y=26*5, .w=10*24, .h=26 };
+        //sprite_init(state->link1, state->zelda, clip, 24, 26);
 
         //sprite_play_animation(state->link1, state->animation1);
+
+        state->walking_left = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
+        SDL_Rect clip1 = {.x=0, .y=26*5, .w=10*24, .h=26 };
+        sprite_init(state->walking_left, state->zelda, clip1, 24, 26);
+
+        state->walking_right = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
+        SDL_Rect clip2 = {.x=0, .y=26*7, .w=10*24, .h=26 };
+        sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
+
+        state->world = (World*) PUSH_STRUCT(&state->world_arena, World);
+        world_init(state->world);
+        //printf("world: %lu\n", sizeof(World));
+        //printf("single texture: %lu\n", sizeof(Texture));
+        //printf("Arena size before pushing Array: %lu \n", state->world_arena.used);
+        state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, WORLD_DEPTH, Texture);
+        //printf("Arena size after pushing Array: %lu \n", state->world_arena.used);
+
+        texture_create_blank( &state->world_slices[0], 1024*2, 768*2, SDL_TEXTUREACCESS_TARGET, renderer);
+        texture_create_blank( &state->world_slices[1], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
+        texture_create_blank( &state->world_slices[2], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
+        printf("the third blank texture, living in world_slices:{ w:%d, h:%d } \n",state->world_slices[2].width, state->world_slices[2].height);
+        create_slice(state, renderer);
+
         memory->is_initialized = true;
     }
 
@@ -85,31 +153,28 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         printf("reloaded textures! \n");
     }
 
+    if (key_pressed(keyboard, KB_W)) {
+        create_slice(state, renderer);
+    }
+
     SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
     SDL_RenderClear( renderer );
-    
-    int32 current_frame_index = (state->link1->current_frame);
-    int32 d = state->animation1->frames[current_frame_index].duration;
-    if (state->link1->elapsed_time > d) {
-        if (current_frame_index < state->animation1->n_frames) {
-            state->link1->current_frame++;
-        }
-        else {
-            state->link1->current_frame = 0;
-        }
-        state->link1->elapsed_time = d - state->link1->elapsed_time;
+
+
+
+    //texture_set_color((state->tex1), 0xFF, 0x00, 0xFF);
+    //exture_set_alpha((state->tex1), 180);
+    //texture_set_alpha((state->tex1), 180);
+    //texture_render((&state->world_slices[2]), 100, 100, renderer);
+    //texture_set_alpha((state->world_slices[0]), 10);
+
+    for (int i = 0; i< WORLD_DEPTH ; i++) {
+        texture_render((&state->world_slices[0]), 0, 0, renderer);
     }
-    int frame_width = state->link1->frame_width;
-    int xs = state->link1->clip.x + frame_width * state->link1->current_frame;
-    int ys = state->link1->clip.y;
-    for (int i = 0; i < 40; i++) {
-        for (int j = 0; j < 30; j++) {
-            SDL_Rect source = {.x=xs, .y=ys, .w=24, .h=26};
-            SDL_Rect dest = {.x= i*24, .y=(j*26), .w=24, .h=26};
-            texture_render_part(state->zelda, &source, &dest, renderer);
-        }
-    }
-    state->link1->elapsed_time += frametime->duration;
+
+
+
+
 
 
 #if 0
@@ -157,6 +222,21 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     texture_set_color((state->terminal8), 0xff, 0xaa, 0xff);
     texture_render_text((state->terminal8), 10, 100, "Here's some text\nLorem ipsum dolor sit amet, ea vix modo\ntantas prodesset, nec ne veri salutandi\nhonestatis, ad nam omittam adipiscing.\nAt modus verterem abhorreant duo.\nNe lorem imperdiet qui.\nAt nam exerci civibus scribentur, \nea per nisl inimicus\nevertitur, ut vocent similique ius.\nSonet deserunt no mea, quo id\nscriptorem signiferumque,\nmel ad unum essent elaboraret.\n", 3, renderer);
+#endif
+
+#if 0
+    for (int i = 0; i < 30; i++) {
+        for (int j = 0; j < 30; j++) {
+            SDL_Rect source = sprite_get_current_frame(state->walking_left, state->animation1);
+            if ((i+j) % 2 == 0) {
+                source = sprite_get_current_frame(state->walking_right, state->animation1);
+            }
+            SDL_Rect dest = {.x=i*30, .y=j*30, .w=24, .h=26};
+            texture_render_part(state->zelda, &source, &dest, renderer);
+        }
+    }
+    sprite_update_elapsed_time(state->walking_left, frametime->duration);
+    sprite_update_elapsed_time(state->walking_right, frametime->duration);
 #endif
 
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);
