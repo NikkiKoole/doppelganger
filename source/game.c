@@ -10,10 +10,12 @@
 
 char texture1[] = "resources/image.png";
 char terminal8[] = "resources/terminal8.png";
-char zelda[] = "resources/link.png"; //24x26 pixels
+char zelda[] = "resources/link.png"; // 24 x 26 px
+char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 #define PUSH_STRUCT(arena, type) (type *)push_size_(arena, sizeof(type))
-//#define push_array(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
+//#define PUSH_ARRAY(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
+
 
 internal void* push_size_(Memory_Arena *arena, memory_index size){
     ASSERT(arena->used + size <= arena->size);
@@ -29,11 +31,21 @@ internal void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *ba
     arena->used = 0;
 }
 
+internal void world_init(World* world)
+{
+    UNUSED(world);
+    printf("Enough to do for this world! \n");
+}
+
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
+
+
     SDL_Renderer* renderer = screen->renderer;
     ASSERT(sizeof(State) <= memory->permanent_storage_size);
     State *state = (State *)memory->permanent_storage;
+
+
 
     if (!memory->is_initialized) {
         initialize_arena(&state->world_arena,
@@ -49,22 +61,37 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->zelda = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file( state->zelda, zelda, renderer);
 
-
+        state->blocks = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
+        texture_load_from_file( state->blocks, blocks, renderer);
 
         state->timer = (Timer*) PUSH_STRUCT(&state->world_arena, Timer);
         timer_init(state->timer);
         timer_start(state->timer);
+
         state->animation1 = (Animation*) PUSH_STRUCT(&state->world_arena, Animation);
         animation_init(state->animation1);
         animation_add_frame( state->animation1, 0, 200, NULL );
         animation_add_frame( state->animation1, 1, 200, NULL );
         animation_add_frame( state->animation1, 2, 200, NULL );
         animation_add_frame( state->animation1, 3, 200, NULL );
-        state->link1 = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
-        SDL_Rect clip = {.x=0, .y=26*5, .w=10*24, .h=26 };
-        sprite_init(state->link1, state->zelda, clip, 24, 26);
+        animation_add_frame( state->animation1, 4, 200, NULL );
+        animation_add_frame( state->animation1, 5, 200, NULL );
+        animation_add_frame( state->animation1, 6, 200, NULL );
+        animation_add_frame( state->animation1, 7, 200, NULL );
+        animation_add_frame( state->animation1, 8, 200, NULL );
 
-        //sprite_play_animation(state->link1, state->animation1);
+        state->walking_left = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
+        SDL_Rect clip1 = {.x=0, .y=26*5, .w=10*24, .h=26 };
+        sprite_init(state->walking_left, state->zelda, clip1, 24, 26);
+
+        state->walking_right = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
+        SDL_Rect clip2 = {.x=0, .y=26*7, .w=10*24, .h=26 };
+        sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
+
+        state->world = (World*) PUSH_STRUCT(&state->world_arena, World);
+        world_init(state->world);
+        printf("wordl: %lu\n", sizeof(World));
+
         memory->is_initialized = true;
     }
 
@@ -78,31 +105,20 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
     SDL_RenderClear( renderer );
-    
 
-    printf("A animationto check: %d\n",state->animation1->frames[state->link1->current_frame].duration);
-    printf("now the animations elapsed is at %d Millisceonds (duration: %d)\n ", state->link1->elapsed_time, frametime->duration);
-    
-    int32 d = state->animation1->frames[state->link1->current_frame].duration;
-    
-    if (state->link1->elapsed_time > d) {
-        if (state->link1->current_frame < state->animation1->n_frames) {
-            state->link1->current_frame++;
+    int startX = 30;
+    int startY = 400;
+
+    for (int height = 0; height < 20; height++) {
+        for (int depth = 0; depth< 36; depth++) {
+            for (int width = 0; width < 36; width++) {
+                int index = rand() % 5;
+                SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
+                SDL_Rect dest = {.x=startX+width*16, .y=startY+(depth*8)-(height*16), .w=16, .h=24};
+                texture_render_part(state->blocks, &source, &dest, renderer);
+            }
         }
-        else {
-            state->link1->current_frame = 0;
-        }
-        state->link1->elapsed_time = d - state->link1->elapsed_time;
     }
-    printf("would like to play frame nr: %d\n", state->link1->current_frame);
-    int xs = state->link1->clip.x + state->link1->frame_width * state->link1->current_frame;
-    int ys = state->link1->clip.y;
-    SDL_Rect source = {.x=xs, .y=ys, .w=24, .h=26};
-    SDL_Rect dest = {.x=100, .y=100, .w=24*4, .h=26*4};
-
-    texture_render_part(state->zelda, &source, &dest, renderer);
-    state->link1->elapsed_time += frametime->duration;
-    
 
 
 #if 0
@@ -150,6 +166,21 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     texture_set_color((state->terminal8), 0xff, 0xaa, 0xff);
     texture_render_text((state->terminal8), 10, 100, "Here's some text\nLorem ipsum dolor sit amet, ea vix modo\ntantas prodesset, nec ne veri salutandi\nhonestatis, ad nam omittam adipiscing.\nAt modus verterem abhorreant duo.\nNe lorem imperdiet qui.\nAt nam exerci civibus scribentur, \nea per nisl inimicus\nevertitur, ut vocent similique ius.\nSonet deserunt no mea, quo id\nscriptorem signiferumque,\nmel ad unum essent elaboraret.\n", 3, renderer);
+#endif
+
+#if 0
+    for (int i = 0; i < 30; i++) {
+        for (int j = 0; j < 30; j++) {
+            SDL_Rect source = sprite_get_current_frame(state->walking_left, state->animation1);
+            if ((i+j) % 2 == 0) {
+                source = sprite_get_current_frame(state->walking_right, state->animation1);
+            }
+            SDL_Rect dest = {.x=i*30, .y=j*30, .w=24, .h=26};
+            texture_render_part(state->zelda, &source, &dest, renderer);
+        }
+    }
+    sprite_update_elapsed_time(state->walking_left, frametime->duration);
+    sprite_update_elapsed_time(state->walking_right, frametime->duration);
 #endif
 
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);

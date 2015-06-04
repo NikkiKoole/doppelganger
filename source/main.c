@@ -134,7 +134,7 @@ int main(void)
 {
     uint32 now;
     uint32 start;
-
+    srand(0);
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
