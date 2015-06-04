@@ -47,15 +47,17 @@ internal void create_slice(State *state, SDL_Renderer* renderer  ) {
     SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
     SDL_RenderClear( renderer );
     int startX = 30;
-    int startY = 800;
+    int startY = 1000;
 
     for (int height = 0; height < 64; height++) {
         for (int depth = 0; depth< 64; depth++) {
+            texture_set_color((state->blocks), 0xFF - height*4, 0xFF - depth*4, 0xFF);
             for (int width = 0; width < 64; width++) {
                 int index = rand() % 5;
                 SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
                 SDL_Rect dest = {.x=startX+width*16, .y=startY+(depth*8)-(height*16), .w=16, .h=24};
-                if (rand() % 100 < 5) {
+
+                if (rand() % 100 < 90) {
                     texture_render_part(state->blocks, &source, &dest, renderer);
                 }
             }
