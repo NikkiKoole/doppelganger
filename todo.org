@@ -8,15 +8,16 @@
     The file format is not yet clear, I am thinking just a plain text
     file format.  The world will not be just blocks, because that's too
     minceraft, instead I'll make specific wall 3d tiles (think ASCII
-    box drawing but then 3d)
+    box drawing but then 3d).
     
     Instead of just rendering each block I have to figure out some
     culling, (?front to back bounding-box exclusion?) I have ideas about
-    some dynamic render-textures that could be helpful
+    some dynamic render-textures that could be helpful.
     
 **** TODO 
-     - [X] Figure out culling front to back
-     - [ ] Make sprites for  sides looking at various wall formation blocks
+     - [ ] Figure out culling front to back. [http://stackoverflow.com/questions/3693407/culling-techniques-for-rendering-lots-of-cubes]
+     - [ ] Make sprites for  sides looking at various wall formation blocks (think ASCII).
+       
  
 *** Entities
     There will be a few hundred 'smart' entities and many more dumb
