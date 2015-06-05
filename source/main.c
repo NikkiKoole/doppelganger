@@ -7,8 +7,8 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const int32 SCREEN_WIDTH = 1024*2;
-const int32 SCREEN_HEIGHT = 768*2;
+const int32 SCREEN_WIDTH = 1024;
+const int32 SCREEN_HEIGHT = 768;
 const char* TITLE = "DoppelGangers";
 
 internal bool init(void);
@@ -128,7 +128,7 @@ internal void initialize_memory(void)
     memory.is_initialized = false;
 }
 
-#define FRAMERATE 1000/60
+#define FRAMERATE 1000/30
 
 int main(void)
 {

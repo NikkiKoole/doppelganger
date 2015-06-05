@@ -1,0 +1,6 @@
+* Hi there 
+  this will be a todo list and other relevant info might up ed in here too
+** It has menus
+   Theyhave nice colors
+** More submenus too
+   You know you want that.
