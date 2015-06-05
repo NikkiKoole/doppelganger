@@ -13,6 +13,12 @@
     Instead of just rendering each block I have to figure out some
     culling, (?front to back bounding-box exclusion?) I have ideas about
     some dynamic render-textures that could be helpful
+    
+**** TODO 
+     Figure out culling front to back
+**** TODO 
+     Make sprites for  sides looking at various wall formation blocks
+ 
 *** Entities
     There will be a few hundred 'smart' entities and many more dumb
     ones, the smart ones are 'actors' that have collision, AI,
