@@ -15,9 +15,8 @@
     some dynamic render-textures that could be helpful
     
 **** TODO 
-     Figure out culling front to back
-**** TODO 
-     Make sprites for  sides looking at various wall formation blocks
+     - [ ] Figure out culling front to back
+     - [ ] Make sprites for  sides looking at various wall formation blocks
  
 *** Entities
     There will be a few hundred 'smart' entities and many more dumb
