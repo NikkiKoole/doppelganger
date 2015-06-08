@@ -1,4 +1,9 @@
 * Doppel engine & game 
+** TODO Todo List
+   - [ ] (World) Figure out culling front to back.
+   - [ ] (World) Make sprites for sides looking at various wall formation blocks (think ASCII).
+   - [ ] (General) read [http://c-faq.com/], and then read it more.
+
 ** Engine
 *** World
     The world is built in a 3d voxel, minecraft-like way, only more
@@ -13,21 +18,30 @@
     Instead of just rendering each block I have to figure out some
     culling, (?front to back bounding-box exclusion?) I have ideas about
     some dynamic render-textures that could be helpful.
-    
-**** TODO 
-     - [ ] Figure out culling front to back. [http://stackoverflow.com/questions/3693407/culling-techniques-for-rendering-lots-of-cubes]
-     - [ ] Make sprites for  sides looking at various wall formation blocks (think ASCII).
        
- 
 *** Entities
     There will be a few hundred 'smart' entities and many more dumb
     ones, the smart ones are 'actors' that have collision, AI,
     path-finding, animation and then some more. The dumber ones are
     just static objects in the world, perhaps some of them will have
-    some animateable behaviors.
-*** Debug
-** Game
+    some animate-able behaviors.
+    
+    Think about state machines to drive animations and perhaps
+    transitions Either decide to use just predraw frames (and draw
+    them) or put time in skeleton based animation, measure if that's
+    feasible though
 
+*** Debug
+    Make some very simple UI (Buttons, slider, panels) Use the ASCII
+    font for all text come to think of it just use the ASCII font for
+    everything, so I cannot waste time worrying about finicky design
+    decisions.
+    
+    The goal of the UI is just to help with debugging, inspect
+    variables during run time, add/update properties and etc.
+
+** Game
+   
 
 
 

@@ -22,9 +22,7 @@ typedef struct Actor
 
 typedef struct Tile
 {
-    u8 color;
-    u8 light;
-    u16 texture;
+    u8 texture;
 } Tile;
 
 typedef struct World
@@ -94,7 +92,101 @@ void build(BuildOrder order)
     }
 }
 
-int mainOld() {
+
+
+
+void fillTile(Tile *tiles, int x, int y, int z, int value) 
+{
+    Tile v = {.texture=(u8)value};
+    tiles[(y*(WIDTH*HEIGHT)) + (z*WIDTH) + x ] = v;
+}
+
+u8 getValueAt(Tile *tiles, int x, int y, int z)
+{
+    return tiles[(y*(WIDTH*HEIGHT)) + (z*WIDTH) + x ].texture;
+}
+
+/*
+  When culling a 3d world what do I do?  I check the world front -->
+  back So I start with Y = Max and go to Y = Min at each iteration I
+  don't change the x, but do check all y values.  if the tile I am
+  currenlty checking out (bounding box collides)/(fully overlaps) with
+  any of the earlier ones or set of earlier ones, I dont draw it.
+
+  This imples I should keep a list of rectangles that are drawn at the
+  current X column.
+  This in turn leads me to an algorithm that should be able to possible grow rectangle
+ */
+
+typedef struct Shape
+{
+    int x;
+    int y;
+    int w;
+    int h;
+} Shape;
+
+enum Overlap
+{
+    NONE,
+    PARTLY,
+    FULL
+};
+
+enum Overlap shape_overlaps(Shape *test, Shape *existing)
+{
+    int pleft = test->x;
+    int pright = pleft + test->w;
+    int ptop = test->y;
+    int pbottom = ptop + test->h;
+    
+    int eleft = existing->x;
+    int eright = eleft + existing->w;
+    int etop = existing->y;
+    int ebottom = etop + existing->h;
+
+    if (pright < eleft || pleft > eright || pbottom < etop || ptop > ebottom)
+        return NONE;
+    if (pbottom < ebottom || ptop > etop || pright < eright || pleft > eleft) 
+        return PARTLY;
+    return FULL;
+}
+
+#define MAX(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b);\
+        _a > _b ? _a : _b; })
+
+#define MIN(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b);\
+        _a < _b ? _a : _b; })
+
+
+Shape combine_shapes(Shape *add, Shape *existing)
+{
+    Shape result = {.x = existing->x, .y = existing->y};
+    int growWidth = 0;
+    int growHeight = 0;
+
+    if (add->x < existing->x){ 
+        result.x  = add->x;
+        growWidth = existing->x - add->x;
+    } 
+    if (add->y < existing->y){ 
+        result.y  = add->y;
+        growHeight = existing->y - add->y;
+    } 
+
+    printf("some min test %d", MIN(-12020, 123123));
+
+    result.w = existing->w + growWidth; 
+    result.h = existing->h + growHeight;
+    return(result);
+}
+
+
+int main() {
     printf("%lu kB.\n", sizeof(World) / 1000);
 
     World world = {};
@@ -118,6 +210,15 @@ int mainOld() {
     double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ;
     printf("Building took: %f \n", elapsed_time);
 
+    fillTile(world.tiles, 0, 0, 0, 99);
+    u8 value = getValueAt(world.tiles, 0, 0, 0);
+    printf("retrieved %d from 3d array.\n", (u8)value);
 
-
+    Shape existing = {.x=0, .y=-24, .w=16, .h=24};
+    Shape test = {.x=0, .y=0, .w=16, .h=24};
+    if (shape_overlaps(&test, &existing) == PARTLY) {
+        existing = combine_shapes(&test, &existing);
+    };
+    printf("Adding results in Shape(x:%d, y:%d, w:%d, h:%d).\n",existing.x, existing.y, existing.w, existing.h);
 }
+
