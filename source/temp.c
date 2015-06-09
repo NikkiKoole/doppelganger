@@ -126,6 +126,21 @@ typedef struct Shape
     int h;
 } Shape;
 
+typedef struct Bounds
+{
+    int left;
+    int right;
+    int top;
+    int bottom;
+} Bounds;
+
+
+
+Bounds getBoundsForShape(Shape *s)
+{
+    return (Bounds){.left=s->x, .top=s->y, .right=s->x+s->w, .bottom=s->y+s->h };
+}
+
 enum Overlap
 {
     NONE,
@@ -169,6 +184,9 @@ static internal Rectangle intersect(Rectangle lhs, Rectangle rhs)
         _a < _b ? _a : _b; })
 
 
+
+
+
 Shape getInterSectingShape(Shape *lhs, Shape *rhs)
 {
     int lhs_left = lhs->x;
@@ -191,32 +209,21 @@ Shape getInterSectingShape(Shape *lhs, Shape *rhs)
     return (Shape){.x=left, .y=top, .w=width, .h=height};
 }
 
-
-enum Overlap shape_overlaps(Shape *test, Shape *existing)
+enum Overlap shape_overlaps(Shape *lhs, Shape *rhs)
 {
-    /* int lhs_left = lhs->x; */
-    /* int lhs_top = lhs->y; */
-    /* int lhs_right = lhs_left + lhs->w; */
-    /* int lhs_bottom = lhs_top + lhs->h; */
-
-    /* int rhs_left = rhs->x; */
-    /* int rhs_top = rhs->y; */
-    /* int rhs_right = rhs_left + rhs->w; */
-    /* int rhs_bottom = rhs_top + rhs->h; */
-
-    int pleft = test->x;
-    int pright = pleft + test->w;
-    int ptop = test->y;
-    int pbottom = ptop + test->h;
+    int lhs_left = lhs->x;
+    int lhs_right = lhs_left + lhs->w;
+    int lhs_top = lhs->y;
+    int lhs_bottom = lhs_top + lhs->h;
     
-    int eleft = existing->x;
-    int eright = eleft + existing->w;
-    int etop = existing->y;
-    int ebottom = etop + existing->h;
+    int rhs_left = rhs->x;
+    int rhs_right = rhs_left + rhs->w;
+    int rhs_top = rhs->y;
+    int rhs_bottom = rhs_top + rhs->h;
 
-    if (pright < eleft || pleft > eright || pbottom < etop || ptop > ebottom)
+    if (lhs_right < rhs_left || lhs_left > rhs_right || lhs_bottom < rhs_top || lhs_top > rhs_bottom)
         return NONE;
-    if (pbottom < ebottom || ptop > etop || pright < eright || pleft > eleft) 
+    if (lhs_bottom < rhs_bottom || lhs_top > rhs_top || lhs_right < rhs_right || lhs_left > rhs_left) 
         return PARTLY;
     return FULL;
 }
