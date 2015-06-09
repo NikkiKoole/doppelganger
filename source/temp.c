@@ -133,8 +133,77 @@ enum Overlap
     FULL
 };
 
+
+/*
+static internal Rectangle intersect(Rectangle lhs, Rectangle rhs)
+{
+    Dimension lhsLeft = lhs.Location.X;
+    Dimension rhsLeft = rhs.Location.X;
+    Dimension lhsTop = lhs.Location.Y;
+    Dimension rhsTop = rhs.Location.Y;
+    Dimension lhsRight = lhs.Right;
+    Dimension rhsRight = rhs.Right;
+    Dimension lhsBottom = lhs.Bottom;
+    Dimension rhsBottom = rhs.Bottom;
+
+    Dimension left = Dimension.max(lhsLeft, rhsLeft);
+    Dimension top = Dimension.max(lhsTop, rhsTop);
+    Dimension right = Dimension.min(lhsRight, rhsRight);
+    Dimension bottom = Dimension.min(lhsBottom, rhsBottom);
+    Point location = new Point(left, top);
+    Dimension width = (right > left) ? (right - left) : new Dimension(0);
+    Dimension height = (bottom > top) ? (bottom - top) : new Dimension(0);
+
+    return new Rectangle(location, new Size(width, height));
+}
+ */
+
+#define MAX(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b);\
+        _a > _b ? _a : _b; })
+
+#define MIN(a,b) \
+    ({ __typeof__ (a) _a = (a); \
+        __typeof__ (b) _b = (b);\
+        _a < _b ? _a : _b; })
+
+
+Shape getInterSectingShape(Shape *lhs, Shape *rhs)
+{
+    int lhs_left = lhs->x;
+    int lhs_top = lhs->y;
+    int lhs_right = lhs_left + lhs->w;
+    int lhs_bottom = lhs_top + lhs->h;
+
+    int rhs_left = rhs->x;
+    int rhs_top = rhs->y;
+    int rhs_right = rhs_left + rhs->w;
+    int rhs_bottom = rhs_top + rhs->h;
+    
+    int left = MAX(lhs_left, rhs_left);
+    int top = MAX(lhs_top, rhs_top);
+    int right = MIN(lhs_right, rhs_right);
+    int bottom = MIN(lhs_bottom, rhs_bottom);
+
+    int width = (right > left) ? (right - left) : 0;
+    int height = (bottom > top) ? (bottom - top) : 0;
+    return (Shape){.x=left, .y=top, .w=width, .h=height};
+}
+
+
 enum Overlap shape_overlaps(Shape *test, Shape *existing)
 {
+    /* int lhs_left = lhs->x; */
+    /* int lhs_top = lhs->y; */
+    /* int lhs_right = lhs_left + lhs->w; */
+    /* int lhs_bottom = lhs_top + lhs->h; */
+
+    /* int rhs_left = rhs->x; */
+    /* int rhs_top = rhs->y; */
+    /* int rhs_right = rhs_left + rhs->w; */
+    /* int rhs_bottom = rhs_top + rhs->h; */
+
     int pleft = test->x;
     int pright = pleft + test->w;
     int ptop = test->y;
@@ -150,39 +219,6 @@ enum Overlap shape_overlaps(Shape *test, Shape *existing)
     if (pbottom < ebottom || ptop > etop || pright < eright || pleft > eleft) 
         return PARTLY;
     return FULL;
-}
-
-#define MAX(a,b) \
-    ({ __typeof__ (a) _a = (a); \
-        __typeof__ (b) _b = (b);\
-        _a > _b ? _a : _b; })
-
-#define MIN(a,b) \
-    ({ __typeof__ (a) _a = (a); \
-        __typeof__ (b) _b = (b);\
-        _a < _b ? _a : _b; })
-
-
-Shape combine_shapes(Shape *add, Shape *existing)
-{
-    Shape result = {.x = existing->x, .y = existing->y};
-    int growWidth = 0;
-    int growHeight = 0;
-
-    if (add->x < existing->x){ 
-        result.x  = add->x;
-        growWidth = existing->x - add->x;
-    } 
-    if (add->y < existing->y){ 
-        result.y  = add->y;
-        growHeight = existing->y - add->y;
-    } 
-
-    printf("some min test %d", MIN(-12020, 123123));
-
-    result.w = existing->w + growWidth; 
-    result.h = existing->h + growHeight;
-    return(result);
 }
 
 
@@ -214,11 +250,14 @@ int main() {
     u8 value = getValueAt(world.tiles, 0, 0, 0);
     printf("retrieved %d from 3d array.\n", (u8)value);
 
-    Shape existing = {.x=0, .y=-24, .w=16, .h=24};
-    Shape test = {.x=0, .y=0, .w=16, .h=24};
+    Shape existing = {.x=0, .y=0, .w=16, .h=24};
+    Shape test = {.x=4, .y=12, .w=12, .h=20};
+    Shape overlap;
+
     if (shape_overlaps(&test, &existing) == PARTLY) {
-        existing = combine_shapes(&test, &existing);
+        overlap = getInterSectingShape(&test, &existing);
+        // the overlap could be of 0 height, this just means they exactly are next to each other
     };
-    printf("Adding results in Shape(x:%d, y:%d, w:%d, h:%d).\n",existing.x, existing.y, existing.w, existing.h);
+    printf("overlap =(x:%d, y:%d, w:%d, h:%d).\n",overlap.x, overlap.y, overlap.w, overlap.h);
 }
 

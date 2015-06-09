@@ -124,7 +124,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         printf("Arena size before pushing Array: %zu \n", state->world_arena.used);
         state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, WORLD_DEPTH, Texture);
         printf("Arena size after pushing Array: %zu \n", state->world_arena.used);
-
+        
         texture_create_blank( &state->world_slices[0], 1024*2, 768*2, SDL_TEXTUREACCESS_TARGET, renderer);
         texture_create_blank( &state->world_slices[1], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
         texture_create_blank( &state->world_slices[2], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
