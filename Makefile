@@ -5,6 +5,7 @@ LIBRARY_PATH := -L/usr/local/include
 LIBRARIES := SDL2 SDL2_image
 LD_FLAGS += $(foreach library, $(LIBRARIES),-l$(library))
 
+
 CC := gcc
 STD_FLAGS := -std=gnu99 -g3
 

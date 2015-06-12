@@ -14,9 +14,19 @@ At the basis it follows some principles from 'Handmade Hero';
 
 On top of that it's a SDL backed engine based on the 'Lazy Foo tutorials'.
 
+
+Dependancies:
+-------------
+SDL2, SDL2_image
+linux:
+    inotify-tools
+osx:
+    fswatch
+
+
+
 Notes to self
 -------------
 
 Compiling in Emacs (while working in the source folder):
 `make all --directory=../`
-

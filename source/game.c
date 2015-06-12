@@ -1,5 +1,4 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include "memory.h"
 #include "texture.h"
 #include "timer.h"
@@ -124,7 +123,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         printf("Arena size before pushing Array: %zu \n", state->world_arena.used);
         state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, WORLD_DEPTH, Texture);
         printf("Arena size after pushing Array: %zu \n", state->world_arena.used);
-        
+
         texture_create_blank( &state->world_slices[0], 1024*2, 768*2, SDL_TEXTUREACCESS_TARGET, renderer);
         texture_create_blank( &state->world_slices[1], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
         texture_create_blank( &state->world_slices[2], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
@@ -154,7 +153,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     //texture_set_alpha((state->tex1), 180);
     //texture_render((&state->world_slices[2]), 100, 100, renderer);
     //texture_set_alpha((state->world_slices[0]), 10);
-    
+
     for (int i = 0; i< 10 ; i++) {
         texture_render((&state->world_slices[0]), 0, 0, renderer);
     }
@@ -206,13 +205,13 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 #endif
 
 #if 1
-    for (int i = 0; i < 30; i++) {
-        for (int j = 0; j < 30; j++) {
+    for (int i = 0; i < 90; i++) {
+        for (int j = 0; j < 90; j++) {
             SDL_Rect source = sprite_get_current_frame(state->walking_left, state->animation1);
             if ((i+j) % 2 == 0) {
                 source = sprite_get_current_frame(state->walking_right, state->animation1);
             }
-            SDL_Rect dest = {.x=i*30, .y=j*30, .w=24, .h=26};
+            SDL_Rect dest = {.x=i*30/3, .y=j*30/3, .w=24, .h=26};
             texture_render_part(state->zelda, &source, &dest, renderer);
         }
     }
