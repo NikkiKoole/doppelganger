@@ -1,0 +1,31 @@
+#ifndef GEOM_H
+#define GEOM_H
+
+typedef struct Vec2
+{
+    float x;
+    float y;
+} Vec2;
+
+int vec2_eql(Vec2 v1, Vec2 v2);
+
+Vec2 vec2(float x, float y);
+
+Vec2 vec2_zero(void);
+Vec2 vec2_unit(void);
+Vec2 vec2_heading(float a);
+
+Vec2 vec2_add(Vec2 left, Vec2 right);
+Vec2 vec2_sub(Vec2 left, Vec2 right);
+Vec2 vec2_mul(Vec2 left, float mul);
+Vec2 vec2_div(Vec2 left, float div);
+
+float vec2_len_sqrd(Vec2 v);
+float vec2_len(Vec2 v);
+float vec2_dist(Vec2 v1, Vec2 v2);
+float vec2_dist_sqrd(Vec2 v1, Vec2 v2);
+float vec2_dist_manh(Vec2 v1, Vec2 v2);
+
+Vec2 vec2_normalize(Vec2 v);
+void vec2_swap(Vec2* a, Vec2* b);
+#endif
