@@ -95,7 +95,7 @@ void build(BuildOrder order)
 
 
 
-void fillTile(Tile *tiles, int x, int y, int z, int value) 
+void fillTile(Tile *tiles, int x, int y, int z, int value)
 {
     Tile v = {.texture=(u8)value};
     tiles[(y*(WIDTH*HEIGHT)) + (z*WIDTH) + x ] = v;
@@ -173,15 +173,6 @@ static internal Rectangle intersect(Rectangle lhs, Rectangle rhs)
 }
  */
 
-#define MAX(a,b) \
-    ({ __typeof__ (a) _a = (a); \
-        __typeof__ (b) _b = (b);\
-        _a > _b ? _a : _b; })
-
-#define MIN(a,b) \
-    ({ __typeof__ (a) _a = (a); \
-        __typeof__ (b) _b = (b);\
-        _a < _b ? _a : _b; })
 
 
 
@@ -198,7 +189,7 @@ Shape getInterSectingShape(Shape *lhs, Shape *rhs)
     int rhs_top = rhs->y;
     int rhs_right = rhs_left + rhs->w;
     int rhs_bottom = rhs_top + rhs->h;
-    
+
     int left = MAX(lhs_left, rhs_left);
     int top = MAX(lhs_top, rhs_top);
     int right = MIN(lhs_right, rhs_right);
@@ -215,7 +206,7 @@ enum Overlap shape_overlaps(Shape *lhs, Shape *rhs)
     int lhs_right = lhs_left + lhs->w;
     int lhs_top = lhs->y;
     int lhs_bottom = lhs_top + lhs->h;
-    
+
     int rhs_left = rhs->x;
     int rhs_right = rhs_left + rhs->w;
     int rhs_top = rhs->y;
@@ -223,7 +214,7 @@ enum Overlap shape_overlaps(Shape *lhs, Shape *rhs)
 
     if (lhs_right < rhs_left || lhs_left > rhs_right || lhs_bottom < rhs_top || lhs_top > rhs_bottom)
         return NONE;
-    if (lhs_bottom < rhs_bottom || lhs_top > rhs_top || lhs_right < rhs_right || lhs_left > rhs_left) 
+    if (lhs_bottom < rhs_bottom || lhs_top > rhs_top || lhs_right < rhs_right || lhs_left > rhs_left)
         return PARTLY;
     return FULL;
 }
@@ -267,4 +258,3 @@ int main() {
     };
     printf("overlap =(x:%d, y:%d, w:%d, h:%d).\n",overlap.x, overlap.y, overlap.w, overlap.h);
 }
-
