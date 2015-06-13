@@ -1,5 +1,3 @@
-
-
 Doppelganger
 ------------
 
@@ -18,9 +16,9 @@ On top of that it's a SDL backed engine based on the 'Lazy Foo tutorials'.
 Dependancies:
 -------------
 SDL2, SDL2_image
-linux
+* linux
 * inotify-tools
-osx:
+* osx
 * fswatch
 
 
