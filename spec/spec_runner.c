@@ -42,9 +42,10 @@ describe(rectangles) {
         in = (BBox){(Point){50,50}, (Point){100,100}};
         out = (BBox){(Point){100,50}, (Point){150,100}};
         expect(bbox_intersect(in, out, &result) == 0);
-        //printf("result BBox(%f, %f, %f, %f)\n", result.tl.x, result.tl.y,result.br.x, result.br.y);
-        //printf("resulting bbox: (%d, %d, %d, %d) \n ", result.tl.x result.tl.y, result.br.x, result.br.y);
+        printf("\n%s.\n",vec2_to_string((Vec2){1.0f/3,1}));
     }
+
+
 }
 
 describe(defines) {

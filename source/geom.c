@@ -1,7 +1,17 @@
-
+#include <stdio.h>
 #include "geom.h"
 #include "defines.h"
 #include <math.h>
+
+// TODO this buffer need to be an argument to this function
+char* vec2_to_string(Vec2 v)
+{
+    char buffer[64];
+    sprintf(buffer, "Vec2(%.3f, %.3f)\n", v.x, v.y);
+    sprintf(buffer, "is this added?");
+    return buffer;
+}
+
 
 int vec2_eql(Vec2 v1, Vec2 v2)
 {

@@ -7,6 +7,7 @@ typedef struct Vec2
     float y;
 } Vec2;
 
+char* vec2_to_string(Vec2 v);
 int vec2_eql(Vec2 v1, Vec2 v2);
 
 Vec2 vec2(float x, float y);
