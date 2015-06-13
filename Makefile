@@ -21,7 +21,7 @@ SUPERSTRICT = -Werror -Wall -Wextra  -Wformat=2 -Wno-import \
 
 WARNINGS = $(SUPERSTRICT)
 
-LFILES := game texture timer animation keyboard sprite
+LFILES := game texture timer animation keyboard sprite geom
 LIB_FILES += $(foreach file, $(LFILES), source/$(file).c)
 LIB_O_FILES += $(foreach file, $(LFILES), $(file).o)
 
@@ -41,5 +41,11 @@ clean:
 fswatch:
 	# this will only work on osx, for linux run the separate notify.sh
 	fswatch-run ./source "make libgame"
+
+test:
+	gcc -std=c99 spec/spec_runner.c  $(LIB_FILES) -lm  $(LIBRARY_PATH) $(LD_FLAGS) && ./a.out
+	rm ./a.out
+
+
 
 all:libgame main

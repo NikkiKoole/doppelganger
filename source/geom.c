@@ -1,4 +1,6 @@
+
 #include "geom.h"
+#include "defines.h"
 #include <math.h>
 
 int vec2_eql(Vec2 v1, Vec2 v2)
@@ -95,4 +97,28 @@ void vec2_swap(Vec2* a, Vec2* b)
     Vec2 tmp = *a;
     a->x = b->x;  a->y = b->y;
     b->x = tmp.x; b->y = tmp.y;
+}
+
+int point_in_bbox(Point p, BBox b)
+{
+    return ( ( p.x >= b.tl.x && p.x <= b.br.x ) &&
+             ( p.y >= b.tl.y && p.y <= b.br.y) );
+}
+
+int bbox_in_bbox(BBox this, BBox other)
+{
+     return point_in_bbox( this.tl, other ) &&
+         point_in_bbox( this.br, other );
+}
+
+
+int bbox_intersect(BBox this, BBox other, BBox* result)
+{
+    result->tl.x = MAX(this.tl.x, other.tl.x);
+    result->tl.y = MAX(this.tl.y, other.tl.y);
+    result->br.x = MIN(this.br.x, other.br.x);
+    result->br.y = MIN(this.br.y, other.br.y);
+
+    return (result->br.x > result->tl.x &&
+            result->br.y > result->tl.y);
 }

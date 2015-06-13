@@ -5,24 +5,66 @@
 #include <math.h>
 
 
+describe(rectangles) {
+    Point p;
+    BBox b;
+    BBox in;
+    BBox out;
+    BBox result;
+
+    it (point in bbox should succeed) {
+        p = (Point){100,100};
+        b = (BBox){(Point){50,50}, (Point){150,150}};
+        expect(point_in_bbox(p, b) == 1);
+    }
+    it (point in bbox should fail) {
+        p = (Point){40,100};
+        expect(point_in_bbox(p, b) == 0);
+    }
+
+    it (bbox in bbox should succeed) {
+        in = (BBox){(Point){50,50}, (Point){150,150}};
+        out = (BBox){(Point){10,50}, (Point){150,150}};
+        expect(bbox_in_bbox(in, out));
+    }
+    it (bbox in bbox should fail) {
+        in = (BBox){(Point){50,50}, (Point){150,150}};
+        out = (BBox){(Point){60,50}, (Point){100,150}};
+        expect(bbox_in_bbox(in, out) == 0);
+    }
+    it (clearly intersect bounding boxes) {
+        in = (BBox){(Point){50,50}, (Point){100,100}};
+        out = (BBox){(Point){60,50}, (Point){100,100}};
+        expect(bbox_intersect(in, out, &result));
+        expect(result.br.x - 40 == result.tl.x);
+    }
+    it (doesnt intersect bounding boxes packed against each other) {
+        in = (BBox){(Point){50,50}, (Point){100,100}};
+        out = (BBox){(Point){100,50}, (Point){150,100}};
+        expect(bbox_intersect(in, out, &result) == 0);
+        //printf("result BBox(%f, %f, %f, %f)\n", result.tl.x, result.tl.y,result.br.x, result.br.y);
+        //printf("resulting bbox: (%d, %d, %d, %d) \n ", result.tl.x result.tl.y, result.br.x, result.br.y);
+    }
+}
+
 describe(defines) {
     it (min; positive ints) {
-        assert(MIN(0, 23) == 0);
+        expect(MIN(0, 23) == 0);
     }
     it (min; negative ints) {
-        assert(MIN(-120, 23) == -120);
+        expect(MIN(-120, 23) == -120);
     }
     it (min; negative floats) {
-        assert(MIN(-120.0f, 23) == -120.0);
+        expect(MIN(-120.0f, 23) == -120.0);
     }
     it (max; negative ints) {
-        assert(MAX(-9213123, -12312) == -12312);
+        expect(MAX(-9213123, -12312) == -12312);
     }
     it (max; positive floats) {
-        assert(MAX(12312.123f, 888123.000023f) == 888123.000023f);
+        expect(MAX(12312.123f, 888123.000023f) == 888123.000023f);
     }
     it (clamps; from negative to positive values) {
-        assert(CLAMP(90, -123456, 654321) == 90);
+        expect(CLAMP(90, -123456, 654321) == 90);
     }
 }
 
@@ -32,16 +74,17 @@ describe(geom) {
 
     it (can add two vectors){
         result = vec2_add(vec2(1,9), vec2(3,7));
-        assert(vec2_eql(result, vec2(4,16)));
+        expect(vec2_eql(result, vec2(4,16)));
     }
 
     it (can subtract two vectors) {
         result = vec2_sub(vec2(12, 34), vec2(8, 14));
-        assert(vec2_eql(result, vec2(4, 20)));
+        expect(vec2_eql(result, vec2(4, 20)));
     }
 }
 
 int main() {
+    test(rectangles);
     test(defines);
     test(geom);
     return summary();

@@ -28,4 +28,18 @@ float vec2_dist_manh(Vec2 v1, Vec2 v2);
 
 Vec2 vec2_normalize(Vec2 v);
 void vec2_swap(Vec2* a, Vec2* b);
+
+typedef Vec2 Point;
+
+typedef struct BBox
+{
+    Point tl;
+    Point br;
+} BBox;
+
+int point_in_bbox(Point p, BBox b);
+int bbox_in_bbox(BBox this, BBox other);
+int bbox_intersect(BBox this, BBox other, BBox* result);
+
+
 #endif

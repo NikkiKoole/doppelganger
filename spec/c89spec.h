@@ -1,3 +1,8 @@
+
+/*********************************************************************/
+/* 2015 Nikki Koole has copied , merged, modified and published this */
+/*********************************************************************/
+
 /*
 Copyright (c) 2013 Ithai Levi
 
@@ -32,7 +37,7 @@ DEALINGS IN THE SOFTWARE.
 /* -----------------------------                                              */
 /* describe({module_name})                                                    */
 /* it({module responsibility})                                                */
-/* assert({scalar})                                                           */
+/* expect({scalar})                                                           */
 /* test({module_name})                                                        */
 /* summary()                                                                  */
 
@@ -41,13 +46,13 @@ DEALINGS IN THE SOFTWARE.
 #define describe(MODULE) \
    void MODULE(void)
 
-/* "assert" tests the passed scalar, and prints the result and time.          */
-/* You can have several assert tests declared in a single "it" clause but     */
-/* only one assert can be executed during the test.                           */
-#define assert(SCALAR) \
+/* "expect" tests the passed scalar, and prints the result and time.          */
+/* You can have several expect tests declared in a single "it" clause but     */
+/* only one expect can be executed during the test.                           */
+#define expect(SCALAR) \
    _c89spec_end_it(); \
-   (SCALAR) ? _c89spec_assert_passed() \
-            : _c89spec_assert_failed(#SCALAR);
+   (SCALAR) ? _c89spec_expect_passed() \
+            : _c89spec_expect_failed(#SCALAR);
 
 /* "it" encapsulates a single test in a curly block.                          */
 /* REQUIREMENT can be anything that's valid as string.                        */
@@ -66,8 +71,8 @@ int summary(void);
 void _c89spec_test_module(const char * module,void (*func)(void));
 void _c89spec_begin_it(const char * requirement);
 void _c89spec_end_it(void);
-void _c89spec_assert_passed(void);
-void _c89spec_assert_failed(const char * scalar);
+void _c89spec_expect_passed(void);
+void _c89spec_expect_failed(const char * scalar);
 
 #endif /* end of include guard: C89SPEC_H_SC604JRD */
 
@@ -151,12 +156,12 @@ void _c89spec_end_it(void) {
    printf(" (%.2f seconds)", _c89spec_test_time);
 }
 
-void _c89spec_assert_passed(void) {
+void _c89spec_expect_passed(void) {
    printf("\r\t%s[x]\t",_C89SPEC_GREEN_COLOR);
    _c89spec_tests_passed++;
 }
 
-void _c89spec_assert_failed(const char * scalar) {
+void _c89spec_expect_failed(const char * scalar) {
    printf("\r\t%s[ ]\n\t\t%s",_C89SPEC_RED_COLOR,scalar);
    _c89spec_tests_failed++;
 }

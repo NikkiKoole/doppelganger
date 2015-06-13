@@ -1,4 +1,5 @@
-* Doppel engine & game 
+
+* Doppel engine & game
 ** TODO Todo List
    - [ ] (World) Figure out culling front to back.
    - [ ] (World) Make sprites for sides looking at various wall formation blocks (think ASCII).
@@ -14,18 +15,18 @@
     file format.  The world will not be just blocks, because that's too
     minceraft, instead I'll make specific wall 3d tiles (think ASCII
     box drawing but then 3d).
-    
+
     Instead of just rendering each block I have to figure out some
     culling, (?front to back bounding-box exclusion?) I have ideas about
     some dynamic render-textures that could be helpful.
-       
+
 *** Entities
     There will be a few hundred 'smart' entities and many more dumb
     ones, the smart ones are 'actors' that have collision, AI,
     path-finding, animation and then some more. The dumber ones are
     just static objects in the world, perhaps some of them will have
     some animate-able behaviors.
-    
+
     Think about state machines to drive animations and perhaps
     transitions Either decide to use just predraw frames (and draw
     them) or put time in skeleton based animation, measure if that's
@@ -36,13 +37,8 @@
     font for all text come to think of it just use the ASCII font for
     everything, so I cannot waste time worrying about finicky design
     decisions.
-    
+
     The goal of the UI is just to help with debugging, inspect
     variables during run time, add/update properties and etc.
 
 ** Game
-   
-
-
-
-
