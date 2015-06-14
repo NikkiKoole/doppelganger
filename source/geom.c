@@ -115,6 +115,7 @@ int point_in_bbox(Point p, BBox b)
              ( p.y >= b.tl.y && p.y <= b.br.y) );
 }
 
+
 int bbox_in_bbox(BBox this, BBox other)
 {
      return point_in_bbox( this.tl, other ) &&
