@@ -17,6 +17,7 @@ describe(rectangles) {
         b = (BBox){(Point){50,50}, (Point){150,150}};
         expect(point_in_bbox(p, b) == 1);
     }
+
     it (point in bbox should fail) {
         p = (Point){40,100};
         expect(point_in_bbox(p, b) == 0);
@@ -27,24 +28,33 @@ describe(rectangles) {
         out = (BBox){(Point){10,50}, (Point){150,150}};
         expect(bbox_in_bbox(in, out));
     }
+
     it (bbox in bbox should fail) {
         in = (BBox){(Point){50,50}, (Point){150,150}};
         out = (BBox){(Point){60,50}, (Point){100,150}};
         expect(bbox_in_bbox(in, out) == 0);
     }
+
     it (clearly intersect bounding boxes) {
         in = (BBox){(Point){50,50}, (Point){100,100}};
         out = (BBox){(Point){60,50}, (Point){100,100}};
         expect(bbox_intersect(in, out, &result));
         expect(result.br.x - 40 == result.tl.x);
     }
+
     it (doesnt intersect bounding boxes packed against each other) {
         in = (BBox){(Point){50,50}, (Point){100,100}};
         out = (BBox){(Point){100,50}, (Point){150,100}};
         expect(bbox_intersect(in, out, &result) == 0);
-        printf("\n%s.\n",vec2_to_string((Vec2){1.0f/3,1}));
-    }
+        char buffer[64] = {};
+        vec2_to_buffer((Vec2){1.0f/3,1}, &buffer);
+        printf("1) What is the buffer? :%s\n", buffer);
+        bbox_to_buffer(out, &buffer);
+        printf("2) What is the buffer? :%s\n", buffer);
+        bbox_to_buffer(in, &buffer);
+        printf("3) What is the buffer? :%s\n", buffer);
 
+    }
 
 }
 

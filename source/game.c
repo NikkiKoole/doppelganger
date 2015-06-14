@@ -4,7 +4,6 @@
 #include "timer.h"
 #include "animation.h"
 #include "keyboard.h"
-//#include "sprite.h"
 #include <time.h>
 
 char texture1[] = "resources/image.png";
@@ -14,7 +13,6 @@ char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 #define PUSH_STRUCT(arena, type) (type *)push_size_(arena, sizeof(type))
 #define PUSH_ARRAY(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
-
 
 internal void* push_size_(Memory_Arena *arena, memory_index size){
     ASSERT(arena->used + size <= arena->size);

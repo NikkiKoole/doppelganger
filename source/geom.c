@@ -3,13 +3,13 @@
 #include "defines.h"
 #include <math.h>
 
-// TODO this buffer need to be an argument to this function
-char* vec2_to_string(Vec2 v)
+void vec2_to_buffer(Vec2 v, char* buffer)
 {
-    char buffer[64];
-    sprintf(buffer, "Vec2(%.3f, %.3f)\n", v.x, v.y);
-    sprintf(buffer, "is this added?");
-    return buffer;
+    sprintf(buffer, "Vec2(%.1f, %.1f)\n", v.x, v.y);
+}
+void bbox_to_buffer(BBox b, char* buffer)
+{
+    sprintf(buffer, "BBox(%.1f, %.1f, %.1f, %.1f)\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
 }
 
 
