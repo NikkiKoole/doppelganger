@@ -203,13 +203,13 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 #endif
 
 #if 1
-    for (int i = 0; i < 90; i++) {
-        for (int j = 0; j < 90; j++) {
+    for (int i = 0; i < 20; i++) {
+        for (int j = 0; j < 10; j++) {
             SDL_Rect source = sprite_get_current_frame(state->walking_left, state->animation1);
             if ((i+j) % 2 == 0) {
                 source = sprite_get_current_frame(state->walking_right, state->animation1);
             }
-            SDL_Rect dest = {.x=i*30/3, .y=j*30/3, .w=24, .h=26};
+            SDL_Rect dest = {.x=i*30, .y=j*30, .w=24, .h=26};
             texture_render_part(state->zelda, &source, &dest, renderer);
         }
     }

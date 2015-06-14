@@ -7,8 +7,8 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const int32 SCREEN_WIDTH = 1024;
-const int32 SCREEN_HEIGHT = 768;
+const int32 SCREEN_WIDTH = 1280;
+const int32 SCREEN_HEIGHT = 800;
 const char* TITLE = "DoppelGangers";
 
 internal bool init(void);
@@ -62,7 +62,6 @@ internal bool init(void)
         printf("SDL_Image could not initialize");
         goto SDL_Error;
     }
-
 
     return true;
   SDL_Error:

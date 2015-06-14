@@ -3,6 +3,10 @@
 #include "../source/geom.h"
 #include "../source/defines.h"
 #include <math.h>
+#include <string.h>
+
+
+#define STRINGS_EQL(a, b) (strcmp((a),(b)) == 0)
 
 
 describe(rectangles) {
@@ -42,18 +46,18 @@ describe(rectangles) {
         expect(result.br.x - 40 == result.tl.x);
     }
 
-    it (doesnt intersect bounding boxes packed against each other) {
+    it (can be stringified) {
+        in = (BBox){50, 50, 100, 100};
+        char buffer[64];
+        bbox_to_buffer(in, buffer);
+        expect(STRINGS_EQL("BBox(50.0, 50.0, 100.0, 100.0)", buffer));
+
+    }
+
+    it ('doesnt intersect bounding boxes packed against each other') {
         in = (BBox){(Point){50,50}, (Point){100,100}};
         out = (BBox){(Point){100,50}, (Point){150,100}};
         expect(bbox_intersect(in, out, &result) == 0);
-        char buffer[64] = {};
-        vec2_to_buffer((Vec2){1.0f/3,1}, &buffer);
-        printf("1) What is the buffer? :%s\n", buffer);
-        bbox_to_buffer(out, &buffer);
-        printf("2) What is the buffer? :%s\n", buffer);
-        bbox_to_buffer(in, &buffer);
-        printf("3) What is the buffer? :%s\n", buffer);
-
     }
 
 }
@@ -82,6 +86,13 @@ describe(defines) {
 
 describe(geom) {
     Vec2 result;
+
+    it (can be stringified) {
+        result = vec2(1,2);
+        char buffer[64];
+        vec2_to_buffer(result, buffer);
+        expect(STRINGS_EQL("Vec2(1.0, 2.0)", buffer));
+    }
 
     it (can add two vectors){
         result = vec2_add(vec2(1,9), vec2(3,7));
