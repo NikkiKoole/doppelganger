@@ -5,9 +5,7 @@
 #include <math.h>
 #include <string.h>
 
-
 #define STRINGS_EQL(a, b) (strcmp((a),(b)) == 0)
-
 
 describe(rectangles) {
     Point p;
@@ -18,7 +16,7 @@ describe(rectangles) {
 
     it (point in bbox should succeed) {
         p = (Point){100,100};
-        b = (BBox){(Point){50,50}, (Point){150,150}};
+        b = (BBox){50,50,150,150};
         expect(point_in_bbox(p, b) == 1);
     }
 
@@ -28,8 +26,8 @@ describe(rectangles) {
     }
 
     it (bbox in bbox should succeed) {
-        in = (BBox){(Point){50,50}, (Point){150,150}};
-        out = (BBox){(Point){10,50}, (Point){150,150}};
+        in = (BBox){50,50,150,150};
+        out = (BBox){10,50,150,150};
         expect(bbox_in_bbox(in, out));
     }
 
@@ -40,8 +38,8 @@ describe(rectangles) {
     }
 
     it (clearly intersect bounding boxes) {
-        in = (BBox){(Point){50,50}, (Point){100,100}};
-        out = (BBox){(Point){60,50}, (Point){100,100}};
+        in = (BBox){50,50,100,100};
+        out = (BBox){60,50,100,100};
         expect(bbox_intersect(in, out, &result));
         expect(result.br.x - 40 == result.tl.x);
     }
@@ -51,14 +49,30 @@ describe(rectangles) {
         char buffer[64];
         bbox_to_buffer(in, buffer);
         expect(STRINGS_EQL("BBox(50.0, 50.0, 100.0, 100.0)", buffer));
-
     }
 
-    it ('doesnt intersect bounding boxes packed against each other') {
-        in = (BBox){(Point){50,50}, (Point){100,100}};
-        out = (BBox){(Point){100,50}, (Point){150,100}};
+    it (doesnt intersect bounding boxes packed against each other) {
+        in = (BBox){50,50,100,100};
+        out = (BBox){100,50,150,100};
         expect(bbox_intersect(in, out, &result) == 0);
     }
+
+    it (can subtract two bounding boxes) {
+        // in this situation we have to assert that the bounding boxes have the same width,
+        // if they wouldn't then the result would not be a rectangle.
+        BBox first = (BBox) {50,50,100,100};
+        BBox second = (BBox) {50,50,100,100};
+        //bbox_subtract(second, first, &result);
+        expect(result.tl.x == result.br.x && result.tl.y == result.br.y);
+    }
+
+    it (can merge two bounding boxes) {
+        // Same as the subtract I can only work with boxes that have the same width
+        // bbox_merge_equal_width(this, other, result)
+        // maybe a better name will be bbox_merge_with_similar_width(this, other, result)
+        // the other one will be called bbox_subtract_from_similar_width(this, other, result)
+    }
+
 
 }
 
