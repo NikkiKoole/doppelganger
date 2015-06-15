@@ -115,6 +115,13 @@ int point_in_bbox(Point p, BBox b)
              ( p.y >= b.tl.y && p.y <= b.br.y) );
 }
 
+int bbox_eql(BBox b1, BBox b2)
+{
+    return (b1.tl.x == b2.tl.x &&
+            b1.tl.y == b2.tl.y &&
+            b1.br.x == b2.br.x &&
+            b1.br.y == b2.br.y);
+}
 
 int bbox_in_bbox(BBox this, BBox other)
 {
@@ -122,6 +129,10 @@ int bbox_in_bbox(BBox this, BBox other)
          point_in_bbox( this.br, other );
 }
 
+int bbox_neighbour_vertically(BBox this, BBox other)
+{
+    return(this.br.y == other.tl.y || this.tl.y == other.br.y);
+}
 
 int bbox_intersect(BBox this, BBox other, BBox *result)
 {

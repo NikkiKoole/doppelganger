@@ -55,8 +55,15 @@ describe(rectangles) {
 
     it (doesnt intersect bounding boxes packed against each other) {
         in = (BBox){50,50,100,100};
-        out = (BBox){100,50,150,100};
+        out = (BBox){50,100,100,150};
         expect(bbox_intersect(in, out, &result) == 0);
+    }
+
+    it (knows when bounding boxes just touch when packed against each other as above) {
+        in = (BBox){50,50,100,100};
+        out = (BBox){50,100,100,150};
+        expect(bbox_neighbour_vertically(in, out) == 1);
+
     }
 
     it (can grow bounding boxes vertically) {
@@ -73,6 +80,30 @@ describe(rectangles) {
         second = (BBox) {50,50,100,100};
         bbox_shrink_vertically(&first, second);
         expect(BBOX_HEIGHT(first) == 0);
+    }
+
+    it (succeeds at a situation with differently sized bounding boxes) {
+
+        //     +---+
+        //     | A |
+        // +---+---+----+
+        // |   |   |    |
+        // |   | B |    |
+        // |   +---+    |
+        // |     C      |
+        // +------------+
+        // in the above case I start with the rectangle A+B and another one C
+        // the intersection of the two is the B shape
+        // I can shrink the AB one with B to get at A
+
+        BBox AB = (BBox) {100,100,200,400};
+        BBox C = (BBox) {0,200,600,600};
+        BBox intersect;
+        bbox_intersect(AB, C, &intersect);
+        expect(bbox_eql(intersect, (BBox){100,200,200,400}));
+        bbox_shrink_vertically(&AB, intersect);
+        expect(bbox_eql(AB, (BBox){100,100,200,200}));
+
     }
 }
 
