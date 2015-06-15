@@ -4,19 +4,19 @@
 #include <SDL2/SDL_image.h>
 
 
-bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
+bool texture_load_from_file(Texture *t, char *path, SDL_Renderer *renderer)
 {
     texture_free(t);
 
-    SDL_Texture* new_texture = NULL;
-    SDL_Surface* loaded_surface = IMG_Load(path);
+    SDL_Texture *new_texture = NULL;
+    SDL_Surface *loaded_surface = IMG_Load(path);
 
     if (loaded_surface == NULL){
         SDL_WARN('Unable to load image!');
     }
     else
     {
-        SDL_Surface* formatted_surface = SDL_ConvertSurfaceFormat( loaded_surface, SDL_PIXELFORMAT_RGBA8888, 0 );
+        SDL_Surface *formatted_surface = SDL_ConvertSurfaceFormat( loaded_surface, SDL_PIXELFORMAT_RGBA8888, 0 );
         if (formatted_surface == NULL) {
            SDL_WARN('Unable to convert loaded surface to display format');
         } else {
@@ -36,7 +36,7 @@ bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
                 t->width = formatted_surface->w;
                 t->height = formatted_surface->h;
 
-                uint32* pixels = (uint32*)t->pixels;
+                uint32 *pixels = (uint32*)t->pixels;
                 int32 pixel_count = (t->pitch / 4) * t->height;
                 uint32 color_key = SDL_MapRGB(formatted_surface->format, 0, 0xFF, 0xFF);
                 uint32 transparent = SDL_MapRGBA(formatted_surface->format, 0x00, 0xFF,0xFF, 0x00);
@@ -59,7 +59,7 @@ bool texture_load_from_file(Texture* t, char* path, SDL_Renderer* renderer)
     return t->tex != NULL;
 }
 
-void texture_render_text(Texture* t, int32 x, int32 y,const char* text, real32 scale, SDL_Renderer* renderer)
+void texture_render_text(Texture *t, int32 x, int32 y,const char *text, real32 scale, SDL_Renderer* renderer)
 {
     // this function assumes you load a 8x8 bitmap font texture
     // all glyphs alligned in ascii rows, google 'libtcod font image' when unsure.
@@ -84,14 +84,14 @@ void texture_render_text(Texture* t, int32 x, int32 y,const char* text, real32 s
 }
 
 
-void texture_init(Texture* t)
+void texture_init(Texture *t)
 {
     t->width = 0;
     t->height = 0;
     t->tex = NULL;
 }
 
-void texture_free(Texture* t)
+void texture_free(Texture *t)
 {
     if (t->tex != NULL){
         SDL_DestroyTexture(t->tex);
@@ -103,39 +103,39 @@ void texture_free(Texture* t)
     }
 }
 
-void texture_destroy(Texture* t)
+void texture_destroy(Texture *t)
 {
     texture_free(t);
 }
 
-void texture_set_color(Texture* t, uint8 Red, uint8 Green, uint8 Blue)
+void texture_set_color(Texture *t, uint8 Red, uint8 Green, uint8 Blue)
 {
     SDL_SetTextureColorMod(t->tex, Red, Green, Blue );
 }
 
-void texture_set_blend_mode(Texture* t, SDL_BlendMode mode)
+void texture_set_blend_mode(Texture *t, SDL_BlendMode mode)
 {
     SDL_SetTextureBlendMode(t->tex, mode);
 }
-void texture_set_alpha(Texture* t, uint8 alpha)
+void texture_set_alpha(Texture *t, uint8 alpha)
 {
     SDL_SetTextureAlphaMod(t->tex, alpha);
 }
 
 
-void texture_render_part(Texture* t, SDL_Rect* source, SDL_Rect* dest, SDL_Renderer* renderer)
+void texture_render_part(Texture *t, SDL_Rect* source, SDL_Rect *dest, SDL_Renderer *renderer)
 {
     SDL_RenderCopy(renderer, t->tex, source, dest);
 }
 
 
-void texture_render(Texture* t, int32 x,int32 y, SDL_Renderer* renderer)
+void texture_render(Texture *t, int32 x,int32 y, SDL_Renderer *renderer)
 {
     SDL_Rect render_quad = {x,y, t->width, t->height};
     SDL_RenderCopy(renderer, t->tex, NULL, &render_quad);
 }
 
-void texture_render_ex(Texture* t, int32 x, int32 y, SDL_Rect* clip, real32 angle, SDL_Point* center, SDL_RendererFlip flip, SDL_Renderer* renderer)
+void texture_render_ex(Texture *t, int32 x, int32 y, SDL_Rect *clip, real32 angle, SDL_Point *center, SDL_RendererFlip flip, SDL_Renderer *renderer)
 {
     SDL_Rect render_quad = {x, y, t->width, t->height};
 
@@ -147,7 +147,7 @@ void texture_render_ex(Texture* t, int32 x, int32 y, SDL_Rect* clip, real32 angl
     SDL_RenderCopyEx( renderer, t->tex, clip, &render_quad, angle, center, flip );
 }
 
-bool texture_lock(Texture* t)
+bool texture_lock(Texture *t)
 {
     bool success = true;
     if (t->pixels != NULL) {
@@ -161,7 +161,7 @@ bool texture_lock(Texture* t)
     }
     return success;
 }
-bool texture_unlock(Texture* t)
+bool texture_unlock(Texture *t)
 {
     bool success = true;
     if (t->pixels == NULL) {
@@ -175,7 +175,7 @@ bool texture_unlock(Texture* t)
     return success;
 }
 
-void texture_copy_pixels(Texture* t, void* pixels)
+void texture_copy_pixels(Texture *t, void *pixels)
 {
     if(t->pixels != NULL) {
         memcpy(t->pixels, pixels, t->pitch*t->height);
@@ -183,13 +183,13 @@ void texture_copy_pixels(Texture* t, void* pixels)
 }
 
 
-uint32 texture_get_pixel32(Texture* t, int32 x, int32 y)
+uint32 texture_get_pixel32(Texture *t, int32 x, int32 y)
 {
     uint32* pixels = (uint32*)t->pixels;
     return pixels[( y * ( t->pitch / 4 ) ) + x ];
 }
 
-bool texture_create_blank(Texture* t, int32 width, int32 height, SDL_TextureAccess access,  SDL_Renderer* renderer)
+bool texture_create_blank(Texture *t, int32 width, int32 height, SDL_TextureAccess access,  SDL_Renderer *renderer)
 {
     t->tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, width, height);
     if(t->tex == NULL) {
@@ -201,7 +201,7 @@ bool texture_create_blank(Texture* t, int32 width, int32 height, SDL_TextureAcce
     return (t->tex != NULL);
 }
 
-void texture_set_as_rendertarget(Texture* t, SDL_Renderer* renderer)
+void texture_set_as_rendertarget(Texture *t, SDL_Renderer *renderer)
 {
 	SDL_SetRenderTarget( renderer, t->tex );
 }

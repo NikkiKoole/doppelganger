@@ -9,7 +9,7 @@
 
 const int32 SCREEN_WIDTH = 1280;
 const int32 SCREEN_HEIGHT = 800;
-const char* TITLE = "DoppelGangers";
+const char *TITLE = "DoppelGangers";
 
 internal bool init(void);
 internal void close_game(void);
@@ -17,15 +17,15 @@ internal void maybe_load_libgame(void);
 internal void initialize_memory(void);
 
 Screen global_screen;
-Screen* screen = &global_screen;
+Screen *screen = &global_screen;
 Keyboard global_keyboard;
-Keyboard* keyboard = &global_keyboard;
+Keyboard *keyboard = &global_keyboard;
 FrameTime global_frame_time;
-FrameTime* frame_time = &global_frame_time;
+FrameTime *frame_time = &global_frame_time;
 
 Memory memory;
 
-void (*func)(Screen *, Memory *, Keyboard *, FrameTime*);
+void (*func)(Screen *, Memory *, Keyboard *, FrameTime *);
 
 internal void close_game(void)
 {
@@ -79,7 +79,7 @@ Shared_Library libgame = {
 };
 
 
-internal void stub(Screen* s, Memory* m, Keyboard* k, FrameTime* f)
+internal void stub(Screen *s, Memory *m, Keyboard *k, FrameTime *f)
 {
     UNUSED(s);  UNUSED(m);  UNUSED(k);  UNUSED(f);
     usleep(10000);

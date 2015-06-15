@@ -1,4 +1,3 @@
-
 * Doppel engine & game
 ** TODO Todo List
    - [ ] (World) Figure out culling front to back.

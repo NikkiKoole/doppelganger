@@ -13,7 +13,7 @@ uint8 KB_S     = SDL_SCANCODE_S;
 uint8 KB_A     = SDL_SCANCODE_A;
 uint8 KB_D     = SDL_SCANCODE_D;
 
-bool key_pressed(Keyboard* keyboard , uint8 key ) {
+bool key_pressed(Keyboard *keyboard , uint8 key ) {
     if ( keyboard->keys[ key ] ) {
         if ( keyboard->states[ key ] == 0 ) {
             keyboard->states[ key ] = 1;
@@ -25,6 +25,6 @@ bool key_pressed(Keyboard* keyboard , uint8 key ) {
     return 0;
 }
 
-bool key_down(Keyboard* keyboard, uint8 key ) {
+bool key_down(Keyboard *keyboard, uint8 key ) {
     return ( keyboard->keys[ key ] );
 }

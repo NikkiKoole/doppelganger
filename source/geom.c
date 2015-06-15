@@ -3,11 +3,11 @@
 #include "defines.h"
 #include <math.h>
 
-void vec2_to_buffer(Vec2 v, char* buffer)
+void vec2_to_buffer(Vec2 v, char *buffer)
 {
     sprintf(buffer, "Vec2(%.1f, %.1f)", v.x, v.y);
 }
-void bbox_to_buffer(BBox b, char* buffer)
+void bbox_to_buffer(BBox b, char *buffer)
 {
     sprintf(buffer, "BBox(%.1f, %.1f, %.1f, %.1f)", b.tl.x, b.tl.y, b.br.x, b.br.y);
 }
@@ -102,7 +102,7 @@ Vec2 vec2_normalize(Vec2 v)
     return vec2_div(v, len);
 }
 
-void vec2_swap(Vec2* a, Vec2* b)
+void vec2_swap(Vec2 *a, Vec2 *b)
 {
     Vec2 tmp = *a;
     a->x = b->x;  a->y = b->y;
@@ -123,7 +123,7 @@ int bbox_in_bbox(BBox this, BBox other)
 }
 
 
-int bbox_intersect(BBox this, BBox other, BBox* result)
+int bbox_intersect(BBox this, BBox other, BBox *result)
 {
     result->tl.x = MAX(this.tl.x, other.tl.x);
     result->tl.y = MAX(this.tl.y, other.tl.y);
@@ -133,3 +133,8 @@ int bbox_intersect(BBox this, BBox other, BBox* result)
     return (result->br.x > result->tl.x &&
             result->br.y > result->tl.y);
 }
+
+//void bbox_grow_vertically(BBox this, BBox other)
+//{
+
+//}

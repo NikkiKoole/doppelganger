@@ -28,7 +28,7 @@ internal void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *ba
     arena->used = 0;
 }
 
-internal void world_init(World* world)
+internal void world_init(World *world)
 {
     UNUSED(world);
     printf("Enough to do for this world! \n");
@@ -78,23 +78,23 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
                         memory->permanent_storage_size - sizeof(State),
                         (uint8 *)memory->permanent_storage + sizeof(State));
         state->angle1 = 0;
-        state->tex1 = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
+        state->tex1 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file( state->tex1, texture1, renderer);
-        state->terminal8 = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
+        state->terminal8 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file( state->terminal8, terminal8, renderer);
-        state->render_target = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
+        state->render_target = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_create_blank( state->render_target, 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
-        state->zelda = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
+        state->zelda = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file( state->zelda, zelda, renderer);
 
-        state->blocks = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
+        state->blocks = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file( state->blocks, blocks, renderer);
 
-        state->timer = (Timer*) PUSH_STRUCT(&state->world_arena, Timer);
+        state->timer = (Timer *) PUSH_STRUCT(&state->world_arena, Timer);
         timer_init(state->timer);
         timer_start(state->timer);
 
-        state->animation1 = (Animation*) PUSH_STRUCT(&state->world_arena, Animation);
+        state->animation1 = (Animation *) PUSH_STRUCT(&state->world_arena, Animation);
         animation_init(state->animation1);
         animation_add_frame( state->animation1, 0, 200, NULL );
         animation_add_frame( state->animation1, 1, 200, NULL );
@@ -106,15 +106,15 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         animation_add_frame( state->animation1, 7, 200, NULL );
         animation_add_frame( state->animation1, 8, 200, NULL );
 
-        state->walking_left = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
+        state->walking_left = (Sprite *) PUSH_STRUCT(&state->world_arena, Sprite);
         SDL_Rect clip1 = {.x=0, .y=26*5, .w=10*24, .h=26 };
         sprite_init(state->walking_left, state->zelda, clip1, 24, 26);
 
-        state->walking_right = (Sprite*) PUSH_STRUCT(&state->world_arena, Sprite);
+        state->walking_right = (Sprite *) PUSH_STRUCT(&state->world_arena, Sprite);
         SDL_Rect clip2 = {.x=0, .y=26*7, .w=10*24, .h=26 };
         sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
-        state->world = (World*) PUSH_STRUCT(&state->world_arena, World);
+        state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
         world_init(state->world);
         printf("world: %zu\n", sizeof(World));
         printf("single texture: %zu\n", sizeof(Texture));
@@ -134,7 +134,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     if (key_pressed(keyboard,KB_F5)){
         ASSERT(state->tex1);
         texture_load_from_file((state->tex1), texture1, renderer);
-        state->terminal8 = (Texture*) PUSH_STRUCT(&state->world_arena, Texture);
+        state->terminal8 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file((state->terminal8), terminal8, renderer);
         printf("reloaded textures! \n");
     }

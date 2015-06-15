@@ -8,13 +8,13 @@
 
 typedef struct Keyboard
 {
-    const uint8* keys;
+    const uint8 *keys;
     int32 states[256];
 
 } Keyboard;
 
-bool key_pressed(Keyboard* keyboard, uint8 key);
-bool key_down(Keyboard* keyboard, uint8 key);
+bool key_pressed(Keyboard *keyboard, uint8 key);
+bool key_down(Keyboard *keyboard, uint8 key);
 
 extern uint8 KB_SPACE;
 extern uint8 KB_RIGHT;
