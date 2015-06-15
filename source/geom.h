@@ -42,6 +42,7 @@ void bbox_to_buffer(BBox b, char *buffer);
 int point_in_bbox(Point p, BBox b);
 int bbox_in_bbox(BBox this, BBox other);
 int bbox_intersect(BBox this, BBox other, BBox *result);
-
+void bbox_grow_vertically(BBox *this, BBox other);
+void bbox_shrink_vertically(BBox *this, BBox other);
 
 #endif

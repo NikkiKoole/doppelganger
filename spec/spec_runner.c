@@ -6,6 +6,8 @@
 #include <string.h>
 
 #define STRINGS_EQL(a, b) (strcmp((a),(b)) == 0)
+#define BBOX_HEIGHT(a) (a.br.y - a.tl.y)
+#define BBOX_WIDTH(a) (a.br.x - a.tl.x)
 
 describe(rectangles) {
     Point p;
@@ -41,7 +43,7 @@ describe(rectangles) {
         in = (BBox){50,50,100,100};
         out = (BBox){60,50,100,100};
         expect(bbox_intersect(in, out, &result));
-        expect(result.br.x - 40 == result.tl.x);
+        expect(BBOX_WIDTH(result) == 40);
     }
 
     it (can be stringified) {
@@ -57,26 +59,21 @@ describe(rectangles) {
         expect(bbox_intersect(in, out, &result) == 0);
     }
 
-    it (can subtract two bounding boxes) {
-        // in this situation we have to assert that the bounding boxes have the same width,
-        // if they wouldn't then the result would not be a rectangle.
-
+    it (can grow bounding boxes vertically) {
         BBox first = (BBox) {50,50,100,100};
-        BBox second = (BBox) {50,50,100,100};
-        //bbox_shrink_vertically();
-        //bbox_grow_vertically();
-        //bbox_subtract(second, first, &result);
-        //expect(result.tl.x == result.br.x && result.tl.y == result.br.y);
+        BBox second = (BBox) {50,100,100,200};
+        bbox_grow_vertically(&first, second);
+        expect(BBOX_HEIGHT(first) == 150);
     }
 
-    it (can merge two bounding boxes) {
-        // Same as the subtract I can only work with boxes that have the same width
-        // bbox_merge_equal_width(this, other, result)
-        // maybe a better name will be bbox_merge_with_similar_width(this, other, result)
-        // the other one will be called bbox_subtract_from_similar_width(this, other, result)
+    it (can shrink bounding boxes vertically) {
+        BBox first = (BBox) {50,50,100,200};
+        BBox second = (BBox) {50,100,100,200};
+        bbox_shrink_vertically(&first, second);
+        second = (BBox) {50,50,100,100};
+        bbox_shrink_vertically(&first, second);
+        expect(BBOX_HEIGHT(first) == 0);
     }
-
-
 }
 
 describe(defines) {
