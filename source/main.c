@@ -112,6 +112,9 @@ internal void maybe_load_libgame(void)
     }
 }
 
+
+
+
 internal void initialize_memory(void)
 {
     void *base_address = (void *) gigabytes(1);
