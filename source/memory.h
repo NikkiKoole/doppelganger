@@ -10,6 +10,7 @@
 #include "animation.h"
 #include "sprite.h"
 #include "keyboard.h"
+#include "blockmap.h"
 
 typedef struct Screen
 {
@@ -55,21 +56,9 @@ typedef struct Memory_Arena
 } Memory_Arena;
 
 
+
+
 // TODO : expand this babe to greatness!
-
-typedef struct Block
-{
-    uint8 type;
-} Block;
-
-#define WORLD_WIDTH    32
-#define WORLD_HEIGHT   32
-#define WORLD_DEPTH    32
-
-typedef struct World
-{
-    Block blocks[WORLD_WIDTH  *WORLD_HEIGHT  *WORLD_DEPTH];
-} World;
 
 typedef struct State
 {
@@ -87,9 +76,7 @@ typedef struct State
 
     World *world;
     Texture *world_slices;
-
 } State;
-
 
 
 

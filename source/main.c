@@ -9,7 +9,7 @@
 
 const int32 SCREEN_WIDTH = 1280;
 const int32 SCREEN_HEIGHT = 800;
-const char *TITLE = "DoppelGangers";
+const char *TITLE = "Doppelgangs";
 
 internal bool init(void);
 internal void close_game(void);

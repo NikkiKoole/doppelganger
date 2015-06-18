@@ -1,7 +1,6 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-
 #include "defines.h"
 #include <SDL2/SDL.h>
 #include <stdbool.h>
