@@ -56,12 +56,11 @@ typedef struct BuildOrder
     int third_step;
 } BuildOrder;
 
-BuildOrder orderArray[2];
 
 void setBlockAt(World *w, int x, int y, int z, uint8 type);
 uint8 getBlockAt(World *w, int x, int y, int z);
-uint8 getBlockWhileLookingFromSide(World *w, int s, int x, int y, int z);
-void createOrdersFromDimensions(int WIDTH, int HEIGHT, int DEPTH, BuildOrder orderArray[]);
+uint8 getBlockWhileLookingFromSide(World *w, BuildOrder b, int x, int y, int z);
+void createOrdersFromDimensions(int WIDTH, int HEIGHT, int DEPTH, BuildOrder *orderArray);
 
 void cacheSlices(Texture *slices, Block *blocks, BuildOrder order);
 

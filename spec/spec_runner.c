@@ -20,13 +20,14 @@ describe(blockmap) {
     it (can look at the world from all 6 sides) {
         World w = {.width=32, .height=32, .depth=32};
         w.blocks = malloc((32*32*32));
+        BuildOrder *orderArray = malloc(sizeof(BuildOrder) * 6);
         createOrdersFromDimensions(32, 32, 32, orderArray);
-        //printf((unsigned int) front);
-        printf("\n%d\n", orderArray[1].first_start);
-        //setBlockAt(&w, 10, 10, 10, 100);
-        //expect(getBlockWhileLookingFromSide(&w, 0, 10,10,10) == 100);
+        //printf("\n%d\n", orderArray[1].first_start);
+        expect(getBlockWhileLookingFromSide(&w, orderArray[0], 10,10,10) == 100);
+        expect(1 == 1);
     }
 }
+
 
 
 
@@ -84,7 +85,6 @@ describe(rectangles) {
         in = (BBox){50,50,100,100};
         out = (BBox){50,100,100,150};
         expect(bbox_neighbour_vertically(in, out) == 1);
-
     }
 
     it (can grow bounding boxes vertically) {
@@ -124,7 +124,6 @@ describe(rectangles) {
         expect(bbox_eql(intersect, (BBox){100,200,200,400}));
         bbox_shrink_vertically(&AB, intersect);
         expect(bbox_eql(AB, (BBox){100,100,200,200}));
-
     }
 }
 
@@ -148,7 +147,6 @@ describe(defines) {
         expect(CLAMP(90, -123456, 654321) == 90);
     }
 }
-
 
 describe(geom) {
     Vec2 result;
