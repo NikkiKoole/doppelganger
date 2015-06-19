@@ -55,6 +55,11 @@ typedef struct Memory_Arena
     memory_index used;
 } Memory_Arena;
 
+#define PUSH_STRUCT(arena, type) (type *)push_size_(arena, sizeof(type))
+#define PUSH_ARRAY(arena, count, type) (type *)push_size_(arena, (count)*sizeof(type))
+
+void* push_size_(Memory_Arena *arena, memory_index size);
+void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base);
 
 
 

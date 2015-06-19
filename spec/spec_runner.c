@@ -1,13 +1,34 @@
 #include <stdio.h>
 #include "c89spec.h"
-#include "../source/geom.h"
-#include "../source/defines.h"
 #include <math.h>
 #include <string.h>
+#include "../source/geom.h"
+#include "../source/defines.h"
+#include "../source/blockmap.h"
 
 #define STRINGS_EQL(a, b) (strcmp((a),(b)) == 0)
 #define BBOX_HEIGHT(a) (a.br.y - a.tl.y)
 #define BBOX_WIDTH(a) (a.br.x - a.tl.x)
+
+describe(blockmap) {
+    it (3d blocky world dynamically sizeable) {
+        World w = {.width=32, .height=32, .depth=32};
+        w.blocks = malloc((32*32*32));
+        setBlockAt(&w, 10, 10, 10, 100);
+        expect(getBlockAt(&w, 10,10,10) == 100);
+    }
+    it (can look at the world from all 6 sides) {
+        World w = {.width=32, .height=32, .depth=32};
+        w.blocks = malloc((32*32*32));
+        createOrdersFromDimensions(32, 32, 32, orderArray);
+        //printf((unsigned int) front);
+        printf("\n%d\n", orderArray[1].first_start);
+        //setBlockAt(&w, 10, 10, 10, 100);
+        expect(getBlockWhileLookingFromSide(&w, 0, 10,10,10) == 100);
+    }
+}
+
+
 
 describe(rectangles) {
     Point p;
@@ -151,8 +172,9 @@ describe(geom) {
 }
 
 int main() {
-    test(rectangles);
-    test(defines);
-    test(geom);
+    test(blockmap);
+    /* test(rectangles); */
+    /* test(defines); */
+    /* test(geom); */
     return summary();
 }

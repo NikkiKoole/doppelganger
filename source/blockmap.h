@@ -5,6 +5,9 @@
 #define WORLD_HEIGHT   32
 #define WORLD_DEPTH    32
 
+#include "defines.h"
+#include "texture.h"
+
 typedef struct Block
 {
     uint8 type;
@@ -12,11 +15,21 @@ typedef struct Block
 
 typedef struct World
 {
-    Block blocks[WORLD_WIDTH  *WORLD_HEIGHT  *WORLD_DEPTH];
+    uint8 width;
+    uint8 height;
+    uint8 depth;
+    Block *blocks;//[WORLD_WIDTH * WORLD_HEIGHT * WORLD_DEPTH];
 } World;
 
-int setBlockAt(Block *blocks, int x, int y, int z, uint8 type);
-uint8 getBlockAt(Block *blocks, int x, int y, int z);
+typedef enum Side
+{
+    front,
+    back,
+    left,
+    right,
+    top,
+    bottom
+} Side;
 
 typedef enum Axis
 {
@@ -42,6 +55,13 @@ typedef struct BuildOrder
     int third_end;
     int third_step;
 } BuildOrder;
+
+BuildOrder orderArray[2];
+
+void setBlockAt(World *w, int x, int y, int z, uint8 type);
+uint8 getBlockAt(World *w, int x, int y, int z);
+uint8 getBlockWhileLookingFromSide(World *w, int s, int x, int y, int z);
+void createOrdersFromDimensions(int WIDTH, int HEIGHT, int DEPTH, BuildOrder orderArray[]);
 
 void cacheSlices(Texture *slices, Block *blocks, BuildOrder order);
 
