@@ -28,9 +28,13 @@ LIB_O_FILES += $(foreach file, $(LFILES), $(file).o)
 MFILES := main.c keyboard.c
 MAIN_FILES += $(foreach file, $(MFILES), source/$(file))
 
+OBJDIR = ./objs/
+
 libgame:
+	@(mkdir -p $(OBJDIR))
 	@($(CC) -c $(WARNINGS) $(STD_FLAGS) -fpic $(LIB_FILES))
 	@($(CC) -shared -o $(LIBRARY_NAME) $(LIB_O_FILES) $(LIBRARY_PATH) $(LD_FLAGS))
+	@(mv *.o $(OBJDIR))
 
 main:
 	@($(CC) $(WARNINGS)  $(STD_FLAGS) $(MAIN_FILES) -o $(PROGRAM_NAME) $(LIBRARY_PATH) $(LD_FLAGS))

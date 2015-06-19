@@ -204,7 +204,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
 #if 1
     for (int i = 0; i < 20; i++) {
-        for (int j = 0; j < 10; j++) {
+        for (int j = 0; j < 20; j++) {
             SDL_Rect source = sprite_get_current_frame(state->walking_left, state->animation1);
             if ((i+j) % 2 == 0) {
                 source = sprite_get_current_frame(state->walking_right, state->animation1);

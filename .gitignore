@@ -6,3 +6,4 @@ doppel
 *.so
 *.o
 a.out
+objs/*.o
