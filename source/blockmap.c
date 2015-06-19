@@ -2,7 +2,7 @@
 
 //BuildOrder orderArray[2];
 
-void createOrdersFromDimensions(int WIDTH, int HEIGHT, int DEPTH, BuildOrder orderArray[])
+void createOrdersFromDimensions(int WIDTH, int HEIGHT, int DEPTH, BuildOrder oa[])
 {
     BuildOrder front_order = {
         .first  = X,  .first_start  = 0,      .first_end  = WIDTH,  .first_step  = 1,
@@ -16,8 +16,8 @@ void createOrdersFromDimensions(int WIDTH, int HEIGHT, int DEPTH, BuildOrder ord
         .third  = Y,  .third_start  = DEPTH,  .third_end  = 0,      .third_step  = -1
     };
 
-    orderArray[0] = front_order;
-    orderArray[1] = back_order;
+    oa[0] = front_order;
+    oa[1] = back_order;
 }
 void setBlockAt(World *world, int x, int y, int z, uint8 type)
 {
@@ -30,6 +30,10 @@ uint8 getBlockAt(World *world, int x, int y, int z)
 
 uint8 getBlockWhileLookingFromSide(World *w, int s, int x, int y, int z)
 {
+    UNUSED(w);
+    UNUSED(x);
+    UNUSED(y);
+    UNUSED(z);
     //printf("side int: %d", (int) s);
     printf("\n%d\n", orderArray[s].first_start);
     return 0;
