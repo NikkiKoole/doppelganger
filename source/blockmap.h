@@ -43,17 +43,14 @@ typedef struct BuildOrder
     Axis first;
     int first_start;
     int first_end;
-    int first_step;
 
     Axis second;
     int second_start;
     int second_end;
-    int second_step;
 
     Axis third;
     int third_start;
     int third_end;
-    int third_step;
 } BuildOrder;
 
 
