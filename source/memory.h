@@ -14,6 +14,8 @@
 
 typedef struct Screen
 {
+    int width;
+    int height;
     SDL_Renderer *renderer;
     SDL_Window *window;
 } Screen;

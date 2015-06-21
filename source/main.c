@@ -49,6 +49,8 @@ internal bool init(void)
                                SDL_WINDOW_SHOWN);
 
     if (window == NULL) goto SDL_Error;
+    screen->width = SCREEN_WIDTH;
+    screen->height = SCREEN_HEIGHT;
     screen->window = window;
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);

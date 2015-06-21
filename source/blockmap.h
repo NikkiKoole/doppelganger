@@ -31,37 +31,9 @@ typedef enum Side
     bottom
 } Side;
 
-typedef enum Axis
-{
-    X,
-    Y,
-    Z
-} Axis;
-
-typedef struct BuildOrder
-{
-    Axis first;
-    int first_start;
-    int first_end;
-
-    Axis second;
-    int second_start;
-    int second_end;
-
-    Axis third;
-    int third_start;
-    int third_end;
-} BuildOrder;
-
-
+void resetBlocks(World *world);
 void setBlockAt(World *w, int x, int y, int z, uint8 type);
 uint8 getBlockAt(World *w, int x, int y, int z);
-uint8 getBlockWhileLookingFromSide(World *w, BuildOrder b, int x, int y, int z);
-void createOrdersFromDimensions(int WIDTH, int HEIGHT, int DEPTH, BuildOrder *orderArray);
-
-void cacheSlices(Texture *slices, Block *blocks, BuildOrder order);
-
-
 
 
 #endif
