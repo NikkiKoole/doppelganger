@@ -2,48 +2,48 @@
 
 void createOrdersFromDimensions(int width, int height, int depth, BuildOrder *orders)
 {
-    BuildOrder front  = {
+    BuildOrder frontOrder  = {
         .first  = X,  .first_start  = 0,      .first_end  = width,
         .second = Z,  .second_start = 0,      .second_end = height,
         .third  = Y,  .third_start  = 0,      .third_end  = depth
     };
 
-    BuildOrder back = {
+    BuildOrder backOrder = {
         .first  = X,  .first_start  = width-1,  .first_end  = 0,
         .second = Z,  .second_start = 0,        .second_end = height,
         .third  = Y,  .third_start  = depth-1,  .third_end  = 0
     };
 
-    BuildOrder left = {
+    BuildOrder leftOrder = {
         .first  = Y,   .first_start  = 0,       .first_end  = depth,
         .second = Z,   .second_start = 0,       .second_end = height,
         .third  = X,   .third_start  = width-1, .third_end  = 0
     };
 
-    BuildOrder right = {
+    BuildOrder rightOrder = {
         .first  = Y,   .first_start  = depth-1, .first_end  = 0,
         .second = Z,   .second_start = 0,       .second_end = height,
         .third  = X,   .third_start  = 0,       .third_end  = width
     };
 
-    BuildOrder top = {
+    BuildOrder topOrder = {
         .first  = X,   .first_start  = 0,       .first_end  = width,
         .second = Y,   .second_start = depth-1, .second_end = 0,
         .third  = Z,   .third_start  = 0,       .third_end  = height
     };
 
-    BuildOrder bottom = {
+    BuildOrder bottomOrder = {
         .first  = X,   .first_start  = 0,       .first_end  = width,
         .second = Y,   .second_start = 0,       .second_end = depth,
         .third  = Z,   .third_start  = height-1,.third_end  = 0
     };
 
-    orders[0] = front;
-    orders[1] = back;
-    orders[2] = left;
-    orders[3] = right;
-    orders[4] = top;
-    orders[5] = bottom;
+    orders[0] = frontOrder;
+    orders[1] = backOrder;
+    orders[2] = leftOrder;
+    orders[3] = rightOrder;
+    orders[4] = topOrder;
+    orders[5] = bottomOrder;
 }
 /*
     |Z (height)

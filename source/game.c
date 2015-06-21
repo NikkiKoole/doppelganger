@@ -11,6 +11,7 @@ char terminal8[] = "resources/terminal8.png";
 char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
+internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer);
 
 internal void world_init(World *world)
 {
@@ -51,6 +52,8 @@ internal void create_slice(State *state, SDL_Renderer* renderer  ) {
     printf("create slice took:  %f\n", elapsed_time);
 }
 
+
+
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
     SDL_Renderer* renderer = screen->renderer;
@@ -58,7 +61,34 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     State *state = (State *)memory->permanent_storage;
 
     if (!memory->is_initialized) {
-        initialize_arena(&state->world_arena,
+        initialize_memory(state, memory, renderer);
+        memory->is_initialized = true;
+    }
+
+    if (key_pressed(keyboard,KB_F5)){
+        ASSERT(state->tex1);
+        texture_load_from_file((state->tex1), texture1, renderer);
+        state->terminal8 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
+        texture_load_from_file((state->terminal8), terminal8, renderer);
+        printf("reloaded textures! \n");
+    }
+
+    if (key_pressed(keyboard, KB_W)) {
+        //create_slice(state, renderer);
+    }
+
+    SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
+    SDL_RenderClear( renderer );
+
+
+    SDL_RenderPresent( renderer );
+}
+
+
+
+internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* renderer)
+{
+            initialize_arena(&state->world_arena,
                         memory->permanent_storage_size - sizeof(State),
                         (uint8 *)memory->permanent_storage + sizeof(State));
         state->angle1 = 0;
@@ -110,26 +140,14 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         texture_create_blank( &state->world_slices[1], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
         texture_create_blank( &state->world_slices[2], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
         printf("the third blank texture, living in world_slices:{ w:%d, h:%d } \n",state->world_slices[2].width, state->world_slices[2].height);
-        create_slice(state, renderer);
+        //create_slice(state, renderer);
+}
 
-        memory->is_initialized = true;
-    }
 
-    if (key_pressed(keyboard,KB_F5)){
-        ASSERT(state->tex1);
-        texture_load_from_file((state->tex1), texture1, renderer);
-        state->terminal8 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
-        texture_load_from_file((state->terminal8), terminal8, renderer);
-        printf("reloaded textures! \n");
-    }
 
-    if (key_pressed(keyboard, KB_W)) {
-        create_slice(state, renderer);
-    }
-
-    SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
-    SDL_RenderClear( renderer );
-
+internal void oldstuff(void)
+{
+#if 0
     //texture_set_color((state->tex1), 0xFF, 0x00, 0xFF);
     //exture_set_alpha((state->tex1), 180);
     //texture_set_alpha((state->tex1), 180);
@@ -202,6 +220,5 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 #endif
 
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);
-
-    SDL_RenderPresent( renderer );
+#endif
 }
