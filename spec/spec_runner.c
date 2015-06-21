@@ -31,36 +31,6 @@ describe(blockmap) {
         setBlockAt(&w, 10, 10, 10, 100);
         expect(getBlockAt(&w, 10,10,10) == 100);
     }
-    it (can look at the world from all 6 sides) {
-        World w = {.width=11, .height=11, .depth=11};
-        w.blocks = malloc((w.width*w.height*w.depth));
-        BuildOrder *orderArray = malloc(sizeof(BuildOrder) * 6);
-        setBlockAt(&w, 10, 10, 10, 100);
-        setBlockAt(&w, 0, 0, 0, 10);
-
-        // TODO get out all bugs, I am sure all but front and back are broken.
-
-        createOrdersFromDimensions(w.width,w.height,w.depth, orderArray);
-        // front
-        expect(getBlockWhileLookingFromSide(&w, orderArray[0], 10,10,10) == 100);
-        expect(getBlockWhileLookingFromSide(&w, orderArray[0], 0,0,0) == 10);
-        // back
-        expect(getBlockWhileLookingFromSide(&w, orderArray[1], 0,0,10) == 100);
-        expect(getBlockWhileLookingFromSide(&w, orderArray[1], 10,10,0) == 10);
-        //left
-        expect(getBlockWhileLookingFromSide(&w, orderArray[2], 10,0,10) == 100);
-        expect(getBlockWhileLookingFromSide(&w, orderArray[2], 0,10,0) == 10);
-        //right
-        expect(getBlockWhileLookingFromSide(&w, orderArray[3], 0,10,10) == 100);
-        expect(getBlockWhileLookingFromSide(&w, orderArray[3], 10,0,0) == 10);
-        //top
-        expect(getBlockWhileLookingFromSide(&w, orderArray[4], 10,10,0) == 100);
-        expect(getBlockWhileLookingFromSide(&w, orderArray[4], 0,0,10) == 10);
-        // bottom
-        //expect(getBlockWhileLookingFromSide(&w, orderArray[5], 10,0,10) == 100);
-        //expect(getBlockWhileLookingFromSide(&w, orderArray[5], 0,0,10) == 10);
-
-    }
 }
 
 
