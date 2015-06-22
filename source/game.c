@@ -81,6 +81,8 @@ typedef struct BBoxColumn
 
 } BBoxColumn;
 
+// TODO: thinking some more about it I believe I need a simple linked list approach instead. make that
+
 internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex)
 {
     printf("The world has a certain size, in the flat direction thats width (%d) * depth (%d) the largest is %d\n",
