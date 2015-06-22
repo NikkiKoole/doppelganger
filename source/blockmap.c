@@ -19,6 +19,8 @@ void resetBlocks(World *world)
     }
 }
 
+
+
 void setBlockAt(World *world, int x, int y, int z, uint8 type)
 {
     ASSERT(x < world->width);

@@ -4,7 +4,10 @@
 #include "timer.h"
 #include "animation.h"
 #include "keyboard.h"
+#include "geom.h"
+#include "stretchy_buffer.h"
 #include <time.h>
+
 
 char texture1[] = "resources/image.png";
 char terminal8[] = "resources/terminal8.png";
@@ -42,6 +45,7 @@ internal void draw_3d_lines(int width, int height, int depth, SDL_Renderer* rend
                            x_off+ width*16,
                            y_off+ y*8 + height*16);
     }
+
 }
 /*
     |Z (height)
@@ -69,6 +73,33 @@ internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *render
         texture_render_part(tex, &source, &dest, renderer);
     }
 }
+
+
+typedef struct BBoxColumn
+{
+    BBox *boxes;
+
+} BBoxColumn;
+
+internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex)
+{
+    printf("The world has a certain size, in the flat direction thats width (%d) * depth (%d) the largest is %d\n",
+           world->width,
+           world->depth,
+           MAX(world->width, world->depth));
+
+    BBoxColumn columns[10];
+    for (int c = 0; c<10; c++){
+        columns[c] = (BBoxColumn) {.boxes=NULL};
+        for (int v =0; v < 5; v++) {
+            BBox new_one = (BBox) {(Vec2){v*2,v*2},(Vec2){100,100}};
+            sb_push( columns[c].boxes, new_one);
+        }
+    }
+    printf("value at columns[7] value[3].tl %f,%f \n", columns[7].boxes[3].tl.x,columns[7].boxes[3].tl.y);
+
+}
+
 
 
 internal void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex)
@@ -180,21 +211,23 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         //create_slice(state, renderer);
     }
 
-    SDL_SetRenderDrawColor( renderer, 0xff, 0xFF, 0xFF, 0xFF );
+    SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
     SDL_RenderClear( renderer );
 
     resetBlocks(state->world);
-    for (int x = 0; x<3; x++){
-        for (int y = 0; y<9; y++) {
-            setBlockAt(state->world, x, y, 0, (x+y % 1)+1 );
+
+    for (int z = 0; z<state->world->height; z++) {
+        for (int x = 0; x<state->world->width; x++){
+            for (int y = 0; y<state->world->depth; y++) {
+                setBlockAt(state->world, x, y, z, (x+y % 1)+1 );
+            }
         }
     }
-    //setBlockAt(state->world, 2, 8, 0, 1);
-    //setBlockAt(state->world, 0, 0, 5, 3);
-    //setBlockAt(state->world, 0, 0, 0, 2);
 
-    draw_3d_space(state->world, right, renderer, screen, state->blocks);
-
+    draw_3d_space(state->world, front, renderer, screen, state->blocks);
+    draw_3d_space_in_slices(state->world, front, renderer, screen, state->world_slices, state->blocks);
+    texture_set_color(state->terminal8, 0, 0, 0);
+    texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);
     SDL_RenderPresent( renderer );
 }
 
@@ -277,9 +310,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
         sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
         state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-        state->world->width = 3;
-        state->world->height = 6;
-        state->world->depth = 9;
+        state->world->width = 15;
+        state->world->height = 10;
+        state->world->depth = 20;
         state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                    state->world->width*state->world->height*state->world->depth,
                                                    Block);
@@ -290,7 +323,7 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
         printf("single texture: %zu\n", sizeof(Texture));
         printf("Arena size before pushing Array: %zu \n", state->world_arena.used);
-        state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, WORLD_DEPTH, Texture);
+        state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, MAX(state->world->depth, state->world->width), Texture);
         printf("Arena size after pushing Array: %zu \n", state->world_arena.used);
 
         texture_create_blank( &state->world_slices[0], 1024*2, 768*2, SDL_TEXTUREACCESS_TARGET, renderer);
