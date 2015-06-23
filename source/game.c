@@ -77,29 +77,35 @@ internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *render
 
 typedef struct BBoxColumn
 {
+    int max_size;
+    int currently_using;
     BBox *boxes;
 
 } BBoxColumn;
 
-// TODO: thinking some more about it I believe I need a simple linked list approach instead. make that
+// TODO : later on replace this simple stack based crazyness with some transient memory (and make it a linked list or something)
 
-internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex)
+
+internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBox *cull)
 {
-    printf("The world has a certain size, in the flat direction thats width (%d) * depth (%d) the largest is %d\n",
-           world->width,
-           world->depth,
-           MAX(world->width, world->depth));
+    /* printf("The world has a certain size, in the flat direction thats width (%d) * depth (%d) the largest is %d\n", */
+    /*        world->width, */
+    /*        world->depth, */
+    /*        MAX(world->width, world->depth)); */
 
-    BBoxColumn columns[10];
-    for (int c = 0; c<10; c++){
-        columns[c] = (BBoxColumn) {.boxes=NULL};
-        for (int v =0; v < 5; v++) {
-            BBox new_one = (BBox) {(Vec2){v*2,v*2},(Vec2){100,100}};
-            sb_push( columns[c].boxes, new_one);
-        }
-    }
-    printf("value at columns[7] value[3].tl %f,%f \n", columns[7].boxes[3].tl.x,columns[7].boxes[3].tl.y);
+    /* BBoxColumn columns[10]; */
 
+    /* for (int c = 0; c<10; c++){ */
+    /*     columns[c] = (BBoxColumn) {.boxes=NULL}; */
+    /*     for (int v =0; v < 5; v++) { */
+    /*         BBox new_one = (BBox) {(Vec2){v*2,v*2},(Vec2){100,100}}; */
+    /*         sb_push( columns[c].boxes, new_one); */
+    /*     } */
+    /* } */
+    /* printf("value at columns[7] value[3].tl %f,%f \n", columns[7].boxes[3].tl.x,columns[7].boxes[3].tl.y); */
+    BBox boxes[50][50];
+    int sizes[10];
+    printf("sizeof boxes: %zu\n", sizeof(boxes));
 }
 
 
@@ -195,8 +201,15 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     SDL_Renderer* renderer = screen->renderer;
     ASSERT(sizeof(State) <= memory->permanent_storage_size);
     State *state = (State *)memory->permanent_storage;
+    ASSERT(sizeof(TransState) <= memory->transient_storage_size);
+    TransState *trans_state = (TransState *)memory->transient_storage;
 
     if (!memory->is_initialized) {
+        initialize_arena(&trans_state->scratch_arena,
+                         memory->transient_storage_size - sizeof(TransState),
+                         (uint8 *)memory->transient_storage + sizeof(TransState));
+
+        printf("what size does the transient have: %d\n",memory->transient_storage_size);
         initialize_memory(state, memory, renderer);
         memory->is_initialized = true;
     }
@@ -227,7 +240,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     }
 
     draw_3d_space(state->world, front, renderer, screen, state->blocks);
-    draw_3d_space_in_slices(state->world, front, renderer, screen, state->world_slices, state->blocks);
+    draw_3d_space_in_slices(state->world, front, renderer, screen, state->world_slices, state->blocks, trans_state->culling_bounding_boxes);
     texture_set_color(state->terminal8, 0, 0, 0);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);
     SDL_RenderPresent( renderer );
