@@ -27,8 +27,6 @@ typedef enum Side
     back,
     left,
     right,
-    top,
-    bottom
 } Side;
 
 void resetBlocks(World *world);
