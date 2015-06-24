@@ -71,6 +71,13 @@ typedef struct TempMemory
 void* push_size_(Memory_Arena *arena, memory_index size);
 void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base);
 
+typedef struct JaggedBoundingBoxes
+{
+    // this one will have multiple 'columns' of boundingboxes, each with t heir own length.
+    int *lengths;
+    BBox *columns;
+} JaggedBoundingBoxes;
+
 typedef struct TransState
 {
     Memory_Arena scratch_arena;

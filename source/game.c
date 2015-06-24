@@ -88,6 +88,16 @@ typedef struct BBoxColumn
 
 internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBox *cull)
 {
+    UNUSED(world);
+    UNUSED(side);
+    UNUSED(renderer);
+    UNUSED(screen);
+    UNUSED(slices);
+    UNUSED(tex);
+    UNUSED(cull);
+    printf("the size of the culling box container: %zu\n", sizeof(cull));
+
+    //World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBox *cull
     /* printf("The world has a certain size, in the flat direction thats width (%d) * depth (%d) the largest is %d\n", */
     /*        world->width, */
     /*        world->depth, */
@@ -103,9 +113,9 @@ internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *ren
     /*     } */
     /* } */
     /* printf("value at columns[7] value[3].tl %f,%f \n", columns[7].boxes[3].tl.x,columns[7].boxes[3].tl.y); */
-    BBox boxes[50][50];
-    int sizes[10];
-    printf("sizeof boxes: %zu\n", sizeof(boxes));
+    //BBox boxes[50][50];
+    //int sizes[10];
+    //printf("sizeof boxes: %zu\n", sizeof(boxes));
 }
 
 
@@ -204,13 +214,19 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     ASSERT(sizeof(TransState) <= memory->transient_storage_size);
     TransState *trans_state = (TransState *)memory->transient_storage;
 
+
     if (!memory->is_initialized) {
-        initialize_arena(&trans_state->scratch_arena,
-                         memory->transient_storage_size - sizeof(TransState),
-                         (uint8 *)memory->transient_storage + sizeof(TransState));
 
         printf("what size does the transient have: %d\n",memory->transient_storage_size);
         initialize_memory(state, memory, renderer);
+
+        initialize_arena(&trans_state->scratch_arena,
+                         memory->transient_storage_size - sizeof(TransState),
+                         (uint8 *)memory->transient_storage + sizeof(TransState));
+        trans_state->culling_bounding_boxes =  (BBox*) PUSH_ARRAY(&trans_state->scratch_arena,
+                                                                  state->world->depth * state->world->width
+                                                                  , BBox);
+
         memory->is_initialized = true;
     }
 
