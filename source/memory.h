@@ -73,15 +73,22 @@ void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base);
 
 typedef struct JaggedBoundingBoxes
 {
-    // this one will have multiple 'columns' of boundingboxes, each with t heir own length.
+    // this one will have multiple 'columns' of boundingboxes, each with their own length.
     int *lengths;
     BBox *columns;
 } JaggedBoundingBoxes;
 
+typedef struct BBoxColumn
+{
+    int max_size;
+    int size;
+    BBox *value;
+} BBoxColumn;
+
 typedef struct TransState
 {
     Memory_Arena scratch_arena;
-    BBox *culling_bounding_boxes;
+    BBoxColumn *columns;
 } TransState;
 
 // TODO : expand this babe to greatness!

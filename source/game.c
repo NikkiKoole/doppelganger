@@ -75,18 +75,23 @@ internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *render
 }
 
 
-typedef struct BBoxColumn
-{
-    int max_size;
-    int currently_using;
-    BBox *boxes;
-
-} BBoxColumn;
-
 // TODO : later on replace this simple stack based crazyness with some transient memory (and make it a linked list or something)
+internal void reset_bbox(BBox *v) {
+    printf("getting in here to clean out this BBOX\n");
+}
 
+internal void prepare_scratch_bboxes(int current_width, int current_height, BBoxColumn *collection)
+{
+    printf("prepare scratch\n\n");
+    for (int i = 0; i< current_width; i++){
+        collection[i].max_size = current_height;
+        for (int j = 0; j < current_height; j++) {
+            reset_bbox(&collection[i].value[j]);
+        }
+    }
+}
 
-internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBox *cull)
+internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBoxColumn *cull)
 {
     UNUSED(world);
     UNUSED(side);
@@ -96,6 +101,21 @@ internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *ren
     UNUSED(tex);
     UNUSED(cull);
     printf("the size of the culling box container: %zu\n", sizeof(cull));
+
+    // first you got to figure out what my current width and depth are, they can be swapped you see.
+    // if side is front|back then width=width otherwise its depth.
+    // this is relevant because you change the amount of columns needed (and their size)
+    // I am assuming the scratch_bboxes are atleats big enough to do what I want.
+    if (side == front || side == back) {
+        prepare_scratch_bboxes(world->width, world->height, cull);
+    } else {
+        prepare_scratch_bboxes(world->height, world->width, cull);
+    }
+
+
+    //prepare_culling_scratch(cull, )
+
+
 
     //World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBox *cull
     /* printf("The world has a certain size, in the flat direction thats width (%d) * depth (%d) the largest is %d\n", */
@@ -110,7 +130,7 @@ internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *ren
     /*     for (int v =0; v < 5; v++) { */
     /*         BBox new_one = (BBox) {(Vec2){v*2,v*2},(Vec2){100,100}}; */
     /*         sb_push( columns[c].boxes, new_one); */
-    /*     } */
+    /*      */
     /* } */
     /* printf("value at columns[7] value[3].tl %f,%f \n", columns[7].boxes[3].tl.x,columns[7].boxes[3].tl.y); */
     //BBox boxes[50][50];
@@ -197,8 +217,6 @@ internal void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Scr
         }
         break;
 
-    case(top):
-    case(bottom):
     default:
         printf("shouldnt be here");
     }
@@ -223,9 +241,9 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         initialize_arena(&trans_state->scratch_arena,
                          memory->transient_storage_size - sizeof(TransState),
                          (uint8 *)memory->transient_storage + sizeof(TransState));
-        trans_state->culling_bounding_boxes =  (BBox*) PUSH_ARRAY(&trans_state->scratch_arena,
-                                                                  state->world->depth * state->world->width
-                                                                  , BBox);
+        trans_state->columns =  (BBoxColumn*) PUSH_ARRAY(&trans_state->scratch_arena,
+                                                   MAX(state->world->depth, state->world->width),
+                                                                  BBoxColumn);
 
         memory->is_initialized = true;
     }
@@ -256,7 +274,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     }
 
     draw_3d_space(state->world, front, renderer, screen, state->blocks);
-    draw_3d_space_in_slices(state->world, front, renderer, screen, state->world_slices, state->blocks, trans_state->culling_bounding_boxes);
+    draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
+
     texture_set_color(state->terminal8, 0, 0, 0);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);
     SDL_RenderPresent( renderer );
@@ -341,9 +360,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
         sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
         state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-        state->world->width = 15;
-        state->world->height = 10;
-        state->world->depth = 20;
+        state->world->width = 5;
+        state->world->height = 5;
+        state->world->depth = 5;
         state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                    state->world->width*state->world->height*state->world->depth,
                                                    Block);
