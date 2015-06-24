@@ -91,7 +91,13 @@ internal void prepare_scratch_bboxes(int current_width, int current_height, BBox
     }
 }
 
-internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBoxColumn *cull)
+internal void draw_3d_space_in_slices(World *world,
+                                      Side side,
+                                      SDL_Renderer *renderer,
+                                      Screen *screen,
+                                      Texture *slices,
+                                      Texture *tex,
+                                      BBoxColumn *collection)
 {
     UNUSED(world);
     UNUSED(side);
@@ -99,22 +105,26 @@ internal void draw_3d_space_in_slices(World *world, Side side, SDL_Renderer *ren
     UNUSED(screen);
     UNUSED(slices);
     UNUSED(tex);
-    UNUSED(cull);
-    printf("the size of the culling box container: %zu\n", sizeof(cull));
+    printf("the size of the culling box container: %zu\n", sizeof(collection));
 
-    // first you got to figure out what my current width and depth are, they can be swapped you see.
-    // if side is front|back then width=width otherwise its depth.
-    // this is relevant because you change the amount of columns needed (and their size)
-    // I am assuming the scratch_bboxes are atleats big enough to do what I want.
-    if (side == front || side == back) {
-        prepare_scratch_bboxes(world->width, world->height, cull);
-    } else {
-        prepare_scratch_bboxes(world->height, world->width, cull);
+    int my_width = (side == front || side == back) ? world->width : world->height;
+    int my_height = (side == front || side == back) ? world->height : world->width;
+
+    prepare_scratch_bboxes(my_width, my_height, collection);
+
+    // now we will walk the world
+    // front to back, column by column
+    // and grow the bboxcolumns
+
+    // lets just start with the front Side.
+    for (int x = 0; x< world->width; x++) {
+        for (int z = 0; z<world->height; z++) {
+            for (int y = 0; y< world->depth; y++) {
+
+            }
+        }
+
     }
-
-
-    //prepare_culling_scratch(cull, )
-
 
 
     //World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBox *cull
