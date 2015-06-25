@@ -81,17 +81,6 @@ internal void reset_bbox(BBox *v) {
     printf("getting in here to clean out this BBOX\n");
 }
 
-internal void prepare_scratch_bboxes(int current_width, int current_height, BBoxColumn *collection)
-{
-    printf("prepare scratch\n\n");
-    for (int i = 0; i< current_width; i++){
-        collection[i].max_size = current_height;
-        for (int j = 0; j < current_height; j++) {
-            reset_bbox(&collection[i].value[j]);
-        }
-    }
-}
-
 
 
 internal void draw_3d_space_in_slices(World *world,
@@ -99,8 +88,8 @@ internal void draw_3d_space_in_slices(World *world,
                                       SDL_Renderer *renderer,
                                       Screen *screen,
                                       Texture *slices,
-                                      Texture *tex,
-                                      BBoxColumn *collection)
+                                      Texture *tex)
+
 {
     UNUSED(world);
     UNUSED(side);
@@ -108,12 +97,11 @@ internal void draw_3d_space_in_slices(World *world,
     UNUSED(screen);
     UNUSED(slices);
     UNUSED(tex);
-    printf("the size of the culling box container: %zu\n", sizeof(collection));
 
     int my_width = (side == front || side == back) ? world->width : world->height;
     int my_height = (side == front || side == back) ? world->height : world->width;
 
-    prepare_scratch_bboxes(my_width, my_height, collection);
+    //prepare_scratch_bboxes(my_width, my_height, collection);
 
     // now we will walk the world
     // front to back, column by column
@@ -251,6 +239,13 @@ internal void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Scr
     }
 }
 
+typedef struct BBoxNode
+{
+    struct BBoxNode *next;
+    BBox value;
+} BBoxNode;
+
+
 
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
@@ -269,29 +264,51 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         initialize_arena(&trans_state->scratch_arena,
                          memory->transient_storage_size - sizeof(TransState),
                          (uint8 *)memory->transient_storage + sizeof(TransState));
-        trans_state->columns =  (BBoxColumn*) PUSH_ARRAY(&trans_state->scratch_arena,
-                                                   MAX(state->world->depth, state->world->width),
-                                                                  BBoxColumn);
 
         TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena);
-        printf("Current scratch: used: %zu\n", scratch.used);
-        printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
 
-        BBox *box1 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
-        BBox *box2 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
-        *box1 = bbox(1,1,100,100);
 
-        printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
-        end_temporary_memory(scratch, &trans_state->scratch_arena);
-        printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
+        BBoxNode *first = (BBoxNode*) PUSH_STRUCT(&trans_state->scratch_arena, BBoxNode);
+        BBoxNode *current = first;
 
-        scratch = begin_temporary_memory(&trans_state->scratch_arena);
-        box2 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
+        clock_t start = clock() ;
+
+        for (int i = 0; i< 10000; i++){
+            BBoxNode *new = (BBoxNode*) PUSH_STRUCT(&trans_state->scratch_arena, BBoxNode);
+            new->next = NULL;
+            new->value = bbox(i,i,i,i);
+            current->next = new;
+            current = new;
+        }
+
         char buffer[64];
-        bbox_to_buffer(*box2, buffer);
-        printf("addres: %p %s\n", &box1, buffer);
-        bbox_to_buffer(*box1, buffer);
-        printf("addres: %p %s\n", &box2, buffer);
+        current = first;
+        while (current->next != NULL) {
+            bbox_to_buffer(current->value, buffer);
+            current = current->next;
+        }
+
+        clock_t end = clock() ;
+        double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ;
+        printf("doing that linkedlist madness took: %f\n",elapsed_time);
+
+        //printf("Current scratch: used: %zu\n", scratch.used);
+        //printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
+
+        //BBox *box1 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
+        //BBox *box2 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
+        //*box1 = bbox(1,1,100,100);
+
+        //printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
+        //end_temporary_memory(scratch, &trans_state->scratch_arena);
+        //printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
+
+        //scratch = begin_temporary_memory(&trans_state->scratch_arena);
+        //box2 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
+        //char buffer[64];
+        //bbox_to_buffer(*box2, buffer);
+        //bbox_to_buffer(*box1, buffer);
+        //printf("addres: %p %s\n", &box2, buffer);
 
         memory->is_initialized = true;
     }
