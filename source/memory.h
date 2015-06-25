@@ -70,6 +70,9 @@ typedef struct TempMemory
 
 void* push_size_(Memory_Arena *arena, memory_index size);
 void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base);
+void end_temporary_memory(TempMemory temp, Memory_Arena* arena);
+TempMemory begin_temporary_memory(Memory_Arena* arena);
+
 
 typedef struct JaggedBoundingBoxes
 {

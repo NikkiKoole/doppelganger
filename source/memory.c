@@ -1,5 +1,15 @@
 #include "memory.h"
 
+TempMemory begin_temporary_memory(Memory_Arena* arena)
+{
+    TempMemory result = {.used= arena->used, .arena=arena};
+    return result;
+}
+
+void end_temporary_memory(TempMemory temp, Memory_Arena* arena)
+{
+    arena->used = temp.used;
+}
 
 void* push_size_(Memory_Arena *arena, memory_index size){
     // TODO: this allignment should be an argument to this function with a default of 4.

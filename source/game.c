@@ -92,6 +92,8 @@ internal void prepare_scratch_bboxes(int current_width, int current_height, BBox
     }
 }
 
+
+
 internal void draw_3d_space_in_slices(World *world,
                                       Side side,
                                       SDL_Renderer *renderer,
@@ -177,6 +179,7 @@ internal void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Scr
         for (int x = 0; x < world->width; x++) {
             for (int z = 0; z < world->height; z++) {
                 for (int y = 0; y< world->depth; y++) {
+                    SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
                     SDL_RenderClear( renderer );
                     draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
                     int value = getBlockAt(world, x, y, z);
@@ -249,7 +252,6 @@ internal void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Scr
 }
 
 
-
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
     SDL_Renderer* renderer = screen->renderer;
@@ -270,6 +272,26 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         trans_state->columns =  (BBoxColumn*) PUSH_ARRAY(&trans_state->scratch_arena,
                                                    MAX(state->world->depth, state->world->width),
                                                                   BBoxColumn);
+
+        TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena);
+        printf("Current scratch: used: %zu\n", scratch.used);
+        printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
+
+        BBox *box1 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
+        BBox *box2 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
+        *box1 = bbox(1,1,100,100);
+
+        printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
+        end_temporary_memory(scratch, &trans_state->scratch_arena);
+        printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
+
+        scratch = begin_temporary_memory(&trans_state->scratch_arena);
+        box2 = (BBox*)PUSH_STRUCT(&trans_state->scratch_arena, BBox);
+        char buffer[64];
+        bbox_to_buffer(*box2, buffer);
+        printf("addres: %p %s\n", &box1, buffer);
+        bbox_to_buffer(*box1, buffer);
+        printf("addres: %p %s\n", &box2, buffer);
 
         memory->is_initialized = true;
     }
@@ -299,8 +321,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         }
     }
 
-    draw_3d_space(state->world, front, renderer, screen, state->blocks);
-    draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
+    //draw_3d_space(state->world, front, renderer, screen, state->blocks);
+    //draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
 
     texture_set_color(state->terminal8, 0, 0, 0);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);

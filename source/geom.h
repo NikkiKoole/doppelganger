@@ -38,6 +38,7 @@ typedef struct BBox
     Point br;
 } BBox;
 
+BBox bbox(float tlX, float tlY, float brX, float brY);
 int bbox_eql(BBox b1, BBox b2);
 int bbox_neighbour_vertically(BBox this, BBox other);
 void bbox_to_buffer(BBox b, char *buffer);

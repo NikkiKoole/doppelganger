@@ -114,6 +114,15 @@ int point_in_bbox(Point p, BBox b)
              ( p.y >= b.tl.y && p.y <= b.br.y) );
 }
 
+BBox bbox(float tlX, float tlY, float brX, float brY) {
+    BBox result;
+    result.tl.x = tlX;
+    result.tl.y = tlY;
+    result.br.x = brX;
+    result.br.y = brY;
+    return result;
+}
+
 int bbox_eql(BBox b1, BBox b2)
 {
     return (b1.tl.x == b2.tl.x &&
