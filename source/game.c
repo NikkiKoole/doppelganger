@@ -77,6 +77,7 @@ internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *render
 
 // TODO : later on replace this simple stack based crazyness with some transient memory (and make it a linked list or something)
 internal void reset_bbox(BBox *v) {
+    UNUSED(v);
     printf("getting in here to clean out this BBOX\n");
 }
 
@@ -115,13 +116,24 @@ internal void draw_3d_space_in_slices(World *world,
     // now we will walk the world
     // front to back, column by column
     // and grow the bboxcolumns
-
+    int x_off = 0;
+    int y_off = 0;
     // lets just start with the front Side.
     for (int x = 0; x< world->width; x++) {
         for (int z = 0; z<world->height; z++) {
             for (int y = 0; y< world->depth; y++) {
+                int value = getBlockAt(world, x, y, z);
+                if (value > 0) {
+                    int tlX = x*16;
+                    int tlY = (world->height*16)  + (y*8) - (z*16) - 16;
+                    BBox bb = {{tlX, tlY}, {tlX+16, tlY+24}};
+                    char buffer[64];
 
+                    bbox_to_buffer(bb, buffer);
+                    printf("this bbox: %s\n", buffer);
+                }
             }
+            printf("y column done\n");
         }
 
     }
@@ -165,11 +177,15 @@ internal void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Scr
         for (int x = 0; x < world->width; x++) {
             for (int z = 0; z < world->height; z++) {
                 for (int y = 0; y< world->depth; y++) {
+                    SDL_RenderClear( renderer );
+                    draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
                     int value = getBlockAt(world, x, y, z);
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
                                      .w=16, .h=24};
                     draw_3d_space_helper(value, tex, renderer, source, dest);
+                    SDL_RenderPresent( renderer );
+                    SDL_Delay(10);
                 }
             }
         }
