@@ -6,6 +6,7 @@
 #include "keyboard.h"
 #include "geom.h"
 #include "stretchy_buffer.h"
+#include "colors.h"
 #include <time.h>
 
 
@@ -16,7 +17,6 @@ char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
-
 
 internal void draw_3d_lines(int width, int height, int depth, SDL_Renderer* renderer, Screen* screen)
 {
@@ -128,26 +128,6 @@ internal void draw_3d_space_in_slices(World *world,
 
     }
 
-
-    //World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex, BBox *cull
-    /* printf("The world has a certain size, in the flat direction thats width (%d) * depth (%d) the largest is %d\n", */
-    /*        world->width, */
-    /*        world->depth, */
-    /*        MAX(world->width, world->depth)); */
-
-    /* BBoxColumn columns[10]; */
-
-    /* for (int c = 0; c<10; c++){ */
-    /*     columns[c] = (BBoxColumn) {.boxes=NULL}; */
-    /*     for (int v =0; v < 5; v++) { */
-    /*         BBox new_one = (BBox) {(Vec2){v*2,v*2},(Vec2){100,100}}; */
-    /*         sb_push( columns[c].boxes, new_one); */
-    /*      */
-    /* } */
-    /* printf("value at columns[7] value[3].tl %f,%f \n", columns[7].boxes[3].tl.x,columns[7].boxes[3].tl.y); */
-    //BBox boxes[50][50];
-    //int sizes[10];
-    //printf("sizeof boxes: %zu\n", sizeof(boxes));
 }
 
 
@@ -270,7 +250,6 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
         BBoxNode *first = (BBoxNode*) PUSH_STRUCT(&trans_state->scratch_arena, BBoxNode);
         BBoxNode *current = first;
-
         clock_t start = clock() ;
 
         for (int i = 0; i< 10000; i++){
@@ -319,13 +298,14 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->terminal8 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file((state->terminal8), terminal8, renderer);
         printf("reloaded textures! \n");
-    }
+
+    }s
 
     if (key_pressed(keyboard, KB_W)) {
         //create_slice(state, renderer);
     }
 
-    SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
+    SDL_SetRenderDrawColor( renderer, WHITE,  0xFF );
     SDL_RenderClear( renderer );
 
     resetBlocks(state->world);
@@ -341,8 +321,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     //draw_3d_space(state->world, front, renderer, screen, state->blocks);
     //draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
 
-    texture_set_color(state->terminal8, 0, 0, 0);
-    texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 1, renderer);
+    texture_set_color(state->terminal8, PINK);
+    texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 3, renderer);
     SDL_RenderPresent( renderer );
 }
 
@@ -473,7 +453,7 @@ internal void oldstuff(void)
     texture_set_as_rendertarget(state->render_target, renderer);
     SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
     SDL_RenderClear( renderer );
-
+s
     texture_set_color((state->tex1), 0xFF, 0xFF, 0xFF);
     texture_set_alpha((state->tex1), 180);
     texture_render((state->tex1), 100, 100, renderer);
