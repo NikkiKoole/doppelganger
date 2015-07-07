@@ -183,7 +183,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                                      .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
                                      .w=16, .h=24};
                     draw_3d_space_helper(value, tex, renderer, source, dest);
-                    // drawWait(renderer);
+                    //drawWait(renderer);
                 }
             }
         }
@@ -210,7 +210,6 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         }
         //abort();
         break;
-
     case(left):
         x_off = screen->width/2 - ((world->depth*16)/2);
         y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
@@ -220,7 +219,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 for (int x = 0; x < world->width; x++) {
                     //drawLines(world, renderer, screen);
 
-                    int value = getBlockAt(world, x, y, z);
+                    int value = getBlockAt(world, (world->width-1-x), y, z);
                     SDL_Rect dest = {.x= x_off + y*16,
                                      .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
                                      .w=16, .h=24};
@@ -232,7 +231,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         }
         //abort();
         break;
+
     case(right):
+
         x_off = screen->width/2 - ((world->depth*16)/2);
         y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
         draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
@@ -240,8 +241,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             for (int z = 0; z < world->height; z++) {
                 for (int x = 0; x < world->width; x++) {
                     //drawLines(world, renderer, screen);
-
-                    int value = getBlockAt(world, (world->width-1-x), y, z);
+                    int value = getBlockAt(world, x, (world->depth-1-y), z);
                     SDL_Rect dest = {.x= x_off + y*16,
                                      .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
                                      .w=16, .h=24};

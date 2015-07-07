@@ -144,13 +144,14 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         for (int x = 0; x<state->world->width; x++){
             for (int y = 0; y<state->world->depth; y++) {
                 setBlockAt(state->world, x, y, z, 1 + (z+x+y)% 6 );
+                //setBlockAt(state->world, x, y, z, 1);
             }
         }
     }
 
 
     //set_structured_values_in_world(state->world);
-    draw_3d_space(state->world,right, renderer, screen, state->blocks);
+    draw_3d_space(state->world, left, renderer, screen, state->blocks);
     //draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
 
     texture_set_color(state->terminal8, PINK);
@@ -237,7 +238,7 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
         sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
         state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-        state->world->width = 5;
+        state->world->width = 15;
         state->world->height = 5;
         state->world->depth = 5;
         state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
