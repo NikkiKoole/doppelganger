@@ -38,21 +38,34 @@ typedef struct BBoxNode
 //void set_structured_values_in_world(World* world);
 internal void set_structured_values_in_world(World* world)
 {
-    setBlockAt(world, world->width-1, world->height-1, world->depth-1, 1 );
-    setBlockAt(world, 0, world->height-1, world->depth-1, 1 );
-    setBlockAt(world, world->width/2, world->height-1, world->depth-1, 1 );
+    // bottom plateau
+    for (int x = 0; x < world->width; x++) {
+        for (int y = 0 ; y < world->depth; y++) {
+            setBlockAt(world, x,y,0,1);
+        }
+    }
+    // back wall
+    for (int x = 0; x < world->width; x++) {
+        for (int z = 0 ; z < world->depth; z++) {
+            setBlockAt(world, x,0,z,2);
+        }
+    }
 
-    setBlockAt(world, world->width-1, 0, 0, 2 );
-    setBlockAt(world, 0, 0, 0, 2 );
-    setBlockAt(world, world->width/2, 0, 0, 2 );
+    /* setBlockAt(world, world->width-1, world->height-1, world->depth-1, 1 ); */
+    /* setBlockAt(world, 0, world->height-1, world->depth-1, 1 ); */
+    /* setBlockAt(world, world->width/2, world->height-1, world->depth-1, 1 ); */
 
-    setBlockAt(world, world->width-1, world->height-1, 0, 3 );
-    setBlockAt(world, 0, world->height-1, 0, 3 );
-    setBlockAt(world, world->width/2, world->height-1, 0, 3 );
+    /* setBlockAt(world, world->width-1, 0, 0, 2 ); */
+    /* setBlockAt(world, 0, 0, 0, 2 ); */
+    /* setBlockAt(world, world->width/2, 0, 0, 2 ); */
 
-    setBlockAt(world, world->width-1, 0, world->depth-1, 3 );
-    setBlockAt(world, 0, 0, world->depth-1, 3 );
-    setBlockAt(world, world->width/2, 0, world->depth-1, 3 );
+    /* setBlockAt(world, world->width-1, world->height-1, 0, 3 ); */
+    /* setBlockAt(world, 0, world->height-1, 0, 3 ); */
+    /* setBlockAt(world, world->width/2, world->height-1, 0, 3 ); */
+
+    /* setBlockAt(world, world->width-1, 0, world->depth-1, 3 ); */
+    /* setBlockAt(world, 0, 0, world->depth-1, 3 ); */
+    /* setBlockAt(world, world->width/2, 0, world->depth-1, 3 ); */
 
 }
 
@@ -143,15 +156,15 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     for (int z = 0; z<state->world->height; z++) {
         for (int x = 0; x<state->world->width; x++){
             for (int y = 0; y<state->world->depth; y++) {
-                setBlockAt(state->world, x, y, z, 1 + (z+x+y)% 6 );
+                //setBlockAt(state->world, x, y, z, 1 + (z+x+y)% 6 );
                 //setBlockAt(state->world, x, y, z, 1);
             }
         }
     }
 
 
-    //set_structured_values_in_world(state->world);
-    draw_3d_space(state->world, left, renderer, screen, state->blocks);
+    set_structured_values_in_world(state->world);
+    draw_3d_space(state->world, right, renderer, screen, state->blocks);
     //draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
 
     texture_set_color(state->terminal8, PINK);
