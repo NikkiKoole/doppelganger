@@ -75,6 +75,16 @@ void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_R
     if (value == 3) {
         texture_set_color((tex), 0x00, 0xFF, 0xFF);
     }
+    if (value == 4) {
+        texture_set_color((tex), 0xff, 0x00, 0x00);
+    }
+    if (value == 5) {
+        texture_set_color((tex), 0x00, 0xFF, 0x00);
+    }
+    if (value == 6) {
+        texture_set_color((tex), 0x00, 0x00, 0xFF);
+    }
+
     if (value > 0){
         texture_render_part(tex, &source, &dest, renderer);
     }
@@ -139,7 +149,18 @@ void draw_3d_space_in_slices(World *world,
   /Y (depth)
 */
 
+internal void drawLines(World *world, SDL_Renderer *renderer, Screen *screen)
+{
+    SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
+    SDL_RenderClear( renderer );
+    draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
+}
 
+internal void drawWait(SDL_Renderer *renderer)
+{
+    SDL_RenderPresent( renderer );
+    SDL_Delay(40);
+}
 
 void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex)
 {
@@ -156,20 +177,18 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         for (int x = 0; x < world->width; x++) {
             for (int z = 0; z < world->height; z++) {
                 for (int y = 0; y< world->depth; y++) {
-                    SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
-                    SDL_RenderClear( renderer );
-                    draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
+                    //drawLines(world, renderer, screen);
                     int value = getBlockAt(world, x, y, z);
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
                                      .w=16, .h=24};
                     draw_3d_space_helper(value, tex, renderer, source, dest);
-                    SDL_RenderPresent( renderer );
-                    SDL_Delay(40);
+                    // drawWait(renderer);
                 }
             }
         }
-        abort();
+
+        //abort();
         break;
     case(back) :
         x_off = screen->width/2 - ((world->width*16)/2);
@@ -179,21 +198,17 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         for (int x = 0; x < world->width; x++) {
             for (int z = 0; z < world->height; z++) {
                 for (int y = 0; y< world->depth; y++) {
-                    SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
-                    SDL_RenderClear( renderer );
-                    draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
-
+                    //drawLines(world, renderer, screen);
                     int value = getBlockAt(world, (world->width-1-x), (world->depth-1-y), z);
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16) + (y*8)-(z*16) - 16,
                                      .w=16, .h=24};
                     draw_3d_space_helper(value, tex, renderer, source, dest);
-                    SDL_RenderPresent( renderer );
-                    SDL_Delay(40);
+                    //drawWait(renderer);
                 }
             }
         }
-        abort();
+        //abort();
         break;
 
     case(left):
@@ -203,15 +218,19 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         for (int y = 0; y< world->depth; y++) {
             for (int z = 0; z < world->height; z++) {
                 for (int x = 0; x < world->width; x++) {
+                    //drawLines(world, renderer, screen);
+
                     int value = getBlockAt(world, x, y, z);
                     SDL_Rect dest = {.x= x_off + y*16,
                                      .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
                                      .w=16, .h=24};
 
                     draw_3d_space_helper(value, tex, renderer, source, dest);
+                    //drawWait(renderer);
                 }
             }
         }
+        //abort();
         break;
     case(right):
         x_off = screen->width/2 - ((world->depth*16)/2);
@@ -220,15 +239,19 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         for (int y = 0; y< world->depth; y++) {
             for (int z = 0; z < world->height; z++) {
                 for (int x = 0; x < world->width; x++) {
+                    //drawLines(world, renderer, screen);
+
                     int value = getBlockAt(world, (world->width-1-x), y, z);
                     SDL_Rect dest = {.x= x_off + y*16,
                                      .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
                                      .w=16, .h=24};
 
                     draw_3d_space_helper(value, tex, renderer, source, dest);
+                    //drawWait(renderer);
                 }
             }
         }
+        //abort();
         break;
 
     default:
