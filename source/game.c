@@ -46,27 +46,22 @@ internal void set_structured_values_in_world(World* world)
     }
     // back wall
     for (int x = 0; x < world->width; x++) {
-        for (int z = 0 ; z < world->depth; z++) {
+        for (int z = 0 ; z < world->height; z++) {
             setBlockAt(world, x,0,z,2);
         }
     }
-
-    /* setBlockAt(world, world->width-1, world->height-1, world->depth-1, 1 ); */
-    /* setBlockAt(world, 0, world->height-1, world->depth-1, 1 ); */
-    /* setBlockAt(world, world->width/2, world->height-1, world->depth-1, 1 ); */
-
-    /* setBlockAt(world, world->width-1, 0, 0, 2 ); */
-    /* setBlockAt(world, 0, 0, 0, 2 ); */
-    /* setBlockAt(world, world->width/2, 0, 0, 2 ); */
-
-    /* setBlockAt(world, world->width-1, world->height-1, 0, 3 ); */
-    /* setBlockAt(world, 0, world->height-1, 0, 3 ); */
-    /* setBlockAt(world, world->width/2, world->height-1, 0, 3 ); */
-
-    /* setBlockAt(world, world->width-1, 0, world->depth-1, 3 ); */
-    /* setBlockAt(world, 0, 0, world->depth-1, 3 ); */
-    /* setBlockAt(world, world->width/2, 0, world->depth-1, 3 ); */
-
+    // left wall
+    for (int y = 0; y < world->depth; y++) {
+        for (int z = 0 ; z < world->height; z++) {
+            setBlockAt(world, 0,y,z,3);
+        }
+    }
+    // right wall
+    for (int y = 0; y < world->depth; y++) {
+        for (int z = 0 ; z < world->height; z++) {
+            setBlockAt(world, world->width-1,y,z,4);
+        }
+    }
 }
 
 
@@ -162,9 +157,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         }
     }
 
-
     set_structured_values_in_world(state->world);
-    draw_3d_space(state->world, right, renderer, screen, state->blocks);
+    draw_3d_space(state->world, front, renderer, screen, state->blocks);
     //draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
 
     texture_set_color(state->terminal8, PINK);
