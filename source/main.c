@@ -3,6 +3,7 @@
 #include <SDL2/SDL_image.h>
 #include <sys/mman.h> //mmap
 #include <unistd.h> //usleep
+#include "screen.h"
 #include "memory.h"
 #include "defines.h"
 #include "keyboard.h"

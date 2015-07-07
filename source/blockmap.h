@@ -5,6 +5,8 @@
 #define WORLD_HEIGHT   32
 #define WORLD_DEPTH    32
 
+#include "screen.h"
+#include "memory.h"
 #include "defines.h"
 #include "texture.h"
 
@@ -32,6 +34,8 @@ typedef enum Side
 void resetBlocks(World *world);
 void setBlockAt(World *w, int x, int y, int z, uint8 type);
 uint8 getBlockAt(World *w, int x, int y, int z);
-
-
+void draw_3d_lines(int width, int height, int depth, SDL_Renderer* renderer, Screen* screen);
+void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest);
+void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex);
+void draw_3d_space_in_slices(World *world, Side side,SDL_Renderer *renderer, Screen *screen, Texture *slices, Texture *tex);
 #endif

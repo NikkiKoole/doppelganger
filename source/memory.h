@@ -10,16 +10,9 @@
 #include "animation.h"
 #include "sprite.h"
 #include "keyboard.h"
+#include "screen.h"
 #include "blockmap.h"
 #include "geom.h"
-
-typedef struct Screen
-{
-    int width;
-    int height;
-    SDL_Renderer *renderer;
-    SDL_Window *window;
-} Screen;
 
 typedef struct Shared_Library
 {
@@ -94,7 +87,6 @@ typedef struct State
     Animation *animation1;
     Sprite *walking_left;
     Sprite *walking_right;
-
     World *world;
     Texture *world_slices;
 } State;

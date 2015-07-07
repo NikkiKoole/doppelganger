@@ -1,7 +1,6 @@
 #ifndef COLORS_H
 #define COLORS_H
 // https://onepagelove.com/material-palette
-// assuming these are the google material colors
 
 #define RED         0xF4, 0x43, 0x36
 #define PINK        0xE9, 0x1E, 0x63

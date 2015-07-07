@@ -5,10 +5,8 @@
 #include "animation.h"
 #include "keyboard.h"
 #include "geom.h"
-#include "stretchy_buffer.h"
 #include "colors.h"
 #include <time.h>
-
 
 char texture1[] = "resources/image.png";
 char terminal8[] = "resources/terminal8.png";
@@ -18,61 +16,7 @@ char blocks[] = "resources/blocks.png"; // 16 x 24 px
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
 
-internal void draw_3d_lines(int width, int height, int depth, SDL_Renderer* renderer, Screen* screen)
-{
-    int x_off = screen->width/2 - ((width*16)/2);
-    int y_off = screen->height/2 - ((depth*8 + height*16)/2);
-    int x, y, z;
-    SDL_SetRenderDrawColor( renderer, 0x0, 0x0, 0x0, 0xFF );
-    for (x = 0; x <= width; x++){
-        SDL_RenderDrawLine(renderer,
-                           x_off+  x*16,
-                           y_off + depth*8 + height*16 ,
-                           x_off+ x*16,
-                           y_off + 0);
-    }
-    for (z = 0; z <= height; z++){
-        SDL_RenderDrawLine(renderer,
-                           x_off + 0,
-                           y_off+ z*16 ,
-                           x_off+ width*16 ,
-                           y_off+ z*16);
-    }
-    for (y = 0; y <= depth; y++) {
-        SDL_RenderDrawLine(renderer,
-                           x_off +  0,
-                           y_off+ y*8 + height*16,
-                           x_off+ width*16,
-                           y_off+ y*8 + height*16);
-    }
 
-}
-/*
-    |Z (height)
-    |
-    |
-    |
-    |
-    /---------X (width)
-   /
-  /Y (depth)
-*/
-
-internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest)
-{
-    if (value == 1) {
-        texture_set_color((tex), 0xFF, 0x00, 0xFF);
-    }
-    if (value == 2) {
-        texture_set_color((tex), 0xFF, 0xFF, 0x00);
-    }
-    if (value == 3) {
-        texture_set_color((tex), 0x00, 0xFF, 0xff);
-    }
-    if (value > 0){
-        texture_render_part(tex, &source, &dest, renderer);
-    }
-}
 
 
 // TODO : later on replace this simple stack based crazyness with some transient memory (and make it a linked list or something)
@@ -83,141 +27,6 @@ internal void reset_bbox(BBox *v) {
 
 
 
-internal void draw_3d_space_in_slices(World *world,
-                                      Side side,
-                                      SDL_Renderer *renderer,
-                                      Screen *screen,
-                                      Texture *slices,
-                                      Texture *tex)
-
-{
-    UNUSED(world);
-    UNUSED(side);
-    UNUSED(renderer);
-    UNUSED(screen);
-    UNUSED(slices);
-    UNUSED(tex);
-
-    int my_width = (side == front || side == back) ? world->width : world->height;
-    int my_height = (side == front || side == back) ? world->height : world->width;
-
-    //prepare_scratch_bboxes(my_width, my_height, collection);
-
-    // now we will walk the world
-    // front to back, column by column
-    // and grow the bboxcolumns
-    int x_off = 0;
-    int y_off = 0;
-    // lets just start with the front Side.
-    for (int x = 0; x< world->width; x++) {
-        for (int z = 0; z<world->height; z++) {
-            for (int y = 0; y< world->depth; y++) {
-                int value = getBlockAt(world, x, y, z);
-                if (value > 0) {
-                    int tlX = x*16;
-                    int tlY = (world->height*16)  + (y*8) - (z*16) - 16;
-                    BBox bb = {{tlX, tlY}, {tlX+16, tlY+24}};
-                    char buffer[64];
-
-                    bbox_to_buffer(bb, buffer);
-                    printf("this bbox: %s\n", buffer);
-                }
-            }
-            printf("y column done\n");
-        }
-
-    }
-
-}
-
-
-
-internal void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex)
-{
-    int x_off;
-    int y_off;
-    int index = 6;
-    SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
-
-    switch(side){
-    case(front) :
-        x_off = screen->width/2 - ((world->width*16)/2);
-        y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
-        draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
-        for (int x = 0; x < world->width; x++) {
-            for (int z = 0; z < world->height; z++) {
-                for (int y = 0; y< world->depth; y++) {
-                    SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
-                    SDL_RenderClear( renderer );
-                    draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
-                    int value = getBlockAt(world, x, y, z);
-                    SDL_Rect dest = {.x= x_off + x*16,
-                                     .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
-                                     .w=16, .h=24};
-                    draw_3d_space_helper(value, tex, renderer, source, dest);
-                    SDL_RenderPresent( renderer );
-                    SDL_Delay(10);
-                }
-            }
-        }
-        break;
-    case(back) :
-        x_off = screen->width/2 - ((world->width*16)/2);
-        y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
-
-        draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
-        for (int x = 0; x < world->width; x++) {
-            for (int z = 0; z < world->height; z++) {
-                for (int y = 0; y< world->depth; y++) {
-                    int value = getBlockAt(world, (world->width-1-x), (world->depth-1-y), z);
-                    SDL_Rect dest = {.x= x_off + x*16,
-                                     .y= y_off + (world->height*16) + (y*8)-(z*16) - 16,
-                                     .w=16, .h=24};
-                    draw_3d_space_helper(value, tex, renderer, source, dest);
-                }
-            }
-        }
-        break;
-
-    case(left):
-        x_off = screen->width/2 - ((world->depth*16)/2);
-        y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
-        draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
-        for (int y = 0; y< world->depth; y++) {
-            for (int z = 0; z < world->height; z++) {
-                for (int x = 0; x < world->width; x++) {
-                    int value = getBlockAt(world, x, y, z);
-                    SDL_Rect dest = {.x= x_off + y*16,
-                                     .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
-                                     .w=16, .h=24};
-
-                    draw_3d_space_helper(value, tex, renderer, source, dest);
-                }
-            }
-        }
-        break;
-    case(right):
-        x_off = screen->width/2 - ((world->depth*16)/2);
-        y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
-        draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
-        for (int y = 0; y< world->depth; y++) {
-            for (int z = 0; z < world->height; z++) {
-                for (int x = 0; x < world->width; x++) {
-                    int value = getBlockAt(world, (world->width-1-x), y, z);
-                    SDL_Rect dest = {.x= x_off + y*16,
-                                     .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
-                                     .w=16, .h=24};
-
-                    draw_3d_space_helper(value, tex, renderer, source, dest);
-                }
-            }
-        }
-        break;
-
-    default:
-        printf("shouldnt be here");
-    }
-}
 
 typedef struct BBoxNode
 {
@@ -225,6 +34,27 @@ typedef struct BBoxNode
     BBox value;
 } BBoxNode;
 
+
+//void set_structured_values_in_world(World* world);
+internal void set_structured_values_in_world(World* world)
+{
+    setBlockAt(world, world->width-1, world->height-1, world->depth-1, 1 );
+    setBlockAt(world, 0, world->height-1, world->depth-1, 1 );
+    setBlockAt(world, world->width/2, world->height-1, world->depth-1, 1 );
+
+    setBlockAt(world, world->width-1, 0, 0, 2 );
+    setBlockAt(world, 0, 0, 0, 2 );
+    setBlockAt(world, world->width/2, 0, 0, 2 );
+
+    setBlockAt(world, world->width-1, world->height-1, 0, 3 );
+    setBlockAt(world, 0, world->height-1, 0, 3 );
+    setBlockAt(world, world->width/2, world->height-1, 0, 3 );
+
+    setBlockAt(world, world->width-1, 0, world->depth-1, 3 );
+    setBlockAt(world, 0, 0, world->depth-1, 3 );
+    setBlockAt(world, world->width/2, 0, world->depth-1, 3 );
+
+}
 
 
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
@@ -299,13 +129,13 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         texture_load_from_file((state->terminal8), terminal8, renderer);
         printf("reloaded textures! \n");
 
-    }s
+    }
 
     if (key_pressed(keyboard, KB_W)) {
         //create_slice(state, renderer);
     }
 
-    SDL_SetRenderDrawColor( renderer, WHITE,  0xFF );
+    SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
     SDL_RenderClear( renderer );
 
     resetBlocks(state->world);
@@ -313,12 +143,13 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     for (int z = 0; z<state->world->height; z++) {
         for (int x = 0; x<state->world->width; x++){
             for (int y = 0; y<state->world->depth; y++) {
-                setBlockAt(state->world, x, y, z, (x+y % 1)+1 );
+                setBlockAt(state->world, x, y, z, 1 + (z+x+y)% 3 );
             }
         }
     }
 
-    //draw_3d_space(state->world, front, renderer, screen, state->blocks);
+    //set_structured_values_in_world(state->world);
+    draw_3d_space(state->world, back, renderer, screen, state->blocks);
     //draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
 
     texture_set_color(state->terminal8, PINK);
@@ -409,7 +240,7 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
         state->world->height = 5;
         state->world->depth = 5;
         state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
-                                                   state->world->width*state->world->height*state->world->depth,
+                                                   state->world->width * state->world->height * state->world->depth,
                                                    Block);
 
 
