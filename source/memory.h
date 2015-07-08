@@ -3,16 +3,9 @@
 
 #include <sys/stat.h>   //struct stat
 #include <sys/types.h>  //struct stat
-
-#include "texture.h"
+#include <stdbool.h>    // bool
+#include <stdio.h>
 #include "defines.h"
-#include "timer.h"
-#include "animation.h"
-#include "sprite.h"
-#include "keyboard.h"
-#include "screen.h"
-#include "blockmap.h"
-#include "geom.h"
 
 typedef struct Shared_Library
 {
@@ -66,32 +59,9 @@ void initialize_arena(Memory_Arena *arena, memory_index size, uint8 *base);
 void end_temporary_memory(TempMemory temp, Memory_Arena* arena);
 TempMemory begin_temporary_memory(Memory_Arena* arena);
 
-
 typedef struct TransState
 {
     Memory_Arena scratch_arena;
 } TransState;
-
-// TODO : expand this babe to greatness!
-
-typedef struct State
-{
-    Memory_Arena world_arena;
-    real64  angle1;
-    Texture *tex1;
-    Texture *terminal8;
-    Texture *render_target;
-    Texture *zelda;
-    Texture *blocks;
-    Timer *timer;
-    Animation *animation1;
-    Sprite *walking_left;
-    Sprite *walking_right;
-    World *world;
-    Texture *world_slices;
-} State;
-
-// this is the function thats being called from main, offered up by the gamelib.so file.
-void game_update_and_render(Screen *screen, Memory *memory, Keyboard *keyboard, FrameTime *frametime);
 
 #endif

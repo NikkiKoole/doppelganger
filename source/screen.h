@@ -2,7 +2,6 @@
 #define SCREEN_H
 #include <SDL2/SDL.h>
 
-
 typedef struct Screen
 {
     int width;
@@ -10,6 +9,5 @@ typedef struct Screen
     SDL_Renderer *renderer;
     SDL_Window *window;
 } Screen;
-
 
 #endif

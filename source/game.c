@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include "memory.h"
+#include "state.h"
 #include "texture.h"
 #include "timer.h"
 #include "animation.h"
@@ -15,8 +16,7 @@ char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
-
-
+void game_update_and_render(Screen *screen, Memory *memory, Keyboard *keyboard, FrameTime *frametime);
 
 
 // TODO : later on replace this simple stack based crazyness with some transient memory (and make it a linked list or something)
@@ -24,8 +24,6 @@ internal void reset_bbox(BBox *v) {
     UNUSED(v);
     printf("getting in here to clean out this BBOX\n");
 }
-
-
 
 
 typedef struct BBoxNode
@@ -53,13 +51,13 @@ internal void set_structured_values_in_world(World* world)
     // left wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, 0,y,z,3);
+            //setBlockAt(world, 0,y,z,3);
         }
     }
     // right wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, world->width-1,y,z,4);
+            //setBlockAt(world, world->width-1,y,z,4);
         }
     }
 }
@@ -245,7 +243,7 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
         sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
         state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-        state->world->width = 15;
+        state->world->width = 5;
         state->world->height = 5;
         state->world->depth = 5;
         state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,

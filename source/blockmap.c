@@ -1,5 +1,6 @@
 #include "memory.h"
 #include "blockmap.h"
+#include "geom.h"
 #include <stdlib.h>
 /*
     |Z (height)
@@ -12,6 +13,9 @@
   /Y (depth)
 
 */
+
+
+
 
 void resetBlocks(World *world)
 {
@@ -34,7 +38,7 @@ uint8 getBlockAt(World *world, int x, int y, int z)
     return world->blocks[(y * (world->width * world->height)) + (z * world->width) + x].type;
 }
 
-void draw_3d_lines(int width, int height, int depth, SDL_Renderer* renderer, Screen* screen)
+internal void draw_3d_lines(int width, int height, int depth, SDL_Renderer* renderer, Screen* screen)
 {
     int x_off = screen->width/2 - ((width*16)/2);
     int y_off = screen->height/2 - ((depth*8 + height*16)/2);
@@ -64,7 +68,7 @@ void draw_3d_lines(int width, int height, int depth, SDL_Renderer* renderer, Scr
 
 }
 
-void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest)
+internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest)
 {
     if (value == 1) {
         texture_set_color((tex), 0xFF, 0x00, 0xFF);
@@ -90,53 +94,6 @@ void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_R
     }
 }
 
-void draw_3d_space_in_slices(World *world,
-                             Side side,
-                             SDL_Renderer *renderer,
-                             Screen *screen,
-                             Texture *slices,
-                             Texture *tex)
-
-{
-    UNUSED(world);
-    UNUSED(side);
-    UNUSED(renderer);
-    UNUSED(screen);
-    UNUSED(slices);
-    UNUSED(tex);
-
-    int my_width = (side == front || side == back) ? world->width : world->height;
-    int my_height = (side == front || side == back) ? world->height : world->width;
-
-    //prepare_scratch_bboxes(my_width, my_height, collection);
-
-    // now we will walk the world
-    // front to back, column by column
-    // and grow the bboxcolumns
-    int x_off = 0;
-    int y_off = 0;
-    // lets just start with the front Side.
-    for (int x = 0; x< world->width; x++) {
-        for (int z = 0; z<world->height; z++) {
-            for (int y = 0; y< world->depth; y++) {
-                int value = getBlockAt(world, x, y, z);
-                if (value > 0) {
-                    int tlX = x*16;
-                    int tlY = (world->height*16)  + (y*8) - (z*16) - 16;
-                    BBox bb = {{tlX, tlY}, {tlX+16, tlY+24}};
-                    char buffer[64];
-
-                    bbox_to_buffer(bb, buffer);
-                    printf("this bbox: %s\n", buffer);
-                }
-            }
-            printf("y column done\n");
-        }
-
-    }
-
-}
-
 
 /*
     |Z (height)
@@ -149,11 +106,16 @@ void draw_3d_space_in_slices(World *world,
   /Y (depth)
 */
 
-internal void drawLines(World *world, SDL_Renderer *renderer, Screen *screen)
+internal void drawLines(World *world, SDL_Renderer *renderer, Screen *screen, int frontal)
 {
     SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
     SDL_RenderClear( renderer );
-    draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
+    if (frontal) {
+        draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
+    } else {
+        draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
+    }
+
 }
 
 internal void drawWait(SDL_Renderer *renderer)
@@ -161,6 +123,17 @@ internal void drawWait(SDL_Renderer *renderer)
     SDL_RenderPresent( renderer );
     SDL_Delay(40);
 }
+
+// I will look at the world front to back, column by column
+// I will have a render texture for each front--> back  layer.
+// blocks that are totally within existing bounding boxes are not drawn.
+// block that are partly or completely not within existing bounding boxes are drawn to their layer.
+
+// for a x step (z and y) I keep a dynamic amount of bounding boxes.
+// these grow and shrink and are inserted and removed as necessary.
+
+
+
 
 void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex)
 {
@@ -174,21 +147,32 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         x_off = screen->width/2 - ((world->width*16)/2);
         y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
         draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
-        for (int x = 0; x < world->width; x++) {
-            // for (int z = 0; z < world->height; z++) {
-                printf("\n\n");
-                //for (int y = 0; y< world->depth; y++) {
-                for (int y = world->depth-1; y>=0; y--) {
-                    for (int z = 0; z < world->height; z++) {
 
-                    drawLines(world, renderer, screen);
+        for (int x = 0; x < world->width; x++) {
+            //for (int z = 0; z < world->height; z++) {
+            printf("new x \n");
+            BBox first;
+            int setFirst = 0;
+            //for (int y = 0; y< world->depth; y++) {
+            for (int y = world->depth-1; y>=0; y--) {
+                printf("new y \n");
+                for (int z = 0; z < world->height; z++) {
+                    drawLines(world, renderer, screen, 1);
+
                     int value = getBlockAt(world, x, y, z);
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
                                      .w=16, .h=24};
-                    printf("Y value %d\n", dest.y);
-                    draw_3d_space_helper(value, tex, renderer, source, dest);
-                    drawWait(renderer);
+
+                    if (value > 0) {
+                        if (setFirst == 0) {
+                            first = bbox(dest.x, dest.y, dest.x+dest.w, dest.y+dest.h);
+
+                        }
+                        printf("Y value %d %d %d\n", dest.y, dest.y + dest.h, dest.w);
+                        draw_3d_space_helper(value, tex, renderer, source, dest);
+                        drawWait(renderer);
+                    }
                 }
             }
         }
@@ -198,12 +182,15 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
     case(back) :
         x_off = screen->width/2 - ((world->width*16)/2);
         y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
-
         draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
+
         for (int x = 0; x < world->width; x++) {
-            for (int z = 0; z < world->height; z++) {
-                for (int y = 0; y< world->depth; y++) {
-                    //drawLines(world, renderer, screen);
+            for (int y = 0; y< world->depth; y++) {
+                for (int z = 0; z < world->height; z++) {
+                    drawLines(world, renderer, screen, 1);
+
+
+
                     int value = getBlockAt(world, (world->width-1-x), (world->depth-1-y), z);
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16) + (y*8)-(z*16) - 16,
@@ -220,9 +207,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
         draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
         for (int y = 0; y< world->depth; y++) {
-            for (int z = 0; z < world->height; z++) {
-                for (int x = 0; x < world->width; x++) {
-                    //drawLines(world, renderer, screen);
+            for (int x = 0; x < world->width; x++) {
+                for (int z = 0; z < world->height; z++) {
+                    drawLines(world, renderer, screen, 0);
 
                     int value = getBlockAt(world, (world->width-1-x), y, z);
                     SDL_Rect dest = {.x= x_off + y*16,
@@ -243,9 +230,11 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
         draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
         for (int y = 0; y< world->depth; y++) {
-            for (int z = 0; z < world->height; z++) {
-                for (int x = 0; x < world->width; x++) {
-                    //drawLines(world, renderer, screen);
+            for (int x = 0; x < world->width; x++) {
+                for (int z = 0; z < world->height; z++) {
+                    drawLines(world, renderer, screen, 0);
+
+
                     int value = getBlockAt(world, x, (world->depth-1-y), z);
                     SDL_Rect dest = {.x= x_off + y*16,
                                      .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
@@ -256,7 +245,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 }
             }
         }
-        //abort();
+        //     abort();
         break;
 
     default:
