@@ -132,9 +132,6 @@ internal void drawWait(SDL_Renderer *renderer)
 // for a x step (z and y) I keep a dynamic amount of bounding boxes.
 // these grow and shrink and are inserted and removed as necessary.
 
-
-
-
 void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state)
 {
     int x_off;
@@ -149,7 +146,6 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
 
         for (int x = 0; x < world->width; x++) {
-            //for (int z = 0; z < world->height; z++) {
             printf("new x \n");
             BBox first;
             int setFirst = 0;

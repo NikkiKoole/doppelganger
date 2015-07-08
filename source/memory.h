@@ -25,7 +25,6 @@ typedef struct FrameTime
 
 } FrameTime;
 
-
 typedef struct Memory
 {
     bool is_initialized;

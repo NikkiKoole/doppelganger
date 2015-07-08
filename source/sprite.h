@@ -4,7 +4,6 @@
 #include "texture.h"
 #include "animation.h"
 
-
 typedef struct Sprite
 {
     Texture *texture;

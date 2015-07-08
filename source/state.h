@@ -1,7 +1,6 @@
 #ifndef STATE_H
 #define STATE_H
 
-
 #include "defines.h"
 #include "timer.h"
 #include "animation.h"
@@ -10,7 +9,6 @@
 #include "screen.h"
 #include "blockmap.h"
 #include "geom.h"
-
 
 typedef struct State
 {
