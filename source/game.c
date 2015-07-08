@@ -145,19 +145,9 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     SDL_RenderClear( renderer );
 
     resetBlocks(state->world);
-
-    for (int z = 0; z<state->world->height; z++) {
-        for (int x = 0; x<state->world->width; x++){
-            for (int y = 0; y<state->world->depth; y++) {
-                //setBlockAt(state->world, x, y, z, 1 + (z+x+y)% 6 );
-                //setBlockAt(state->world, x, y, z, 1);
-            }
-        }
-    }
-
     set_structured_values_in_world(state->world);
-    draw_3d_space(state->world, front, renderer, screen, state->blocks);
-    //draw_3d_space_in_slices(state->world, right, renderer, screen, state->world_slices, state->blocks, trans_state->columns);
+
+    draw_3d_space(state->world, front, renderer, screen, state->blocks, trans_state);
 
     texture_set_color(state->terminal8, PINK);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 3, renderer);

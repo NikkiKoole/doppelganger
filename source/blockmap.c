@@ -135,7 +135,7 @@ internal void drawWait(SDL_Renderer *renderer)
 
 
 
-void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex)
+void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state)
 {
     int x_off;
     int y_off;
