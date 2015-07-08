@@ -175,20 +175,25 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
         draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
         for (int x = 0; x < world->width; x++) {
-            for (int z = 0; z < world->height; z++) {
-                for (int y = 0; y< world->depth; y++) {
-                    //drawLines(world, renderer, screen);
+            // for (int z = 0; z < world->height; z++) {
+                printf("\n\n");
+                //for (int y = 0; y< world->depth; y++) {
+                for (int y = world->depth-1; y>=0; y--) {
+                    for (int z = 0; z < world->height; z++) {
+
+                    drawLines(world, renderer, screen);
                     int value = getBlockAt(world, x, y, z);
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
                                      .w=16, .h=24};
+                    printf("Y value %d\n", dest.y);
                     draw_3d_space_helper(value, tex, renderer, source, dest);
-                    //drawWait(renderer);
+                    drawWait(renderer);
                 }
             }
         }
 
-        //abort();
+        abort();
         break;
     case(back) :
         x_off = screen->width/2 - ((world->width*16)/2);
