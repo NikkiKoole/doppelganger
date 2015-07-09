@@ -20,8 +20,8 @@ typedef struct List
 } List;
 
 ListNode *make_node_calloc(void *value);
-int list_add_last(List *list, ListNode *node);
-int list_add_first(List *list, ListNode *node);
+void list_add_last(List *list, ListNode *node);
+void list_add_first(List *list, ListNode *node);
 void *list_remove(List *list, ListNode *node);
 void *list_pop(List *list);
 void *list_shift(List *list);

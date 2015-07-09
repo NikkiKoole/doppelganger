@@ -21,7 +21,7 @@ SUPERSTRICT = -Werror -Wall -Wextra  -Wformat=2 -Wno-import \
 
 WARNINGS = $(SUPERSTRICT)
 
-LFILES := game texture timer animation keyboard sprite geom blockmap memory
+LFILES := game texture timer animation keyboard sprite geom blockmap memory linkedlist
 LIB_FILES += $(foreach file, $(LFILES), source/$(file).c)
 LIB_O_FILES += $(foreach file, $(LFILES), $(file).o)
 

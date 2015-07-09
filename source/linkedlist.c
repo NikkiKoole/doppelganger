@@ -1,4 +1,7 @@
 #include "linkedlist.h"
+#include "defines.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 ListNode *make_node_calloc(void *value) {
     ListNode *node = calloc(1, sizeof(ListNode));
@@ -6,7 +9,7 @@ ListNode *make_node_calloc(void *value) {
     return node;
 }
 
-int list_add_last(List *list, ListNode *node)
+void list_add_last(List *list, ListNode *node)
 {
     //ListNode *node = calloc(1, sizeof(ListNode));
     //node->value = value;
@@ -20,7 +23,7 @@ int list_add_last(List *list, ListNode *node)
     }
     list->length++;
 }
-int list_add_first(List *list, ListNode *node)
+void list_add_first(List *list, ListNode *node)
 {
     //ListNode *node = calloc(1, sizeof(ListNode));
     //node->value = value;
