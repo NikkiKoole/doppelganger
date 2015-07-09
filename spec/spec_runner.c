@@ -10,19 +10,181 @@
 #define BBOX_HEIGHT(a) (a.br.y - a.tl.y)
 #define BBOX_WIDTH(a) (a.br.x - a.tl.x)
 
+#define LIST_FOREACH(L, S, M, V) ListNode *_node = NULL;        \
+    ListNode *V = NULL;                                         \
+    for (V = _node = L->S; _node != NULL; V = _node = _node->M) \
+
+typedef struct ListNode
+{
+    struct ListNode *next;
+    struct ListNode *prev;
+    void* value;
+} ListNode;
+
+typedef struct List
+{
+    ListNode *first;
+    ListNode *last;
+    int length;
+} List;
+
+int list_add_last(List *list, void *value)
+{
+    ListNode *node = calloc(1, sizeof(ListNode));
+    node->value = value;
+    if (list->last == NULL) {
+        list->first = node;
+        list->last = node;
+    } else {
+        node->prev = list->last;
+        list->last->next = node;
+        list->last = node;
+    }
+    list->length++;
+}
+int list_add_first(List *list, void *value)
+{
+    ListNode *node = calloc(1, sizeof(ListNode));
+    node->value = value;
+    if (list->first == NULL) {
+        list->first = node;
+        list->last = node;
+    } else {
+        node->next = list->first;
+        list->first->prev = node;
+        list->first = node;
+    }
+    list->length++;
+}
+
+void *list_remove(List *list, ListNode *node)
+{
+    void *result;
+    ASSERT(list->first && list->last && "List cannot be empty.");
+    ASSERT(node && "Node cannot be null.");
+
+    if (node == list->first && node == list->last) {
+        list->first = NULL;
+        list->last = NULL;
+    } else if (node == list->first) {
+        list->first = node->next;
+        ASSERT(list->first != NULL && "invalid list; first became null somehow.");
+        list->first->prev = NULL;
+    } else if (node == list->last) {
+        list->last = node->prev;
+        ASSERT(list->last != NULL && "invalid list; last became null somehow.");
+        list->last->next = NULL;
+    } else {
+        ListNode *after = node->next;
+        ListNode *before = node->prev;
+        after->prev = before;
+        before->next = after;
+    }
+    list->length--;
+    result = node->value;
+    return result;
+}
+
+void *list_pop(List *list)
+{
+    ListNode *node = list->last;
+    return node != NULL ? list_remove(list, node) : NULL;
+}
+void *list_shift(List *list)
+{
+    ListNode *node = list->first;
+    return node != NULL ? list_remove(list, node) : NULL;
+}
 
 
-/*
-    |Z (height)
-    |
-    |
-    |
-    |
-    /---------X (width)
-   /
-  /Y (depth)
+describe(double_linked_list) {
+    it (can add_last) {
+        List *list = calloc(1, sizeof(List));
+        int mock1 = 1;
+        int mock2 = 12;
+        list_add_last(list, &mock1);
+        list_add_last(list, &mock2);
 
-*/
+        expect(list->length == 2);
+        int *value = list->last->value;
+        expect(*value == 12);
+        int *value2 = list->first->value;
+        expect(*value2 == 1);
+    }
+
+    it (has a handy foreach macro) {
+        List *list = calloc(1, sizeof(List));
+        int mock1 = 1;
+        int mock2 = 2;
+        int mock3 = 3;
+        int mock4 = 5;
+        int mock5 = 7;
+        int mock6 = 11;
+        list_add_last(list, &mock1);
+        list_add_last(list, &mock2);
+        list_add_last(list, &mock3);
+        list_add_last(list, &mock4);
+        list_add_last(list, &mock5);
+        list_add_last(list, &mock6);
+        int running_total = 0;
+
+        LIST_FOREACH(list, first, next, cur) {
+            int *v = cur->value;
+            running_total += *v;
+
+        }
+        expect(list->length == 6);
+        expect(running_total == 1+2+3+5+7+11);
+
+    }
+    it (can pop_last) {
+        List *list = calloc(1, sizeof(List));
+        int mock1 = 134;
+        int mock2 = 12;
+        list_add_last(list, &mock1);
+        list_add_last(list, &mock2);
+        expect(list->length == 2);
+        int *value = list_pop(list);
+        expect(list->length == 1);
+        expect(*value == 12);
+    }
+    it (can add_first) {
+        List *list = calloc(1, sizeof(List));
+        int mock1 = 1;
+        int mock2 = 23;
+        list_add_first(list, &mock1);
+        list_add_first(list, &mock2);
+        expect(list->length == 2);
+        int *value = list->first->value;
+        expect(*value == 23);
+        int *value2 = list->last->value;
+        expect(*value2 == 1);
+    }
+    it (can shift the first) {
+        List *list = calloc(1, sizeof(List));
+        int mock1 = 1;
+        int mock2 = 23;
+        list_add_first(list, &mock1);
+        list_add_first(list, &mock2);
+        expect(list->length == 2);
+        int *value = list_shift(list);
+        expect(list->length == 1);
+        expect(*value == 23);
+    }
+
+    it (can remove from the middle) {
+        List *list = calloc(1, sizeof(List));
+        int mock1 = 1;
+        int mock2 = 23;
+        int mock3 = 69;
+        list_add_first(list, &mock1);
+        list_add_first(list, &mock2);
+        list_add_first(list, &mock3);
+        int *value = list_remove(list, list->first->next);
+        expect(list->length == 2);
+        expect(*value == 23);
+    }
+}
 
 describe(blockmap) {
     it (3d blocky world dynamically sizeable) {
@@ -32,9 +194,6 @@ describe(blockmap) {
         expect(getBlockAt(&w, 10,10,10) == 100);
     }
 }
-
-
-
 
 describe(rectangles) {
     Point p;
@@ -175,7 +334,8 @@ describe(geom) {
 }
 
 int main() {
-    test(blockmap);
+    test(double_linked_list);
+    /* test(blockmap); */
     /* test(rectangles); */
     /* test(defines); */
     /* test(geom); */

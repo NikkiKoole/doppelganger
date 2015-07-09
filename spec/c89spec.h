@@ -153,7 +153,7 @@ void _c89spec_end_it(void) {
    (_c89spec_test_time > C89SPEC_PROFILE_THRESHOLD)
       ? printf("%s",_C89SPEC_RED_COLOR)
       : printf("%s",_C89SPEC_BLACK_COLOR);
-   printf(" (%.2f seconds)", _c89spec_test_time);
+   //printf(" (%.2f seconds)", _c89spec_test_time);
 }
 
 void _c89spec_expect_passed(void) {
