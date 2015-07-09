@@ -6,7 +6,6 @@ ListNode *make_node_calloc(void *value) {
     return node;
 }
 
-
 int list_add_last(List *list, ListNode *node)
 {
     //ListNode *node = calloc(1, sizeof(ListNode));
