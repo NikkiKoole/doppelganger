@@ -8,8 +8,8 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const int32 SCREEN_WIDTH = 1280;
-const int32 SCREEN_HEIGHT = 800;
+const int32 SCREEN_WIDTH = 1500;
+const int32 SCREEN_HEIGHT = 1000;
 const char *TITLE = "Doppelgangs";
 
 internal bool init(void);

@@ -81,31 +81,31 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
                          memory->transient_storage_size - sizeof(TransState),
                          (uint8 *)memory->transient_storage + sizeof(TransState));
 
-        TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena);
+        /* TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena); */
 
 
-        BBoxNode *first = (BBoxNode*) PUSH_STRUCT(&trans_state->scratch_arena, BBoxNode);
-        BBoxNode *current = first;
-        clock_t start = clock() ;
+        /* BBoxNode *first = (BBoxNode*) PUSH_STRUCT(&trans_state->scratch_arena, BBoxNode); */
+        /* BBoxNode *current = first; */
+        /* clock_t start = clock() ; */
 
-        for (int i = 0; i< 10000; i++){
-            BBoxNode *new = (BBoxNode*) PUSH_STRUCT(&trans_state->scratch_arena, BBoxNode);
-            new->next = NULL;
-            new->value = bbox(i,i,i,i);
-            current->next = new;
-            current = new;
-        }
+        /* for (int i = 0; i< 10000; i++){ */
+        /*     BBoxNode *new = (BBoxNode*) PUSH_STRUCT(&trans_state->scratch_arena, BBoxNode); */
+        /*     new->next = NULL; */
+        /*     new->value = bbox(i,i,i,i); */
+        /*     current->next = new; */
+        /*     current = new; */
+        /* } */
 
-        char buffer[64];
-        current = first;
-        while (current->next != NULL) {
-            bbox_to_buffer(current->value, buffer);
-            current = current->next;
-        }
+        /* char buffer[64]; */
+        /* current = first; */
+        /* while (current->next != NULL) { */
+        /*     bbox_to_buffer(current->value, buffer); */
+        /*     current = current->next; */
+        /* } */
 
-        clock_t end = clock() ;
-        double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ;
-        printf("doing that linkedlist madness took: %f\n",elapsed_time);
+        /* clock_t end = clock() ; */
+        /* double elapsed_time = (end-start)/(double)CLOCKS_PER_SEC ; */
+        /* printf("doing that linkedlist madness took: %f\n",elapsed_time); */
 
         //printf("Current scratch: used: %zu\n", scratch.used);
         //printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
@@ -233,26 +233,26 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
         sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
         state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-        state->world->width = 5;
-        state->world->height = 5;
-        state->world->depth = 5;
+        state->world->width = 60;
+        state->world->height = 50;
+        state->world->depth = 20;
         state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                    state->world->width * state->world->height * state->world->depth,
                                                    Block);
 
 
-        printf("world: %zu\n", sizeof(World));
-        printf("world blocks: %d\n", state->world->width*state->world->height*state->world->depth);
+        //printf("world: %zu\n", sizeof(World));
+        //printf("world blocks: %d\n", state->world->width*state->world->height*state->world->depth);
 
-        printf("single texture: %zu\n", sizeof(Texture));
-        printf("Arena size before pushing Array: %zu \n", state->world_arena.used);
-        state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, MAX(state->world->depth, state->world->width), Texture);
-        printf("Arena size after pushing Array: %zu \n", state->world_arena.used);
+        //printf("single texture: %zu\n", sizeof(Texture));
+        //printf("Arena size before pushing Array: %zu \n", state->world_arena.used);
+        //state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, MAX(state->world->depth, state->world->width), Texture);
+        //printf("Arena size after pushing Array: %zu \n", state->world_arena.used);
 
-        texture_create_blank( &state->world_slices[0], 1024*2, 768*2, SDL_TEXTUREACCESS_TARGET, renderer);
-        texture_create_blank( &state->world_slices[1], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
-        texture_create_blank( &state->world_slices[2], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
-        printf("the third blank texture, living in world_slices:{ w:%d, h:%d } \n",state->world_slices[2].width, state->world_slices[2].height);
+        //texture_create_blank( &state->world_slices[0], 1024*2, 768*2, SDL_TEXTUREACCESS_TARGET, renderer);
+        //texture_create_blank( &state->world_slices[1], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
+        //texture_create_blank( &state->world_slices[2], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
+        //printf("the third blank texture, living in world_slices:{ w:%d, h:%d } \n",state->world_slices[2].width, state->world_slices[2].height);
         //create_slice(state, renderer);
 
 }

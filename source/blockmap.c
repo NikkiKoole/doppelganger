@@ -2,6 +2,8 @@
 #include "blockmap.h"
 #include "geom.h"
 #include <stdlib.h>
+#include "linkedlist.h"
+
 /*
     |Z (height)
     |
@@ -128,7 +130,6 @@ internal void drawWait(SDL_Renderer *renderer)
 // I will have a render texture for each front--> back  layer.
 // blocks that are totally within existing bounding boxes are not drawn.
 // block that are partly or completely not within existing bounding boxes are drawn to their layer.
-
 // for a x step (z and y) I keep a dynamic amount of bounding boxes.
 // these grow and shrink and are inserted and removed as necessary.
 
@@ -143,37 +144,74 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
     case(front) :
         x_off = screen->width/2 - ((world->width*16)/2);
         y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
-        draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
+        //draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
 
         for (int x = 0; x < world->width; x++) {
-            printf("new x \n");
-            BBox first;
-            int setFirst = 0;
+            //printf("new x \n");
+            TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena);
+            List *list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
+
             //for (int y = 0; y< world->depth; y++) {
             for (int y = world->depth-1; y>=0; y--) {
-                printf("new y \n");
+                //printf("new y \n");
                 for (int z = 0; z < world->height; z++) {
-                    drawLines(world, renderer, screen, 1);
+                    //drawLines(world, renderer, screen, 1);
 
                     int value = getBlockAt(world, x, y, z);
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
                                      .w=16, .h=24};
 
-                    if (value > 0) {
-                        if (setFirst == 0) {
-                            first = bbox(dest.x, dest.y, dest.x+dest.w, dest.y+dest.h);
 
+
+
+                    if (value > 0) {
+                        //now we have to find out if any of the BBoxes in the List either
+                        // a) partly overlaps, kiss or none overlaps -> we draw the current shape AND we grow the boundingbox
+                        //b) fully overlaps -> we dont draw the current shape
+                        BBox current = bbox(dest.x, dest.y, dest.x+dest.w, dest.y+dest.y);
+                        void *val =  &current;
+                        ListNode *node = (ListNode*) PUSH_STRUCT(&trans_state->scratch_arena, ListNode);
+                        node->value = val;
+
+                        int partly_or_none_or_kisses = 0;
+                        char buffer[64];
+                        //printf("List length: %d\n", list->length);
+                        LIST_FOREACH(list, first, next, cur) {
+                            BBox *v = cur->value;
+                            BBox result = bbox(0,0,0,0);
+                            int i = bbox_intersect(current, *v, &result);
+                            if (i) {
+                                partly_or_none_or_kisses = 1;
+                            }
+
+                            bbox_to_buffer(result, buffer);
+                            //printf("123: %s\n", buffer);
                         }
-                        printf("Y value %d %d %d\n", dest.y, dest.y + dest.h, dest.w);
-                        draw_3d_space_helper(value, tex, renderer, source, dest);
-                        drawWait(renderer);
+                        if (partly_or_none_or_kisses == 0) {
+                            list_add_last(list, node);
+                        }
+
+                        //printf("Y value %d %d %d\n", dest.y, dest.y + dest.h, dest.w);
+                        if (!(dest.y+dest.h < 0 || dest.y >= screen->height)){
+
+                            draw_3d_space_helper(value, tex, renderer, source, dest);
+                        } else{
+                            printf("out of bounds\n");
+                        }
+                        //drawWait(renderer);
                     }
                 }
             }
+
+            //printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
+            end_temporary_memory(scratch, &trans_state->scratch_arena);
+            //printf("Current transstate: used after END: %zu\n", trans_state->scratch_arena.used);
+
+
         }
 
-        abort();
+        //abort();
         break;
     case(back) :
         x_off = screen->width/2 - ((world->width*16)/2);
