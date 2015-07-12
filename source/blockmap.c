@@ -150,7 +150,10 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             //printf("new x \n");
             TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena);
             List *list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
-
+            printf("List adress: %p \n", &list);
+            list->length = 0;
+            list->first = NULL;
+            list->last = NULL;
             //for (int y = 0; y< world->depth; y++) {
             for (int y = world->depth-1; y>=0; y--) {
                 //printf("new y \n");
@@ -161,10 +164,6 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
                                      .w=16, .h=24};
-
-
-
-
                     if (value > 0) {
                         //now we have to find out if any of the BBoxes in the List either
                         // a) partly overlaps, kiss or none overlaps -> we draw the current shape AND we grow the boundingbox
@@ -175,34 +174,30 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                         node->value = val;
 
                         int partly_or_none_or_kisses = 0;
-                        char buffer[64];
-                        //printf("List length: %d\n", list->length);
-                        LIST_FOREACH(list, first, next, cur) {
-                            BBox *v = cur->value;
-                            BBox result = bbox(0,0,0,0);
-                            int i = bbox_intersect(current, *v, &result);
-                            if (i) {
-                                partly_or_none_or_kisses = 1;
-                            }
+                        //char buffer[64];
+                        //LIST_FOREACH(list, first, next, cur) {
+                            //BBox *v = cur->value;
+                            //BBox result = bbox(0,0,0,0);
+                            //int i = bbox_intersect(current, *v, &result);
+                            //if (i) {
+                                //    partly_or_none_or_kisses = 1;
+                            //}
 
-                            bbox_to_buffer(result, buffer);
+                            //bbox_to_buffer(result, buffer);
                             //printf("123: %s\n", buffer);
-                        }
+                        //z}
                         if (partly_or_none_or_kisses == 0) {
                             list_add_last(list, node);
                         }
-
                         //printf("Y value %d %d %d\n", dest.y, dest.y + dest.h, dest.w);
-                        if (!(dest.y+dest.h < 0 || dest.y >= screen->height)){
 
-                            draw_3d_space_helper(value, tex, renderer, source, dest);
-                        } else{
-                            printf("out of bounds\n");
-                        }
+                        draw_3d_space_helper(value, tex, renderer, source, dest);
+
                         //drawWait(renderer);
                     }
                 }
             }
+            printf("List length: %d\n", list->length);
 
             //printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
             end_temporary_memory(scratch, &trans_state->scratch_arena);

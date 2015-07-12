@@ -18,21 +18,6 @@ internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* ren
 internal void create_slice(State *state, SDL_Renderer* renderer  );
 void game_update_and_render(Screen *screen, Memory *memory, Keyboard *keyboard, FrameTime *frametime);
 
-
-// TODO : later on replace this simple stack based crazyness with some transient memory (and make it a linked list or something)
-internal void reset_bbox(BBox *v) {
-    UNUSED(v);
-    printf("getting in here to clean out this BBOX\n");
-}
-
-
-typedef struct BBoxNode
-{
-    struct BBoxNode *next;
-    BBox value;
-} BBoxNode;
-
-
 //void set_structured_values_in_world(World* world);
 internal void set_structured_values_in_world(World* world)
 {
@@ -45,7 +30,7 @@ internal void set_structured_values_in_world(World* world)
     // back wall
     for (int x = 0; x < world->width; x++) {
         for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, x,0,z,2);
+            setBlockAt(world, x,0,MIN(z-x, z),2);
         }
     }
     // left wall
