@@ -224,8 +224,8 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
         state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
         state->world->width = 80;
-        state->world->height = 30;
-        state->world->depth = 30;
+        state->world->height = 64;
+        state->world->depth = 20;
         state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                    state->world->width * state->world->height * state->world->depth,
                                                    Block);

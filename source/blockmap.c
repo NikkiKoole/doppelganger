@@ -193,24 +193,33 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                         int partly_overlapped_by = 0;
                         int barely_touched_by = 0;
 
+                        int growed = 0;
+
                         LIST_FOREACH(list, first, next, cur) {
                             BBox *v = cur->value;
                             BBox result;
+
                             int i = bbox_intersect(*current, *v, &result);
 
                             if (!bbox_eql(*current, *v)) {
                                 if (bbox_in_bbox(*current, *v)) {
                                     fully_contained_by = 1;
+                                    //goto finished_list;
                                 } else if (i) {
                                     bbox_grow_vertically(v, *current);
                                     partly_overlapped_by = 1;
+                                    //goto finished_list;
 
                                 } else if (bbox_neighbour_vertically(*v, *current)) {
                                     bbox_grow_vertically(v, *current);
                                     barely_touched_by = 1;
+                                    //goto finished_list;
                                 }
                             }
+
                         }
+                        //finished_list:
+                        // perhaps I can just remove the unneccesary duplications
 
                         if (! fully_contained_by) {
                             if (barely_touched_by || partly_overlapped_by) {
@@ -219,12 +228,15 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                                 list_add_last(list, node);
                             }
                         }
+
+
                         draw_3d_space_helper(value, tex, renderer, source, dest);
-                    }
-                }
+                        //drawWait(renderer);
+                    } // z
+                } // y
 
             }
-            printList(list);
+            //printList(list);
             printf("List length: %d\n", list->length);
         }
         end_temporary_memory(scratch, &trans_state->scratch_arena);
