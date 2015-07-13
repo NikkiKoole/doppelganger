@@ -153,17 +153,19 @@ int bbox_intersect(BBox this, BBox other, BBox *result)
             result->br.y > result->tl.y);
 }
 
+
 void bbox_grow_vertically(BBox *this, BBox other)
 {
-    ASSERT(other.br.y == this->tl.y || other.tl.y == this->br.y);
-    ASSERT(other.br.y >= other.tl.y);
 
-    if (other.br.y == this->tl.y) {
-        this->tl.y = other.tl.y;  // growing at the top
-    } else if (other.tl.y == this->br.y) {
-        this->br.y = other.br.y; // growing at the bottom
+    if (other.tl.y < this->tl.y) {
+        this->tl.y = other.tl.y;
+    }
+    if (other.br.y > this->br.y) {
+        this->br.y = other.br.y;
+
     }
 }
+
 
 void bbox_shrink_vertically(BBox *this, BBox other)
 {

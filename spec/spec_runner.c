@@ -5,7 +5,7 @@
 #include "../source/geom.h"
 #include "../source/defines.h"
 #include "../source/blockmap.h"
-#include "../source/linkedlist.c"
+#include "../source/linkedlist.h"
 
 #define STRINGS_EQL(a, b) (strcmp((a),(b)) == 0)
 #define BBOX_HEIGHT(a) (a.br.y - a.tl.y)
@@ -251,8 +251,8 @@ describe(geom) {
 int main() {
     test(double_linked_list);
     /* test(blockmap); */
-    /* test(rectangles); */
+    test(rectangles);
     /* test(defines); */
-    /* test(geom); */
+    test(geom);
     return summary();
 }

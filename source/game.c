@@ -21,6 +21,7 @@ void game_update_and_render(Screen *screen, Memory *memory, Keyboard *keyboard, 
 //void set_structured_values_in_world(World* world);
 internal void set_structured_values_in_world(World* world)
 {
+
     // bottom plateau
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
@@ -30,19 +31,19 @@ internal void set_structured_values_in_world(World* world)
     // back wall
     for (int x = 0; x < world->width; x++) {
         for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, x,0,MIN(z-x, z),2);
+            setBlockAt(world, x,0,z,2);
         }
     }
     // left wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            //setBlockAt(world, 0,y,z,3);
+            setBlockAt(world, 0,y,z,3);
         }
     }
     // right wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            //setBlockAt(world, world->width-1,y,z,4);
+            setBlockAt(world, world->width-1,y,z,4);
         }
     }
 }
@@ -128,7 +129,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
     SDL_RenderClear( renderer );
-
+    printf("state world  width: %d height: %d depth: %d\n", state->world->width, state->world->height, state->world->depth);
     resetBlocks(state->world);
     set_structured_values_in_world(state->world);
 
@@ -218,9 +219,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
         sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
         state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-        state->world->width = 60;
-        state->world->height = 50;
-        state->world->depth = 20;
+        state->world->width = 5;
+        state->world->height = 15;
+        state->world->depth = 15;
         state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                    state->world->width * state->world->height * state->world->depth,
                                                    Block);

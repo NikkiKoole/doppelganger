@@ -29,9 +29,9 @@ void resetBlocks(World *world)
 
 void setBlockAt(World *world, int x, int y, int z, uint8 type)
 {
-    ASSERT(x < world->width);
-    ASSERT(y < world->depth);
-    ASSERT(z < world->height);
+    ASSERT(x >= 0); ASSERT(x < world->width);
+    ASSERT(y >= 0); ASSERT(y < world->depth);
+    ASSERT(z >= 0); ASSERT(z < world->height);
 
     world->blocks[(y * (world->width * world->height)) + (z * world->width) + x].type = type;
 }
@@ -133,6 +133,19 @@ internal void drawWait(SDL_Renderer *renderer)
 // for a x step (z and y) I keep a dynamic amount of bounding boxes.
 // these grow and shrink and are inserted and removed as necessary.
 
+//#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
+
+static void printBBox(BBox b) {
+    printf("bbox( %f, %f, %f, %f )\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
+}
+
+static void printList(List *list) {
+    LIST_FOREACH(list, first, next, cur) {
+        BBox *v = cur->value;
+        printBBox(*v);
+    }
+}
+
 void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state)
 {
     int x_off;
@@ -140,23 +153,32 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
     int index = 6;
     SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
 
+    //List *columns[world->width];
+
     switch(side){
     case(front) :
         x_off = screen->width/2 - ((world->width*16)/2);
         y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
-        //draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
+        draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
+        TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena);
+        //List *list = calloc(1, sizeof(List));
+        List *list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
+        //printf("List adress: %p \n", &list);
 
         for (int x = 0; x < world->width; x++) {
             //printf("new x \n");
-            TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena);
-            List *list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
-            printf("List adress: %p \n", &list);
+            //List *list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
+            printf("List:first adress %p adress: %p \n", &list->first, &list);
             list->length = 0;
             list->first = NULL;
             list->last = NULL;
+            printf("resetted list\n");
+
+
+            //
+
             //for (int y = 0; y< world->depth; y++) {
             for (int y = world->depth-1; y>=0; y--) {
-                //printf("new y \n");
                 for (int z = 0; z < world->height; z++) {
                     //drawLines(world, renderer, screen, 1);
 
@@ -164,48 +186,57 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
                                      .w=16, .h=24};
+
                     if (value > 0) {
-                        //now we have to find out if any of the BBoxes in the List either
-                        // a) partly overlaps, kiss or none overlaps -> we draw the current shape AND we grow the boundingbox
-                        //b) fully overlaps -> we dont draw the current shape
-                        BBox current = bbox(dest.x, dest.y, dest.x+dest.w, dest.y+dest.y);
-                        void *val =  &current;
+                        BBox *current = (BBox*) PUSH_STRUCT(&trans_state->scratch_arena, BBox);
+                        current->tl.x = dest.x;
+                        current->tl.y = dest.y;
+                        current->br.x  = dest.x+dest.w;
+                        current->br.y = dest.y+dest.h;
+
+                        void *val =  current;
                         ListNode *node = (ListNode*) PUSH_STRUCT(&trans_state->scratch_arena, ListNode);
                         node->value = val;
 
-                        int partly_or_none_or_kisses = 0;
-                        //char buffer[64];
-                        //LIST_FOREACH(list, first, next, cur) {
-                            //BBox *v = cur->value;
-                            //BBox result = bbox(0,0,0,0);
-                            //int i = bbox_intersect(current, *v, &result);
-                            //if (i) {
-                                //    partly_or_none_or_kisses = 1;
-                            //}
+                        int fully_contained_by = 0;
+                        BBox this ;
+                        int partly_overlapped_by = 0;
+                        int barely_touched_by = 0;
 
-                            //bbox_to_buffer(result, buffer);
-                            //printf("123: %s\n", buffer);
-                        //z}
-                        if (partly_or_none_or_kisses == 0) {
-                            list_add_last(list, node);
+                        LIST_FOREACH(list, first, next, cur) {
+                            BBox *v = cur->value;
+                            BBox result;
+                            int i = bbox_intersect(*current, *v, &result);
+
+                            if (!bbox_eql(*current, *v)) {
+                                if (bbox_in_bbox(*current, *v)) {
+                                    fully_contained_by = 1;
+                                } else if (i) {
+                                    partly_overlapped_by = 1;
+                                    this = *v;
+                                } else if (bbox_neighbour_vertically(*v, *current)) {
+                                    barely_touched_by = 1;
+                                    this = *v;
+                                }
+                            }
                         }
-                        //printf("Y value %d %d %d\n", dest.y, dest.y + dest.h, dest.w);
 
+                        if (! fully_contained_by) {
+                            if (barely_touched_by || partly_overlapped_by) {
+                                bbox_grow_vertically(&this, *current);
+                            }  else {
+                                list_add_last(list, node);
+                            }
+                        }
                         draw_3d_space_helper(value, tex, renderer, source, dest);
-
-                        //drawWait(renderer);
                     }
                 }
+
             }
+            printList(list);
             printf("List length: %d\n", list->length);
-
-            //printf("Current transstate: used: %zu\n", trans_state->scratch_arena.used);
-            end_temporary_memory(scratch, &trans_state->scratch_arena);
-            //printf("Current transstate: used after END: %zu\n", trans_state->scratch_arena.used);
-
-
         }
-
+        end_temporary_memory(scratch, &trans_state->scratch_arena);
         //abort();
         break;
     case(back) :
