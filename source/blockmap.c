@@ -146,7 +146,7 @@ static void printList(List *list) {
     }
 }
 
-static void growList(List *list, BBox *current, ListNode *node) {
+static void growList(List *list, BBox *current, ListNode *node, int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest) {
     int fully_contained_by = 0;
     int partly_overlapped_by = 0;
     int barely_touched_by = 0;
@@ -159,18 +159,22 @@ static void growList(List *list, BBox *current, ListNode *node) {
         if (!bbox_eql(*current, *v)) {
             if (bbox_in_bbox(*current, *v)) {
                 fully_contained_by = 1;
+                goto here;
             } else if (i) {
                 bbox_grow_vertically(v, *current);
                 partly_overlapped_by = 1;
+                goto here;
             } else if (bbox_neighbour_vertically(*v, *current)) {
                 bbox_grow_vertically(v, *current);
                 barely_touched_by = 1;
+                goto here;
             }
         }
     }
-
+ here:
     if (! fully_contained_by) {
         if (barely_touched_by || partly_overlapped_by) {
+            draw_3d_space_helper(value, tex, renderer, source, dest);
         }  else {
             list_add_last(list, node);
         }
@@ -218,9 +222,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                         ListNode *node = (ListNode*) PUSH_STRUCT(&trans_state->scratch_arena, ListNode);
                         node->value = val;
 
-                        growList(list, current, node);
+                        growList(list, current, node, value, tex, renderer, source, dest);
 
-                        draw_3d_space_helper(value, tex, renderer, source, dest);
+
                         //drawWait(renderer);
                     }
                 } // z
@@ -228,6 +232,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             } // y
             //printList(list);
             printf("List length: %d\n", list->length);
+
         }
         end_temporary_memory(scratch, &trans_state->scratch_arena);
         //abort();

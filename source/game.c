@@ -26,9 +26,9 @@ internal void set_structured_values_in_world(World* world)
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
             for (int z = 0 ; z < world->height; z++) {
-            if ((z + y + x) % 3 == 0) {
+                if ((z + y + x) % 3 == 0) {
                 setBlockAt(world, x,y,z,1);
-            }
+                }
             }
             }
     }
@@ -236,9 +236,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
         //printf("single texture: %zu\n", sizeof(Texture));
         //printf("Arena size before pushing Array: %zu \n", state->world_arena.used);
-        //state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, MAX(state->world->depth, state->world->width), Texture);
+        state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena, MAX(state->world->depth, state->world->width), Texture);
         //printf("Arena size after pushing Array: %zu \n", state->world_arena.used);
-
+        printf("amount of slices: %d\n",MAX(state->world->depth, state->world->width));
         //texture_create_blank( &state->world_slices[0], 1024*2, 768*2, SDL_TEXTUREACCESS_TARGET, renderer);
         //texture_create_blank( &state->world_slices[1], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
         //texture_create_blank( &state->world_slices[2], 1024, 768, SDL_TEXTUREACCESS_TARGET, renderer);
