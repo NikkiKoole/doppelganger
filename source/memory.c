@@ -6,8 +6,10 @@ TempMemory begin_temporary_memory(Memory_Arena* arena)
     return result;
 }
 
-void end_temporary_memory(TempMemory temp, Memory_Arena* arena)
+void end_temporary_memory(TempMemory temp)
 {
+    Memory_Arena *arena = temp.arena;
+    ASSERT(arena->used >= temp.used)
     arena->used = temp.used;
 }
 

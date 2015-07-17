@@ -234,7 +234,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             //printf("List length: %d\n", list->length);
 
         }
-        end_temporary_memory(scratch, &trans_state->scratch_arena);
+        end_temporary_memory(scratch);
         //abort();
         break;
     case(back) :
