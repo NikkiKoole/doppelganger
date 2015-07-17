@@ -224,14 +224,14 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
 
                         growList(list, current, node, value, tex, renderer, source, dest);
 
-
+                        //draw_3d_space_helper(value, tex, renderer, source, dest);
                         //drawWait(renderer);
                     }
                 } // z
 
             } // y
             //printList(list);
-            printf("List length: %d\n", list->length);
+            //printf("List length: %d\n", list->length);
 
         }
         end_temporary_memory(scratch, &trans_state->scratch_arena);
