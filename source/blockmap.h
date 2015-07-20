@@ -1,9 +1,6 @@
 #ifndef BLOCKMAP__H
 #define BLOCKMAP__H
 
-#define WORLD_WIDTH    32
-#define WORLD_HEIGHT   32
-#define WORLD_DEPTH    32
 
 #include "screen.h"
 #include "memory.h"
