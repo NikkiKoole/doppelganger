@@ -15,7 +15,6 @@ char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 
-
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
 void game_update_and_render(Screen *screen, Memory *memory, Keyboard *keyboard, FrameTime *frametime);
@@ -27,7 +26,7 @@ internal void set_structured_values_in_world(World* world)
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
             for (int z = 0 ; z < world->height; z++) {
-                if ((z + y + x) % 3 == 0) {
+                if ((z + y + x) % 25 == 0) {
                     setBlockAt(world, x,y,z,1);
                 }
             }
@@ -94,11 +93,11 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     resetBlocks(state->world);
     set_structured_values_in_world(state->world);
 
-    //draw_3d_space(state->world, front, renderer, screen, state->blocks, trans_state);
+    draw_3d_space(state->world, front, renderer, screen, state->blocks, trans_state);
     int slice_count = MAX(state->world->depth, state->world->width);
 
     for (int i = 0; i < slice_count; i++) {
-        texture_render(&(state->world_slices[i]), 0, 0, renderer);
+        //    texture_render(&(state->world_slices[i]), 0, 0, renderer);
     }
 
     texture_set_color(state->terminal8, PINK);
@@ -162,6 +161,6 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena,slice_count, Texture);
     printf("amount of slices: %d\n", slice_count);
     for (int i = 0; i < slice_count; i++) {
-        texture_create_blank( &state->world_slices[i], 1500, 1000, SDL_TEXTUREACCESS_TARGET, renderer);
+        texture_create_blank( &state->world_slices[i], 1500, 100, SDL_TEXTUREACCESS_TARGET, renderer);
     }
 }

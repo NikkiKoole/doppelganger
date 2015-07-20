@@ -16,16 +16,12 @@
 
 */
 
-
-
-
 void resetBlocks(World *world)
 {
     for (int i = 0; i< world->width*world->height*world->depth; i++) {
         world->blocks[i].type = 0;
     }
 }
-
 
 void setBlockAt(World *world, int x, int y, int z, uint8 type)
 {
@@ -96,18 +92,6 @@ internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *render
     }
 }
 
-
-/*
-    |Z (height)
-    |
-    |
-    |
-    |
-    /---------X (width)
-   /
-  /Y (depth)
-*/
-
 internal void drawLines(World *world, SDL_Renderer *renderer, Screen *screen, int frontal)
 {
     SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
@@ -117,7 +101,6 @@ internal void drawLines(World *world, SDL_Renderer *renderer, Screen *screen, in
     } else {
         draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
     }
-
 }
 
 internal void drawWait(SDL_Renderer *renderer)
@@ -125,13 +108,6 @@ internal void drawWait(SDL_Renderer *renderer)
     SDL_RenderPresent( renderer );
     SDL_Delay(40);
 }
-
-// I will look at the world front to back, column by column
-// I will have a render texture for each front--> back  layer.
-// blocks that are totally within existing bounding boxes are not drawn.
-// block that are partly or completely not within existing bounding boxes are drawn to their layer.
-// for a x step (z and y) I keep a dynamic amount of bounding boxes.
-// these grow and shrink and are inserted and removed as necessary.
 
 //#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
 
@@ -159,19 +135,19 @@ static void growList(List *list, BBox *current, ListNode *node, int value, Textu
         if (!bbox_eql(*current, *v)) {
             if (bbox_in_bbox(*current, *v)) {
                 fully_contained_by = 1;
-                goto here;
+                goto decided;
             } else if (i) {
                 bbox_grow_vertically(v, *current);
                 partly_overlapped_by = 1;
-                goto here;
+                goto decided;
             } else if (bbox_neighbour_vertically(*v, *current)) {
                 bbox_grow_vertically(v, *current);
                 barely_touched_by = 1;
-                goto here;
+                goto decided;
             }
         }
     }
- here:
+ decided:
     if (! fully_contained_by) {
         if (barely_touched_by || partly_overlapped_by) {
             draw_3d_space_helper(value, tex, renderer, source, dest);
