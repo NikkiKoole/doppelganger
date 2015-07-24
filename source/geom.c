@@ -154,6 +154,25 @@ int bbox_intersect(BBox this, BBox other, BBox *result)
 }
 
 
+void bbox_grow(BBox *this, BBox other)
+{
+
+    if (other.tl.y < this->tl.y) {
+        this->tl.y = other.tl.y;
+    }
+    if (other.br.y > this->br.y) {
+        this->br.y = other.br.y;
+    }
+    if (other.tl.x < this->tl.x) {
+        this->tl.x = other.tl.x;
+    }
+    if (other.br.x > this->br.x) {
+        this->br.x = other.br.x;
+    }
+
+}
+
+
 void bbox_grow_vertically(BBox *this, BBox other)
 {
 

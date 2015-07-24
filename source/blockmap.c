@@ -109,7 +109,8 @@ internal void drawWait(SDL_Renderer *renderer)
     SDL_Delay(40);
 }
 
-//#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
+#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
+#define BBOX_WIDTH(bbox) bbox.br.x - bbox.tl.x
 
 static void printBBox(BBox b) {
     printf("bbox( %f, %f, %f, %f )\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
@@ -123,6 +124,7 @@ static void printList(List *list) {
 }
 
 static void growList(List *list, BBox *current, ListNode *node, int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest) {
+
     int fully_contained_by = 0;
     int partly_overlapped_by = 0;
     int barely_touched_by = 0;
@@ -170,9 +172,13 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
         TempMemory scratch = begin_temporary_memory(&trans_state->scratch_arena);
         List *list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
+        BBox *bbox_slices = (BBox*) PUSH_ARRAY(&trans_state->scratch_arena, world->depth, BBox );
+        for (int i = 0; i<world->depth; i++ ) {
+            bbox_slices[i] = (BBox) {{1000000,1000000},{0,0}};
+        }
+
 
         for (int x = 0; x < world->width; x++) {
-            //printf("List:first adress %p adress: %p \n", &list->first, &list);
             list->length = 0;
             list->first = NULL;
             list->last = NULL;
@@ -199,7 +205,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                         node->value = val;
 
                         growList(list, current, node, value, tex, renderer, source, dest);
-
+                        bbox_grow(&bbox_slices[0], *current);
                         //draw_3d_space_helper(value, tex, renderer, source, dest);
                         //drawWait(renderer);
                     }
@@ -210,8 +216,14 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             //printf("List length: %d\n", list->length);
 
         }
+
+        for (int i = 0; i<world->depth; i++ ) {
+            printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
+        }
+
+
         end_temporary_memory(scratch);
-        //abort();
+        abort();
         break;
     case(back) :
         x_off = screen->width/2 - ((world->width*16)/2);

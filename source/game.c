@@ -25,29 +25,29 @@ internal void set_structured_values_in_world(World* world)
     // bottom plateau
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
-            for (int z = 0 ; z < world->height; z++) {
-                if ((z + y + x) % 25 == 0) {
-                    setBlockAt(world, x,y,z,1);
-                }
-            }
+            //for (int z = 0 ; z < world->height; z++) {
+            //if ((z + y + x) % 25 == 0) {
+                    setBlockAt(world, x,y,0,1);
+                    //    }
+                    //}
         }
     }
     // back wall
     for (int x = 0; x < world->width; x++) {
         for (int z = 0 ; z < world->height; z++) {
-            // setBlockAt(world, x,0,z,2);
+            setBlockAt(world, x,0,z,2);
         }
     }
     // left wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, 0,y,z,3);
+            //setBlockAt(world, 0,y,z,3);
         }
     }
     // right wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, world->width-1,y,z,4);
+            //setBlockAt(world, world->width-1,y,z,4);
         }
     }
 }
