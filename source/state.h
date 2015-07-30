@@ -7,13 +7,9 @@
 #include "sprite.h"
 #include "keyboard.h"
 #include "screen.h"
-#include "blockmap.h"
 #include "geom.h"
+#include "blockmap.h"
 
-typedef struct CachedSlices {
-    Point screen_dim;
-    TextureWorldSlice *slices;
-} CachedSlices;
 
 typedef struct State
 {

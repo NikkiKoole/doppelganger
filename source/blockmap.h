@@ -8,10 +8,12 @@
 #include "texture.h"
 #include "geom.h"
 
+
 typedef struct TextureWorldSlice {
     BBox bounds;
     Texture tex;
 } TextureWorldSlice;
+
 
 typedef struct Block
 {
@@ -26,6 +28,12 @@ typedef struct World
     Block *blocks;//[WORLD_WIDTH * WORLD_HEIGHT * WORLD_DEPTH];
 } World;
 
+typedef struct CachedSlices {
+    Point screen_dim;
+    TextureWorldSlice *slices;
+} CachedSlices;
+
+
 typedef enum Side
 {
     front,
@@ -37,6 +45,6 @@ typedef enum Side
 void resetBlocks(World *world);
 void setBlockAt(World *w, int x, int y, int z, u8 type);
 u8 getBlockAt(World *w, int x, int y, int z);
-void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state);
+void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state, CachedSlices *cached);
 
 #endif

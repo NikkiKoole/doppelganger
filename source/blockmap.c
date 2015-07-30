@@ -109,8 +109,8 @@ internal void drawWait(SDL_Renderer *renderer)
     SDL_Delay(40);
 }
 
-//#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
-//#define BBOX_WIDTH(bbox) bbox.br.x - bbox.tl.x
+#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
+#define BBOX_WIDTH(bbox) bbox.br.x - bbox.tl.x
 
 static void printBBox(BBox b) {
     printf("bbox( %f, %f, %f, %f )\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
@@ -159,8 +159,9 @@ static void growList(List *list, BBox *current, ListNode *node, int value, Textu
     }
 }
 
-void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state)
+void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state, CachedSlices *cached)
 {
+    UNUSED(cached);
     int x_off;
     int y_off;
     int index = 6;
@@ -177,6 +178,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             bbox_slices[i] = (BBox) {{1000000,1000000},{0,0}};
         }
 
+        //texture_set_as_rendertarget(&cached->slices[0].tex, renderer);
+        //SDL_SetRenderDrawColor( renderer, 0x00, 0xff, 0xff, 0xff );
+        //SDL_RenderClear( renderer );
 
         for (int x = 0; x < world->width; x++) {
             list->length = 0;
@@ -184,7 +188,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             list->last = NULL;
             //for (int y = 0; y< world->depth; y++) {
             for (int y = world->depth-1; y>=0; y--) {
-
+                //texture_set_as_rendertarget()
                 for (int z = 0; z < world->height; z++) {
                     //drawLines(world, renderer, screen, 1);
 
@@ -205,7 +209,8 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                         node->value = val;
 
                         growList(list, current, node, value, tex, renderer, source, dest);
-                        bbox_grow(&bbox_slices[0], *current);
+                        bbox_grow(&bbox_slices[y], *current);
+
                         //draw_3d_space_helper(value, tex, renderer, source, dest);
                         //drawWait(renderer);
                     }
@@ -218,7 +223,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         }
 
         for (int i = 0; i<world->depth; i++ ) {
-            //printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
+            printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
         }
 
 

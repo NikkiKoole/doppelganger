@@ -93,15 +93,19 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     resetBlocks(state->world);
     set_structured_values_in_world(state->world);
 
-    draw_3d_space(state->world, front, renderer, screen, state->blocks, trans_state);
-    int slice_count = MAX(state->world->depth, state->world->width);
+    draw_3d_space(state->world, front, renderer, screen, state->blocks, trans_state, state->cached);
 
-    for (int i = 0; i < slice_count; i++) {
+    //texture_render(&state->cached->slices[0].tex, 0, 0, renderer);
+    //SDL_SetRenderTarget( renderer, NULL );
+    //int slice_count = MAX(state->world->depth, state->world->width);
+
+    //for (int i = 0; i < slice_count; i++) {
         //    texture_render(&(state->world_slices[i]), 0, 0, renderer);
-    }
+    //}
 
     texture_set_color(state->terminal8, PINK);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 3, renderer);
+
     SDL_RenderPresent( renderer );
 }
 
