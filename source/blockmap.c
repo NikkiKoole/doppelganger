@@ -109,8 +109,8 @@ internal void drawWait(SDL_Renderer *renderer)
     SDL_Delay(40);
 }
 
-#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
-#define BBOX_WIDTH(bbox) bbox.br.x - bbox.tl.x
+//#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
+//#define BBOX_WIDTH(bbox) bbox.br.x - bbox.tl.x
 
 static void printBBox(BBox b) {
     printf("bbox( %f, %f, %f, %f )\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
@@ -178,9 +178,11 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             bbox_slices[i] = (BBox) {{1000000,1000000},{0,0}};
         }
 
-        //texture_set_as_rendertarget(&cached->slices[0].tex, renderer);
-        //SDL_SetRenderDrawColor( renderer, 0x00, 0xff, 0xff, 0xff );
-        //SDL_RenderClear( renderer );
+
+
+        SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+        SDL_RenderClear( renderer );
+
 
         for (int x = 0; x < world->width; x++) {
             list->length = 0;
@@ -188,7 +190,10 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             list->last = NULL;
             //for (int y = 0; y< world->depth; y++) {
             for (int y = world->depth-1; y>=0; y--) {
-                //texture_set_as_rendertarget()
+
+                texture_set_blend_mode(&cached->slices[y].tex, SDL_BLENDMODE_BLEND);
+                texture_set_as_rendertarget(&cached->slices[y].tex, renderer);
+
                 for (int z = 0; z < world->height; z++) {
                     //drawLines(world, renderer, screen, 1);
 
@@ -222,9 +227,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
 
         }
 
-        for (int i = 0; i<world->depth; i++ ) {
-            printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
-        }
+        //for (int i = 0; i<world->depth; i++ ) {
+        //    printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
+        //}
 
 
         end_temporary_memory(scratch);

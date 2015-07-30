@@ -25,11 +25,11 @@ internal void set_structured_values_in_world(World* world)
     // bottom plateau
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
-            //for (int z = 0 ; z < world->height; z++) {
+            for (int z = 0 ; z < world->height; z++) {
                 //if ((z + y + x) % 25 == 0) {
-                    setBlockAt(world, x,y,0,1);
+                    setBlockAt(world, x,y,z,1);
                     //    }
-                    //}
+                    }
         }
     }
     // back wall
@@ -41,13 +41,13 @@ internal void set_structured_values_in_world(World* world)
     // left wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            //setBlockAt(world, 0,y,z,3);
+            setBlockAt(world, 0,y,z,3);
         }
     }
     // right wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            //setBlockAt(world, world->width-1,y,z,4);
+            setBlockAt(world, world->width-1,y,z,4);
         }
     }
 }
@@ -72,6 +72,30 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
                          (u8 *)memory->transient_storage + sizeof(TransState));
 
         memory->is_initialized = true;
+
+        // I want to once draw into the cached slices, then draw them.
+        //SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
+        //SDL_RenderClear( renderer );
+        resetBlocks(state->world);
+        set_structured_values_in_world(state->world);
+        SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
+        SDL_RenderClear( renderer );
+
+        for (int i = 0; i < 50; i++) {
+            texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer);
+            texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+            SDL_RenderClear( renderer );
+        }
+
+        SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+        SDL_RenderClear( renderer );
+
+        draw_3d_space(state->world, front, renderer, screen, state->blocks, trans_state, state->cached);
+
+        SDL_SetRenderTarget( renderer, NULL );
+
+
     }
 
     if (key_pressed(keyboard,KB_F5)){
@@ -89,19 +113,12 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
     SDL_RenderClear( renderer );
-    printf("state world  width: %d height: %d depth: %d\n", state->world->width, state->world->height, state->world->depth);
-    resetBlocks(state->world);
-    set_structured_values_in_world(state->world);
 
-    draw_3d_space(state->world, front, renderer, screen, state->blocks, trans_state, state->cached);
+    for (int i = 0; i < 50; i++) {
+        texture_render((&state->cached->slices[i].tex), 0, 0, renderer);
+    }
 
-    //texture_render(&state->cached->slices[0].tex, 0, 0, renderer);
-    //SDL_SetRenderTarget( renderer, NULL );
-    //int slice_count = MAX(state->world->depth, state->world->width);
 
-    //for (int i = 0; i < slice_count; i++) {
-        //    texture_render(&(state->world_slices[i]), 0, 0, renderer);
-    //}
 
     texture_set_color(state->terminal8, PINK);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 3, renderer);

@@ -133,7 +133,7 @@ internal void initialize_memory(void)
     memory.is_initialized = false;
 }
 
-#define FRAMERATE 1000/30
+#define FRAMERATE 1000/60
 
 int main(void)
 {
