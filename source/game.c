@@ -26,10 +26,10 @@ internal void set_structured_values_in_world(World* world)
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
             for (int z = 0 ; z < world->height; z++) {
-                //if ((z + y + x) % 25 == 0) {
+                if ((x+y) % 5 == 0) {
                     setBlockAt(world, x,y,z,1);
-                    //    }
-                    }
+                }
+            }
         }
     }
     // back wall
@@ -172,8 +172,8 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
     state->world->width = 80;
-    state->world->height = 64;
-    state->world->depth = 50;
+    state->world->height = 44;
+    state->world->depth = 10;
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);

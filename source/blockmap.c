@@ -109,21 +109,18 @@ internal void drawWait(SDL_Renderer *renderer)
     SDL_Delay(40);
 }
 
-//#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
-//#define BBOX_WIDTH(bbox) bbox.br.x - bbox.tl.x
-
-static void printBBox(BBox b) {
+internal void printBBox(BBox b) {
     printf("bbox( %f, %f, %f, %f )\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
 }
 
-static void printList(List *list) {
+internal void printList(List *list) {
     LIST_FOREACH(list, first, next, cur) {
         BBox *v = cur->value;
         printBBox(*v);
     }
 }
 
-static void growList(List *list, BBox *current, ListNode *node, int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest) {
+internal b32 growList(List *list, BBox *current, ListNode *node) {
 
     int fully_contained_by = 0;
     int partly_overlapped_by = 0;
@@ -152,11 +149,14 @@ static void growList(List *list, BBox *current, ListNode *node, int value, Textu
  decided:
     if (! fully_contained_by) {
         if (barely_touched_by || partly_overlapped_by) {
-            draw_3d_space_helper(value, tex, renderer, source, dest);
+            return true;
+
         }  else {
             list_add_last(list, node);
+            return false;
         }
     }
+    return false;
 }
 
 void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state, CachedSlices *cached)
@@ -178,11 +178,8 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             bbox_slices[i] = (BBox) {{1000000,1000000},{0,0}};
         }
 
-
-
         SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
         SDL_RenderClear( renderer );
-
 
         for (int x = 0; x < world->width; x++) {
             list->length = 0;
@@ -213,7 +210,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                         ListNode *node = (ListNode*) PUSH_STRUCT(&trans_state->scratch_arena, ListNode);
                         node->value = val;
 
-                        growList(list, current, node, value, tex, renderer, source, dest);
+                        if (growList(list, current, node)) {
+                            draw_3d_space_helper(value, tex, renderer, source, dest);
+                        }
                         bbox_grow(&bbox_slices[y], *current);
 
                         //draw_3d_space_helper(value, tex, renderer, source, dest);
@@ -222,14 +221,11 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 } // z
 
             } // y
-            //printList(list);
-            //printf("List length: %d\n", list->length);
-
         }
 
-        //for (int i = 0; i<world->depth; i++ ) {
-        //    printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
-        //}
+        for (int i = 0; i<world->depth; i++ ) {
+           printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
+        }
 
 
         end_temporary_memory(scratch);
@@ -251,7 +247,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                     SDL_Rect dest = {.x= x_off + x*16,
                                      .y= y_off + (world->height*16) + (y*8)-(z*16) - 16,
                                      .w=16, .h=24};
-                    draw_3d_space_helper(value, tex, renderer, source, dest);
+                    //draw_3d_space_helper(value, tex, renderer, source, dest);
                     //drawWait(renderer);
                 }
             }
@@ -272,7 +268,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                                      .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
                                      .w=16, .h=24};
 
-                    draw_3d_space_helper(value, tex, renderer, source, dest);
+                    //draw_3d_space_helper(value, tex, renderer, source, dest);
                     //drawWait(renderer);
                 }
             }
@@ -296,7 +292,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                                      .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
                                      .w=16, .h=24};
 
-                    draw_3d_space_helper(value, tex, renderer, source, dest);
+                    //draw_3d_space_helper(value, tex, renderer, source, dest);
                     //drawWait(renderer);
                 }
             }

@@ -17,7 +17,7 @@ SUPERSTRICT = -Werror -Wall -Wextra  -Wformat=2 -Wno-import \
 		   -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-qual -Wcast-align \
 		   -Wwrite-strings -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes \
 		   -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline \
-		   -Wdisabled-optimization -Wunused-macros -Wno-unused
+		   -Wdisabled-optimization -Wno-unused
 
 WARNINGS = $(SUPERSTRICT)
 

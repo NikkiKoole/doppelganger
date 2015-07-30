@@ -2,25 +2,14 @@ Doppelganger
 ------------
 
 A simple C engine specifically tailored for my own hobby project.
+SDL backed featuring basic functionality from the ['lazy foo tutorials'](http://lazyfoo.net/tutorials/SDL/), a [pinch of cage](https://github.com/rlofc/cage) and trying to fit in stuff from [handmade hero](https://www.youtube.com/user/handmadeheroarchive) when I can.
 
 ![Alt text](/resources/familiars.jpg?raw=true "Witch and her familiars")
 
 
-At the basis it follows some principles from 'Handmade Hero';
-- live coding loop.
-- all memory is pre-allocated and at fixed adresses.
-
-On top of that it's a SDL backed engine based on the 'Lazy Foo tutorials'.
-
-
 Dependancies:
 -------------
-SDL2, SDL2_image
-* linux
-* inotify-tools
-* osx
-* fswatch
-
+SDL2, SDL2_image, inotify-tools (on linux), fswatch (on osx)
 
 
 Notes to self
