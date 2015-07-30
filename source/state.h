@@ -10,10 +10,16 @@
 #include "blockmap.h"
 #include "geom.h"
 
+typedef struct CachedSlices {
+    Point screen_dim;
+    TextureWorldSlice *slices;
+} CachedSlices;
+
 typedef struct State
 {
+
     Memory_Arena world_arena;
-    real64  angle1;
+    r64  angle1;
     Texture *tex1;
     Texture *terminal8;
     Texture *render_target;
@@ -25,6 +31,8 @@ typedef struct State
     Sprite *walking_right;
     World *world;
     Texture *world_slices;
+    CachedSlices *cached;
+
 } State;
 
 // Lets imagine many helper functions to grow here

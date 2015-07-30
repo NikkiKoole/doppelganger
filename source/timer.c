@@ -39,9 +39,9 @@ void timer_unpause(Timer *t)
         t->paused_ticks = 0;
     }
 }
-uint32 timer_get_ticks(Timer *t)
+u32 timer_get_ticks(Timer *t)
 {
-    uint32 time = 0;
+    u32 time = 0;
 
     if (t->started){
         if (t->paused){
@@ -53,11 +53,11 @@ uint32 timer_get_ticks(Timer *t)
     return time;
 }
 
-bool timer_is_started(Timer *t)
+b32 timer_is_started(Timer *t)
 {
     return t->started;
 }
-bool timer_is_paused(Timer *t)
+b32 timer_is_paused(Timer *t)
 {
     return t->paused;
 }

@@ -8,11 +8,11 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const int32 SCREEN_WIDTH = 1500;
-const int32 SCREEN_HEIGHT = 1000;
+const s32 SCREEN_WIDTH = 1500;
+const s32 SCREEN_HEIGHT = 1000;
 const char *TITLE = "Doppelgangs";
 
-internal bool init(void);
+internal b32 init(void);
 internal void close_game(void);
 internal void maybe_load_libgame(void);
 internal void initialize_memory(void);
@@ -38,7 +38,7 @@ internal void close_game(void)
     SDL_Quit();
 }
 
-internal bool init(void)
+internal b32 init(void)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) goto SDL_Error;
 
@@ -60,7 +60,7 @@ internal bool init(void)
 
     SDL_SetRenderDrawColor(screen->renderer, 0xFF, 0x00, 0xFF, 0xFF);
 
-    int32 img_flags = IMG_INIT_PNG;
+    s32 img_flags = IMG_INIT_PNG;
     if (!(IMG_Init(img_flags) & img_flags)) {
         printf("SDL_Image could not initialize");
         goto SDL_Error;
@@ -124,12 +124,12 @@ internal void initialize_memory(void)
     memory.permanent_storage_size = megabytes(64);
     memory.transient_storage_size = gigabytes(1);
 
-    uint64 total_storage_size = memory.permanent_storage_size + memory.transient_storage_size;
+    u64 total_storage_size = memory.permanent_storage_size + memory.transient_storage_size;
     memory.permanent_storage = mmap(base_address, total_storage_size,
                                     PROT_READ | PROT_WRITE,
                                     MAP_ANON | MAP_PRIVATE,
                                     -1, 0);
-    memory.transient_storage = (uint8*)(memory.permanent_storage) + memory.permanent_storage_size;
+    memory.transient_storage = (u8*)(memory.permanent_storage) + memory.permanent_storage_size;
     memory.is_initialized = false;
 }
 
@@ -137,13 +137,13 @@ internal void initialize_memory(void)
 
 int main(void)
 {
-    uint32 now;
-    uint32 start;
+    u32 now;
+    u32 start;
     srand(0);
     if( !init() ) {
         printf( "Failed to initialize! SDL_Error: %s\n", SDL_GetError() );
     } else {
-        bool quit = false;
+        b32 quit = false;
         SDL_Event e;
 
         initialize_memory();
@@ -163,7 +163,7 @@ int main(void)
             now = SDL_GetTicks();
 
             frame_time->duration = now - start;
-            int32 fps = 1000/frame_time->duration;
+            s32 fps = 1000/frame_time->duration;
             snprintf(frame_time->fps_string, sizeof frame_time->fps_string, "%d %s", fps, "FPS");
 
             func(screen, &memory, keyboard, frame_time);

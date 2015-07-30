@@ -6,8 +6,8 @@
 
 typedef struct Frame
 {
-    int32 index;
-    int32 duration;
+    s32 index;
+    s32 duration;
     void *user_data;
 } Frame;
 
@@ -21,15 +21,15 @@ enum Animation_Mode
 typedef struct Animation
 {
     Frame frames[MAX_FRAMES_PER_ANIMATION];
-    int32 n_frames;
+    s32 n_frames;
     enum Animation_Mode mode;
-    int32 loop_from;
-    int32 loop_to;
+    s32 loop_from;
+    s32 loop_to;
 
 } Animation;
 
 void animation_init(Animation *a);
 
-void animation_add_frame(Animation *a, int32 index, int32 duration, void *data);
+void animation_add_frame(Animation *a, s32 index, s32 duration, void *data);
 
 #endif

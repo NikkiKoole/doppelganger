@@ -23,7 +23,7 @@ void resetBlocks(World *world)
     }
 }
 
-void setBlockAt(World *world, int x, int y, int z, uint8 type)
+void setBlockAt(World *world, int x, int y, int z, u8 type)
 {
     ASSERT(x >= 0); ASSERT(x < world->width);
     ASSERT(y >= 0); ASSERT(y < world->depth);
@@ -31,7 +31,7 @@ void setBlockAt(World *world, int x, int y, int z, uint8 type)
 
     world->blocks[(y * (world->width * world->height)) + (z * world->width) + x].type = type;
 }
-uint8 getBlockAt(World *world, int x, int y, int z)
+u8 getBlockAt(World *world, int x, int y, int z)
 {
     return world->blocks[(y * (world->width * world->height)) + (z * world->width) + x].type;
 }
@@ -109,8 +109,8 @@ internal void drawWait(SDL_Renderer *renderer)
     SDL_Delay(40);
 }
 
-#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
-#define BBOX_WIDTH(bbox) bbox.br.x - bbox.tl.x
+//#define BBOX_HEIGHT(bbox) bbox.br.y - bbox.tl.y
+//#define BBOX_WIDTH(bbox) bbox.br.x - bbox.tl.x
 
 static void printBBox(BBox b) {
     printf("bbox( %f, %f, %f, %f )\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
@@ -218,12 +218,12 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         }
 
         for (int i = 0; i<world->depth; i++ ) {
-            printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
+            //printf("this bbox = (%f, %f),(%f, %f) width: %f height: %f\n",bbox_slices[i].tl.x, bbox_slices[i].tl.y, bbox_slices[i].br.x, bbox_slices[i].br.y, BBOX_WIDTH(bbox_slices[i]), BBOX_HEIGHT(bbox_slices[i])  );
         }
 
 
         end_temporary_memory(scratch);
-        abort();
+        //abort();
         break;
     case(back) :
         x_off = screen->width/2 - ((world->width*16)/2);

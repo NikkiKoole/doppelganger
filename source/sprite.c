@@ -3,7 +3,7 @@
 #include "defines.h"
 
 
-void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  int32 frame_width, int32 frame_height)
+void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  s32 frame_width, s32 frame_height)
 {
     spr->texture = t;
     spr->clip = clip;
@@ -17,7 +17,7 @@ void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  int32 frame_width, int
 
 SDL_Rect sprite_get_current_frame(Sprite* spr, Animation* anim)
 {
-    int32 d = anim->frames[spr->current_frame].duration;
+    s32 d = anim->frames[spr->current_frame].duration;
     if (spr->elapsed_time > d) {
         if (spr->current_frame < anim->n_frames) {
             spr->current_frame++;
@@ -33,6 +33,6 @@ SDL_Rect sprite_get_current_frame(Sprite* spr, Animation* anim)
     return result;
 }
 
-void sprite_update_elapsed_time(Sprite* spr, int32 duration) {
+void sprite_update_elapsed_time(Sprite* spr, s32 duration) {
     spr->elapsed_time += duration;
 }

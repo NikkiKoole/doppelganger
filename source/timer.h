@@ -2,14 +2,14 @@
 #define TIMER_H
 
 #include "defines.h"
-#include <stdbool.h>    // bool
+
 
 typedef struct Timer
 {
-    uint32 start_ticks;
-    uint32 paused_ticks;
-    bool paused;
-    bool started;
+    u32 start_ticks;
+    u32 paused_ticks;
+    b32 paused;
+    b32 started;
 } Timer;
 
 void timer_init(Timer *t);
@@ -17,7 +17,7 @@ void timer_stop(Timer *t);
 void timer_start(Timer *t);
 void timer_pause(Timer *t);
 void timer_unpause(Timer *t);
-uint32 timer_get_ticks(Timer *t);
-bool timer_is_started(Timer *t);
-bool timer_is_paused(Timer *t);
+u32 timer_get_ticks(Timer *t);
+b32 timer_is_started(Timer *t);
+b32 timer_is_paused(Timer *t);
 #endif

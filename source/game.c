@@ -15,7 +15,7 @@ char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 
-internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer);
+internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer, Screen* screen);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
 void game_update_and_render(Screen *screen, Memory *memory, Keyboard *keyboard, FrameTime *frametime);
 
@@ -26,7 +26,7 @@ internal void set_structured_values_in_world(World* world)
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
             //for (int z = 0 ; z < world->height; z++) {
-            //if ((z + y + x) % 25 == 0) {
+                //if ((z + y + x) % 25 == 0) {
                     setBlockAt(world, x,y,0,1);
                     //    }
                     //}
@@ -65,11 +65,11 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     if (!memory->is_initialized) {
 
         printf("what size does the transient have: %d\n",memory->transient_storage_size);
-        initialize_memory(state, memory, renderer);
+        initialize_memory(state, memory, renderer, screen);
 
         initialize_arena(&trans_state->scratch_arena,
                          memory->transient_storage_size - sizeof(TransState),
-                         (uint8 *)memory->transient_storage + sizeof(TransState));
+                         (u8 *)memory->transient_storage + sizeof(TransState));
 
         memory->is_initialized = true;
     }
@@ -107,11 +107,11 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
 
 
-internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* renderer)
+internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* renderer, Screen* screen )
 {
     initialize_arena(&state->world_arena,
                      memory->permanent_storage_size - sizeof(State),
-                     (uint8 *)memory->permanent_storage + sizeof(State));
+                     (u8 *)memory->permanent_storage + sizeof(State));
     state->angle1 = 0;
     state->tex1 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
     texture_load_from_file( state->tex1, texture1, renderer);
@@ -157,10 +157,18 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);
 
+
+
+
     int slice_count = MAX(state->world->depth, state->world->width);
-    state->world_slices = (Texture*) PUSH_ARRAY(&state->world_arena,slice_count, Texture);
-    printf("amount of slices: %d\n", slice_count);
+    state->cached = (CachedSlices*)  PUSH_STRUCT(&state->world_arena, CachedSlices);
+    state->cached->slices = (TextureWorldSlice*) PUSH_ARRAY(&state->world_arena, slice_count, TextureWorldSlice);
     for (int i = 0; i < slice_count; i++) {
-        texture_create_blank( &state->world_slices[i], 1500, 100, SDL_TEXTUREACCESS_TARGET, renderer);
+        texture_create_blank( &state->cached->slices[i].tex, screen->width, screen->height, SDL_TEXTUREACCESS_TARGET, renderer);
     }
+    state->cached->screen_dim.x = screen->width;
+    state->cached->screen_dim.y = screen->height;
+
+    //printf("saving screen dimensions %f %f \n", state->screen_dim.x, state->screen_dim.y);
+
 }
