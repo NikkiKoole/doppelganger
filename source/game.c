@@ -71,7 +71,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     ASSERT(sizeof(TransState) <= memory->transient_storage_size);
     TransState *trans_state = (TransState *)memory->transient_storage;
 
-    Side side_to_render = right;
+    Side side_to_render = left;
 
     if (!memory->is_initialized) {
 
@@ -84,9 +84,6 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
         memory->is_initialized = true;
 
-        // I want to once draw into the cached slices, then draw them.
-        //SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
-        //SDL_RenderClear( renderer );
         resetBlocks(state->world);
         set_structured_values_in_world(state->world);
         SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
@@ -115,6 +112,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->terminal8 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file((state->terminal8), terminal8, renderer);
         printf("reloaded textures! \n");
+
     }
 
     if (key_pressed(keyboard, KB_W)) {
@@ -179,9 +177,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-    state->world->width = 80;
-    state->world->height = 44;
-    state->world->depth = 10;
+    state->world->width  = 15;
+    state->world->height = 15;
+    state->world->depth  = 15;
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);

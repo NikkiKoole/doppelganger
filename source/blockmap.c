@@ -303,10 +303,13 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             bbox_slices[i] = (BBox) {{1000000,1000000},{0,0}};
         }
 
+        SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+        SDL_RenderClear( renderer );
+
         for (int y = 0; y< world->depth; y++) {
             reset_list(list);
             //for (int x = 0; x < world->width; x++) {
-            for (int x = world->width-1; x > 0; x--) {
+            for (int x = world->width-1; x >= 0; x--) {
                 texture_set_blend_mode(&cached->slices[x].tex, SDL_BLENDMODE_BLEND);
                 texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
@@ -337,9 +340,12 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             bbox_slices[i] = (BBox) {{1000000,1000000},{0,0}};
         }
 
+        SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+        SDL_RenderClear( renderer );
+
         for (int y = 0; y< world->depth; y++) {
             reset_list(list);
-            for (int x = world->width-1; x > 0; x--) {
+            for (int x = world->width-1; x >= 0; x--) {
                 //for (int x = 0; x < world->width; x++) {
                 texture_set_blend_mode(&cached->slices[x].tex, SDL_BLENDMODE_BLEND);
                 texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
