@@ -20,8 +20,12 @@ internal void create_slice(State *state, SDL_Renderer* renderer  );
 void game_update_and_render(Screen *screen, Memory *memory, Keyboard *keyboard, FrameTime *frametime);
 
 //void set_structured_values_in_world(World* world);
+
+
 internal void set_structured_values_in_world(World* world)
 {
+
+
     // bottom plateau
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
@@ -52,6 +56,12 @@ internal void set_structured_values_in_world(World* world)
     }
 }
 
+internal int getSliceCount(Side side, World *world) {
+    if (side == left || side == right) {
+        return world->width;
+    }
+    return world->depth;
+}
 
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
@@ -61,6 +71,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     ASSERT(sizeof(TransState) <= memory->transient_storage_size);
     TransState *trans_state = (TransState *)memory->transient_storage;
 
+    Side side_to_render = right;
 
     if (!memory->is_initialized) {
 
@@ -81,7 +92,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
         SDL_RenderClear( renderer );
 
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) {
             texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer);
             texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
@@ -91,7 +102,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
         SDL_RenderClear( renderer );
 
-        draw_3d_space(state->world, front, renderer, screen, state->blocks, trans_state, state->cached);
+        draw_3d_space(state->world, side_to_render, renderer, screen, state->blocks, trans_state, state->cached);
 
         SDL_SetRenderTarget( renderer, NULL );
 
@@ -104,7 +115,6 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->terminal8 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file((state->terminal8), terminal8, renderer);
         printf("reloaded textures! \n");
-
     }
 
     if (key_pressed(keyboard, KB_W)) {
@@ -114,11 +124,9 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
     SDL_RenderClear( renderer );
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) {
         texture_render((&state->cached->slices[i].tex), 0, 0, renderer);
     }
-
-
 
     texture_set_color(state->terminal8, PINK);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 3, renderer);
@@ -182,6 +190,7 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
 
     int slice_count = MAX(state->world->depth, state->world->width);
+    printf("slice count:  %d\n",slice_count);
     state->cached = (CachedSlices*)  PUSH_STRUCT(&state->world_arena, CachedSlices);
     state->cached->slices = (TextureWorldSlice*) PUSH_ARRAY(&state->world_arena, slice_count, TextureWorldSlice);
     for (int i = 0; i < slice_count; i++) {
