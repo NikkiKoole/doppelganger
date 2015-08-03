@@ -1,11 +1,11 @@
 * Doppel engine & game
-** TODO Todo List
-   - [ ] (World) Figure out culling front to back.
+** Todo List
+   - [-] (World) Figure out culling front to back.
    - [ ] (World) Make sprites for sides looking at various wall formation blocks (think ASCII).
-   - [ ] (General) read [http://c-faq.com/], and then read it more.
+   - [-] (General) read [http://c-faq.com/], and then read it more.
 
 ** Engine
-*** World
+*** DONE World
     The world is built in a 3d voxel, minecraft-like way, only more
     crappy, I don't use a 3d engine but instead just have 6 sides of
     the cube I want to look at the world.
