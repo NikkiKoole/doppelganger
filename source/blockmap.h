@@ -12,6 +12,7 @@
 typedef struct TextureWorldSlice {
     BBox bounds;
     Texture tex;
+    Texture temp_tex;
 } TextureWorldSlice;
 
 

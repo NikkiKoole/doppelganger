@@ -123,6 +123,11 @@ BBox bbox(float tlX, float tlY, float brX, float brY) {
     return result;
 }
 
+void printBBox(BBox b) {
+    printf("bbox( %f, %f, %f, %f )\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
+}
+
+
 int bbox_eql(BBox b1, BBox b2)
 {
     return (b1.tl.x == b2.tl.x &&

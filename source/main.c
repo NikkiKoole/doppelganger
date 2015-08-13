@@ -8,8 +8,10 @@
 #include "defines.h"
 #include "keyboard.h"
 
-const s32 SCREEN_WIDTH = 1500;
-const s32 SCREEN_HEIGHT = 1000;
+#define FRAMERATE 1000/200
+
+const s32 SCREEN_WIDTH = 1920;
+const s32 SCREEN_HEIGHT = 1080;
 const char *TITLE = "Doppelgangs";
 
 internal b32 init(void);
@@ -47,7 +49,7 @@ internal b32 init(void)
                                SDL_WINDOWPOS_UNDEFINED,
                                SCREEN_WIDTH,
                                SCREEN_HEIGHT,
-                               SDL_WINDOW_SHOWN);
+                               SDL_WINDOW_SHOWN );
 
     if (window == NULL) goto SDL_Error;
     screen->width = SCREEN_WIDTH;
@@ -133,7 +135,6 @@ internal void initialize_memory(void)
     memory.is_initialized = false;
 }
 
-#define FRAMERATE 1000/60
 
 int main(void)
 {

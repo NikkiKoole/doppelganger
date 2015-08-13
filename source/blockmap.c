@@ -66,32 +66,6 @@ internal void draw_3d_lines(int width, int height, int depth, SDL_Renderer* rend
 
 }
 
-internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest)
-{
-    if (value == 1) {
-        texture_set_color((tex), 0xFF, 0x00, 0xFF);
-    }
-    if (value == 2) {
-        texture_set_color((tex), 0xFF, 0xFF, 0x00);
-    }
-    if (value == 3) {
-        texture_set_color((tex), 0x00, 0xFF, 0xFF);
-    }
-    if (value == 4) {
-        texture_set_color((tex), 0xff, 0x00, 0x00);
-    }
-    if (value == 5) {
-        texture_set_color((tex), 0x00, 0xFF, 0x00);
-    }
-    if (value == 6) {
-        texture_set_color((tex), 0x00, 0x00, 0xFF);
-    }
-
-    if (value > 0){
-        texture_render_part(tex, &source, &dest, renderer);
-    }
-}
-
 internal void drawLines(World *world, SDL_Renderer *renderer, Screen *screen, int frontal)
 {
     SDL_SetRenderDrawColor( renderer, 0xAA, 0xAA, 0xAA, 0xFF );
@@ -109,9 +83,6 @@ internal void drawWait(SDL_Renderer *renderer)
     SDL_Delay(40);
 }
 
-internal void printBBox(BBox b) {
-    printf("bbox( %f, %f, %f, %f )\n", b.tl.x, b.tl.y, b.br.x, b.br.y);
-}
 
 internal void printList(List *list) {
     LIST_FOREACH(list, first, next, cur) {
@@ -166,6 +137,38 @@ inline internal void reset_list(List *list)
     list->last = NULL;
 }
 
+
+
+internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest)
+{
+    if (value == 1) {
+        texture_set_color((tex), 0xFF, 0x00, 0xFF);
+    }
+    if (value == 2) {
+        texture_set_color((tex), 0xFF, 0xFF, 0x00);
+    }
+    if (value == 3) {
+        texture_set_color((tex), 0x00, 0xFF, 0xFF);
+    }
+    if (value == 4) {
+        texture_set_color((tex), 0xff, 0x00, 0x00);
+    }
+    if (value == 5) {
+        texture_set_color((tex), 0x00, 0xFF, 0x00);
+    }
+    if (value == 6) {
+        texture_set_color((tex), 0x00, 0x00, 0xFF);
+    }
+
+    if (value > 0){
+        texture_render_part(tex, &source, &dest, renderer);
+    }
+}
+
+
+
+
+
 internal void handleFilledBlock(TransState *trans_state, SDL_Rect source, SDL_Rect dest, BBox *bbox_slices, List *list, int value, Texture *tex, SDL_Renderer *renderer, int index)
 {
     BBox *current = (BBox*) PUSH_STRUCT(&trans_state->scratch_arena, BBox);
@@ -207,7 +210,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
     int y_off;
     int index = 6;
     SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
-    TempMemory scratch = {};
+    TempMemory scratch;
     List *list = 0;
     BBox *bbox_slices = 0;
     int this_depth = 0;
@@ -250,6 +253,13 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 } // z
             } // y
         } // x
+
+        for (int i = 0; i<this_depth; i++ ) {
+            cached->slices[i].bounds = bbox(bbox_slices[i].tl.x,bbox_slices[i].tl.y,bbox_slices[i].br.x, bbox_slices[i].br.y);
+            printBBox(cached->slices[i].bounds);
+        }
+
+        //now we can do something usefull with the bbox_slices
 
         end_temporary_memory(scratch);
         //abort();

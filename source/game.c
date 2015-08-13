@@ -30,9 +30,9 @@ internal void set_structured_values_in_world(World* world)
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
             for (int z = 0 ; z < world->height; z++) {
-                if ((x+y) % 5 == 0) {
-                    setBlockAt(world, x,y,z,1);
-                }
+                //if ((x+y) % 5 == 0) {
+                            setBlockAt(world, x,y,z,1);
+                //}
             }
         }
     }
@@ -48,6 +48,11 @@ internal void set_structured_values_in_world(World* world)
             setBlockAt(world, 0,y,z,3);
         }
     }
+    // front left column
+    for (int z = 0 ; z < world->height; z++) {
+        setBlockAt(world, 0,world->depth-1,z,3);
+    }
+
     // right wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
@@ -63,6 +68,11 @@ internal int getSliceCount(Side side, World *world) {
     return world->depth;
 }
 
+//Texture* shrinkSlice(TextureWorldSlice *slice, SDL_Renderer *renderer) {
+//    return (Texture*)texture_create_blank(slice.tex, 100, 100, SDL_TEXTUREACCESS_TARGET, renderer);
+//}
+
+
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
     SDL_Renderer* renderer = screen->renderer;
@@ -71,7 +81,9 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     ASSERT(sizeof(TransState) <= memory->transient_storage_size);
     TransState *trans_state = (TransState *)memory->transient_storage;
 
-    Side side_to_render = left;
+    Side side_to_render = front;
+    int sliceCount;
+
 
     if (!memory->is_initialized) {
 
@@ -89,18 +101,17 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
         SDL_RenderClear( renderer );
 
-        for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) {
-            texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer);
-            texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND);
-            SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
-            SDL_RenderClear( renderer );
-        }
+        /* for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) { */
+        /*     texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer); */
+        /*     texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND); */
+        /*     SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 ); */
+        /*     SDL_RenderClear( renderer ); */
+        /* } */
 
         SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
         SDL_RenderClear( renderer );
 
         draw_3d_space(state->world, side_to_render, renderer, screen, state->blocks, trans_state, state->cached);
-
         SDL_SetRenderTarget( renderer, NULL );
 
 
@@ -122,16 +133,38 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
     SDL_RenderClear( renderer );
 
-    for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) {
-        texture_render((&state->cached->slices[i].tex), 0, 0, renderer);
+    int amount = getSliceCount(side_to_render, state->world);
+    for (int i = 0; i < amount; i++) {
+        s32 x1 = (state->cached->slices[i].bounds.tl.x);
+        s32 y1 = (state->cached->slices[i].bounds.tl.y);
+        s32 x2 = (state->cached->slices[i].bounds.br.x);
+        s32 y2 = (state->cached->slices[i].bounds.br.y);
+        // hier moet het gebeuren.
+
+        //printBBox(state->cached->slices[i].bounds);
+
+        SDL_Rect source = {x1, y1, x2-x1, y2-y1};
+        SDL_Rect dest = {x1, y1, x2-x1, y2-y1};
+
+        if (x2-x1>0 && y2-y1>0) {
+            texture_create_blank( &state->cached->slices[i].temp_tex, x2-x1, y2-y1, SDL_TEXTUREACCESS_TARGET, renderer);
+            SDL_SetTextureBlendMode(state->cached->slices[i].temp_tex.tex, SDL_BLENDMODE_BLEND);
+            //SDL_SetRenderTarget(renderer, state->cached->slices[i].temp_tex.tex);
+            SDL_RenderCopy(renderer, (state->cached->slices[i].tex.tex), &source, &dest);
+            SDL_SetRenderTarget(renderer, NULL);
+        }
+        //texture_render((&state->cached->slices[i].temp_tex), 0, 0, renderer);
+
+        //texture_free((&state->cached->slices[i].tex));
+
     }
+    SDL_SetRenderTarget(renderer, NULL);
 
     texture_set_color(state->terminal8, PINK);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 3, renderer);
 
     SDL_RenderPresent( renderer );
 }
-
 
 
 internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* renderer, Screen* screen )
@@ -177,9 +210,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-    state->world->width  = 15;
-    state->world->height = 15;
-    state->world->depth  = 15;
+    state->world->width  = 100;
+    state->world->height = 50;
+    state->world->depth  = 20;
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);
@@ -193,6 +226,8 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     state->cached->slices = (TextureWorldSlice*) PUSH_ARRAY(&state->world_arena, slice_count, TextureWorldSlice);
     for (int i = 0; i < slice_count; i++) {
         texture_create_blank( &state->cached->slices[i].tex, screen->width, screen->height, SDL_TEXTUREACCESS_TARGET, renderer);
+        texture_create_blank( &state->cached->slices[i].temp_tex, screen->width, screen->height, SDL_TEXTUREACCESS_TARGET, renderer);
+
     }
     state->cached->screen_dim.x = screen->width;
     state->cached->screen_dim.y = screen->height;

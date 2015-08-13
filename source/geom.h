@@ -40,6 +40,7 @@ typedef struct BBox
 } BBox;
 #define BBOX_HEIGHT(bbox) (bbox.br.y - bbox.tl.y)
 #define BBOX_WIDTH(bbox) (bbox.br.x - bbox.tl.x)
+void printBBox(BBox b);
 
 BBox bbox(float tlX, float tlY, float brX, float brY);
 int bbox_eql(BBox b1, BBox b2);
