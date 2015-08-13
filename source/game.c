@@ -30,9 +30,20 @@ internal void set_structured_values_in_world(World* world)
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
             for (int z = 0 ; z < world->height; z++) {
-                //if ((x+y) % 5 == 0) {
-                            setBlockAt(world, x,y,z,1);
-                //}
+                if ((x+y) % 10 > 5) {
+                    //    setBlockAt(world, x,y,z,1);
+                }else {
+                    //setBlockAt(world, x,y,z,2);
+                }
+                if (y >= world->depth-1){
+                    setBlockAt(world, x,y,z,1);
+
+                    if (y % 10 > 5) {
+                        if (x % 10 > 6 && z % 10 > 5) {
+                        setBlockAt(world, x,y,z,0);
+                        }
+                    }
+                }
             }
         }
     }
@@ -45,7 +56,7 @@ internal void set_structured_values_in_world(World* world)
     // left wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, 0,y,z,3);
+            //setBlockAt(world, 0,y,z,3);
         }
     }
     // front left column
@@ -56,7 +67,7 @@ internal void set_structured_values_in_world(World* world)
     // right wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, world->width-1,y,z,4);
+            //setBlockAt(world, world->width-1,y,z,4);
         }
     }
 }
@@ -68,9 +79,6 @@ internal int getSliceCount(Side side, World *world) {
     return world->depth;
 }
 
-//Texture* shrinkSlice(TextureWorldSlice *slice, SDL_Renderer *renderer) {
-//    return (Texture*)texture_create_blank(slice.tex, 100, 100, SDL_TEXTUREACCESS_TARGET, renderer);
-//}
 
 
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
@@ -141,8 +149,6 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         s32 y2 = (state->cached->slices[i].bounds.br.y);
         // hier moet het gebeuren.
 
-        //printBBox(state->cached->slices[i].bounds);
-
         SDL_Rect source = {x1, y1, x2-x1, y2-y1};
         SDL_Rect dest = {x1, y1, x2-x1, y2-y1};
 
@@ -150,12 +156,12 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
             texture_create_blank( &state->cached->slices[i].temp_tex, x2-x1, y2-y1, SDL_TEXTUREACCESS_TARGET, renderer);
             SDL_SetTextureBlendMode(state->cached->slices[i].temp_tex.tex, SDL_BLENDMODE_BLEND);
             //SDL_SetRenderTarget(renderer, state->cached->slices[i].temp_tex.tex);
+            //texture_render(&state->cached->slices[i].tex, 0, 0, renderer);
             SDL_RenderCopy(renderer, (state->cached->slices[i].tex.tex), &source, &dest);
+            //texture_free(&state->cached->slices[i].tex);
             SDL_SetRenderTarget(renderer, NULL);
         }
-        //texture_render((&state->cached->slices[i].temp_tex), 0, 0, renderer);
 
-        //texture_free((&state->cached->slices[i].tex));
 
     }
     SDL_SetRenderTarget(renderer, NULL);
