@@ -31,7 +31,7 @@ internal void set_structured_values_in_world(World* world)
         for (int y = 0 ; y < world->depth; y++) {
             for (int z = 0 ; z < world->height; z++) {
                 if ((x+y) % 10 > 5) {
-                    //    setBlockAt(world, x,y,z,1);
+                    setBlockAt(world, x,y,z,1);
                 }else {
                     //setBlockAt(world, x,y,z,2);
                 }
@@ -109,12 +109,13 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
         SDL_RenderClear( renderer );
 
-        /* for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) { */
-        /*     texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer); */
-        /*     texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND); */
-        /*     SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 ); */
-        /*     SDL_RenderClear( renderer ); */
-        /* } */
+
+        for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) {
+            texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer);
+            texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+            SDL_RenderClear( renderer );
+        }
 
         SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
         SDL_RenderClear( renderer );
@@ -217,8 +218,8 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
     state->world->width  = 100;
-    state->world->height = 50;
-    state->world->depth  = 20;
+    state->world->height = 100;
+    state->world->depth  = 100;
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);

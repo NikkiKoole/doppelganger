@@ -8,7 +8,7 @@
 #include "defines.h"
 #include "keyboard.h"
 
-#define FRAMERATE 1000/200
+#define FRAMERATE 1000/500
 
 const s32 SCREEN_WIDTH = 1920;
 const s32 SCREEN_HEIGHT = 1080;
