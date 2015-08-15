@@ -31,7 +31,7 @@ internal void set_structured_values_in_world(World* world)
         for (int y = 0 ; y < world->depth; y++) {
             for (int z = 0 ; z < world->height; z++) {
                 if ((x+y) % 10 > 5) {
-                    //    setBlockAt(world, x,y,z,1);
+                    setBlockAt(world, x,y,z,1);
                 }else {
                     //setBlockAt(world, x,y,z,2);
                 }
@@ -224,9 +224,11 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
+
     state->world->width  = 80;
     state->world->height = 10;
     state->world->depth  = 20;
+
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);
