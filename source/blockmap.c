@@ -166,9 +166,6 @@ internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *render
 }
 
 
-
-
-
 internal void handleFilledBlock(TransState *trans_state, SDL_Rect source, SDL_Rect dest, BBox *bbox_slices, List *list, int value, Texture *tex, SDL_Renderer *renderer, int index)
 {
     BBox *current = (BBox*) PUSH_STRUCT(&trans_state->scratch_arena, BBox);
@@ -181,7 +178,11 @@ internal void handleFilledBlock(TransState *trans_state, SDL_Rect source, SDL_Re
     node->value = val;
 
     if (growList(list, current, node)) {
-        draw_3d_space_helper(value, tex, renderer, source, dest);
+
+        //int outcome = 1 + (int)(randFloat() * 6);
+        int outcome = value;//randInt(1, 7);
+        //printf("%d\n",outcome);
+        draw_3d_space_helper(outcome, tex, renderer, source, dest);
         bbox_grow(&bbox_slices[index], *current);
     }
 }
@@ -256,7 +257,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
 
         for (int i = 0; i<this_depth; i++ ) {
             cached->slices[i].bounds = bbox(bbox_slices[i].tl.x,bbox_slices[i].tl.y,bbox_slices[i].br.x, bbox_slices[i].br.y);
-            printBBox(cached->slices[i].bounds);
+            //printBBox(cached->slices[i].bounds);
         }
 
         //now we can do something usefull with the bbox_slices

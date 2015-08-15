@@ -8,10 +8,10 @@
 #include "defines.h"
 #include "keyboard.h"
 
-#define FRAMERATE 1000/200
+#define FRAMERATE 1000/30
 
-const s32 SCREEN_WIDTH = 1920;
-const s32 SCREEN_HEIGHT = 1080;
+const s32 SCREEN_WIDTH = 1400;
+const s32 SCREEN_HEIGHT = 800;
 const char *TITLE = "Doppelgangs";
 
 internal b32 init(void);
@@ -123,7 +123,7 @@ internal void maybe_load_libgame(void)
 internal void initialize_memory(void)
 {
     void *base_address = (void *) gigabytes(1);
-    memory.permanent_storage_size = megabytes(64);
+    memory.permanent_storage_size = megabytes(16);
     memory.transient_storage_size = gigabytes(1);
 
     u64 total_storage_size = memory.permanent_storage_size + memory.transient_storage_size;
@@ -161,6 +161,8 @@ int main(void)
             now = SDL_GetTicks();
 
             if ( now - start < FRAMERATE ) SDL_Delay( FRAMERATE - ( now - start ) );
+
+            //printf("now : %d, start: %d, total:%d, desired : %d\n",now, start, now-start,FRAMERATE);
             now = SDL_GetTicks();
 
             frame_time->duration = now - start;
@@ -168,7 +170,10 @@ int main(void)
             snprintf(frame_time->fps_string, sizeof frame_time->fps_string, "%d %s", fps, "FPS");
 
             func(screen, &memory, keyboard, frame_time);
+            //int overflow = ( now - start > FRAMERATE ) ? ( now - start) -FRAMERATE : 0;
             start = now;
+
+
         }
     }
 	close_game();

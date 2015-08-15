@@ -3,6 +3,17 @@
 #include "defines.h"
 #include <math.h>
 
+float randFloat(void) {
+    return (rand()/(2147483648.0));
+}
+int randInt(int start, int end) {
+    ASSERT(end > start);
+    int width = end - start;
+    return start + (int)(randFloat()*width);
+}
+
+
+
 void vec2_to_buffer(Vec2 v, char *buffer)
 {
     sprintf(buffer, "Vec2(%.1f, %.1f)", v.x, v.y);

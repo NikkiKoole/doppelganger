@@ -29,6 +29,9 @@ typedef size_t memory_index;
 #define gigabytes(value) (megabytes(value)*1024LL)
 #define terabytes(value) (gigabytes(value)*1024LL)
 
+
+
+
 #define MAX(a,b) \
     ({ __typeof__ (a) _a = (a); \
         __typeof__ (b) _b = (b);\
@@ -46,9 +49,6 @@ typedef size_t memory_index;
 
 #define UNUSED(x) (void)(x)
 #define SDL_WARN(msg) printf("%s SDL Error: %s \t\t(%s, %s:%d)\n", #msg, SDL_GetError(), __FILE__, __FUNCTION__, __LINE__);
-
-
-
 
 
 #endif

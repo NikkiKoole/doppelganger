@@ -1,6 +1,8 @@
 #ifndef GEOM_H
 #define GEOM_H
 
+float randFloat(void);
+int randInt(int start, int end);
 
 typedef struct Vec2
 {
