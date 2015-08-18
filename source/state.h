@@ -9,7 +9,7 @@
 #include "screen.h"
 #include "geom.h"
 #include "blockmap.h"
-
+#include "entity.h"
 
 typedef struct State
 {
@@ -28,7 +28,7 @@ typedef struct State
     World *world;
     Texture *world_slices;
     CachedSlices *cached;
-
+    Entity *game_entities;
 } State;
 
 // Lets imagine many helper functions to grow here

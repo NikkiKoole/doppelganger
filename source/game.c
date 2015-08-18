@@ -14,6 +14,7 @@ char terminal8[] = "resources/terminal8.png";
 char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
+#define entity_count 500
 
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer, Screen* screen);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
@@ -101,7 +102,6 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     if (!memory->is_initialized) {
 
-        printf("what size does the transient have: %d\n",memory->transient_storage_size);
         initialize_memory(state, memory, renderer, screen);
 
         initialize_arena(&trans_state->scratch_arena,
@@ -127,8 +127,6 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
         draw_3d_space(state->world, side_to_render, renderer, screen, state->blocks, trans_state, state->cached);
         SDL_SetRenderTarget( renderer, NULL );
-
-
     }
 
     if (key_pressed(keyboard,KB_F5)){
@@ -144,6 +142,19 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         //create_slice(state, renderer);
     }
 
+    for (int i = 0; i < entity_count; i++){
+        state->game_entities[i].position.x += state->game_entities[i].velocity.x;
+        state->game_entities[i].position.y += state->game_entities[i].velocity.y;
+        int xPos = state->game_entities[i].position.x;
+        int yPos = state->game_entities[i].position.y;
+        if (xPos <= 0 || xPos >= screen->width) {
+            state->game_entities[i].velocity.x *= -1;
+        }
+        if (yPos <= 0 || yPos >= screen->height) {
+            state->game_entities[i].velocity.y *= -1;
+        }
+    }
+
     SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
     SDL_RenderClear( renderer );
 
@@ -153,27 +164,24 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         s32 y1 = (state->cached->slices[i].bounds.tl.y);
         s32 x2 = (state->cached->slices[i].bounds.br.x);
         s32 y2 = (state->cached->slices[i].bounds.br.y);
-        // hier moet het gebeuren.
-
 
         if (x2-x1>0 && y2-y1>0) {
             SDL_Rect source = {x1, y1, x2-x1, y2-y1};
             SDL_Rect dest = {x1, y1, x2-x1, y2-y1};
 
-            //texture_create_blank( &state->cached->slices[i].temp_tex, x2-x1, y2-y1, SDL_TEXTUREACCESS_TARGET, renderer);
-            //SDL_SetTextureBlendMode(state->cached->slices[i].temp_tex.tex, SDL_BLENDMODE_BLEND);
-            //SDL_SetRenderTarget(renderer, state->cached->slices[i].temp_tex.tex);
-            //texture_render(&state->cached->slices[i].tex, 0, 0, renderer);
             SDL_RenderCopy(renderer, (state->cached->slices[i].tex.tex), &source, &dest);
-            //texture_free(&state->cached->slices[i].tex);
-            //SDL_SetRenderTarget(renderer, NULL);
         } else {
             //printf("Nothing to draw at slice %d\n",i);
         }
-
-
     }
-    //SDL_SetRenderTarget(renderer, NULL);
+
+    for (int i = 0; i < entity_count; i++){
+        Entity this =  state->game_entities[i];
+        SDL_Rect dest = {this.position.x, this.position.y, 16, 48};
+        SDL_SetRenderDrawColor( renderer, this.red, this.green, this.blue,  0xFF );
+        SDL_RenderFillRect(renderer, &dest);
+    }
+
     texture_set_color(state->terminal8, GREY01);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 3, renderer);
 
@@ -242,9 +250,14 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     state->cached->slices = (TextureWorldSlice*) PUSH_ARRAY(&state->world_arena, slice_count, TextureWorldSlice);
     for (int i = 0; i < slice_count; i++) {
         texture_create_blank( &state->cached->slices[i].tex, screen->width, screen->height, SDL_TEXTUREACCESS_TARGET, renderer);
-        texture_create_blank( &state->cached->slices[i].temp_tex, screen->width, screen->height, SDL_TEXTUREACCESS_TARGET, renderer);
-
     }
+
+    state->game_entities = (Entity*) PUSH_ARRAY(&state->world_arena, entity_count, Entity);
+    for (int i = 0; i< entity_count; i++){
+        //Entity rand =
+        state->game_entities[i] = randomEntity();
+    }
+
     //state->cached->screen_dim.x = screen->width;
     //state->cached->screen_dim.y = screen->height;
 

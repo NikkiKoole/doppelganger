@@ -33,6 +33,12 @@
     them) or put time in skeleton based animation, measure if that's
     feasible though
 
+    The Entities will have a vec3 for position and a vec3 for velocity and a vec3 for facing_direction
+    there will be a function that handles updating all these numbers in 1 go.
+    The Entities will be animated using pre-drawn frames,
+    so from their (AI)state and these vec3's and my current view I should be able to get at the current frame that ought to be visible
+
+
 *** Debug
     Make some very simple UI (Buttons, slider, panels) Use the ASCII
     font for all text come to think of it just use the ASCII font for

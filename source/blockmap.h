@@ -12,7 +12,6 @@
 typedef struct TextureWorldSlice {
     BBox bounds;
     Texture tex;
-    Texture temp_tex;
 } TextureWorldSlice;
 
 
@@ -30,7 +29,6 @@ typedef struct World
 } World;
 
 typedef struct CachedSlices {
-    Point screen_dim;
     TextureWorldSlice *slices;
 } CachedSlices;
 

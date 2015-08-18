@@ -12,8 +12,8 @@
 #define FRAMERATE 1000/30
 
 
-const s32 SCREEN_WIDTH = 1400;
-const s32 SCREEN_HEIGHT = 800;
+const s32 SCREEN_WIDTH = 1024;
+const s32 SCREEN_HEIGHT = 768;
 const char *TITLE = "Doppelgangs";
 
 internal b32 init(void);
