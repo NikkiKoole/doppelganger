@@ -30,23 +30,7 @@ internal void set_structured_values_in_world(World* world)
     // bottom plateau
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
-            for (int z = 0 ; z < world->height; z++) {
-                if ((x+y) % 10 > 5) {
-                    setBlockAt(world, x,y,z,1);
-                }else {
-                    //setBlockAt(world, x,y,z,2);
-                }
-                //setBlockAt(world, x,y,z,3);
-                if (y >= world->depth-1){
-                    setBlockAt(world, x,y,z,1);
-
-                    if (y % 10 > 5) {
-                        if (x % 5 > 2 && z % 5 > 2) {
-                        setBlockAt(world, x,y,z,0);
-                        }
-                    }
-                }
-            }
+            setBlockAt(world, x,y,0,5);
         }
     }
     // back wall
@@ -81,13 +65,6 @@ internal int getSliceCount(Side side, World *world) {
     return world->depth;
 }
 
-internal void update_entities(void) {
-
-}
-
-internal void render_entities(void){
-}
-
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
 {
     SDL_Renderer* renderer = screen->renderer;
@@ -96,7 +73,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     ASSERT(sizeof(TransState) <= memory->transient_storage_size);
     TransState *trans_state = (TransState *)memory->transient_storage;
 
-    Side side_to_render = front;
+    Side side_to_render = back;
     int sliceCount;
 
 
@@ -233,16 +210,13 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
 
-    state->world->width  = 80;
-    state->world->height = 10;
-    state->world->depth  = 20;
+    state->world->width  = 50;
+    state->world->height = 4;
+    state->world->depth  = 50;
 
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);
-
-
-
 
     int slice_count = MAX(state->world->depth, state->world->width);
     printf("slice count:  %d\n",slice_count);
@@ -254,13 +228,7 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
     state->game_entities = (Entity*) PUSH_ARRAY(&state->world_arena, entity_count, Entity);
     for (int i = 0; i< entity_count; i++){
-        //Entity rand =
         state->game_entities[i] = randomEntity();
     }
-
-    //state->cached->screen_dim.x = screen->width;
-    //state->cached->screen_dim.y = screen->height;
-
-    //printf("saving screen dimensions %f %f \n", state->screen_dim.x, state->screen_dim.y);
 
 }
