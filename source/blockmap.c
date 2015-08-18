@@ -211,7 +211,7 @@ internal b32 in_screen_bounds(SDL_Rect dest, Screen *screen)
 
 
 
-internal Vec2 get_screen_position(World *world, Screen *screen, Side side, int x, int y, int z){
+Vec2 get_screen_position(World *world, Screen *screen, Side side, int x, int y, int z){
     int x_off;
     int y_off;
     int result_x;
@@ -228,11 +228,18 @@ internal Vec2 get_screen_position(World *world, Screen *screen, Side side, int x
         y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
         result_x = x_off + x*16;
         result_y = y_off + (world->height*16) + (y*8)-(z*16) - 16;
-
         break;
     case(left) :
+        x_off = screen->width/2 - ((world->depth*16)/2);
+        y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
+        result_x = x_off + y*16;
+        result_y = y_off + (world->height*16) + (x*8)-(z*16) - 16;
         break;
     case(right) :
+        x_off = screen->width/2 - ((world->depth*16)/2);
+        y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
+        result_x = x_off + y*16;
+        result_y = y_off + (world->height*16) + (x*8)-(z*16) - 16;
         break;
     default :
         printf("Problems \n");
@@ -254,8 +261,6 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
 
     switch(side){
     case(front) :
-        //x_off = screen->width/2 - ((world->width*16)/2);
-        //y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
         draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
         this_depth = world->depth;
 
@@ -280,10 +285,6 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 for (int z = 0; z < world->height; z++) {
 
                     int value = getBlockAt(world, x, y, z);
-                    //SDL_Rect dest = {.x= x_off + x*16,
-                    //                 .y= y_off + (world->height*16)  + (y*8) - (z*16) - 16,
-                    //                 .w=16, .h=24};
-
                     Vec2 pos = get_screen_position(world, screen, side, x, y, z);
                     SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
 
@@ -295,22 +296,12 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         } // x
 
         for (int i = 0; i<this_depth; i++ ) {
-            cached->slices[i].bounds = bbox(bbox_slices[i].tl.x,
-                                            bbox_slices[i].tl.y,
-                                            bbox_slices[i].br.x,
-                                            bbox_slices[i].br.y);
-
-            //printBBox(cached->slices[i].bounds);
+            cached->slices[i].bounds = bbox_slices[i];
         }
 
-        //now we can do something usefull with the bbox_slices
-
         end_temporary_memory(scratch);
-        //abort();
         break;
     case(back) :
-        x_off = screen->width/2 - ((world->width*16)/2);
-        y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
         draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
         this_depth = world->depth;
 
@@ -333,9 +324,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[y].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, (world->width-1-x), (world->depth-1-y), z);
-                    SDL_Rect dest = {.x= x_off + x*16,
-                                     .y= y_off + (world->height*16) + (y*8)-(z*16) - 16,
-                                     .w=16, .h=24};
+                    Vec2 pos = get_screen_position(world, screen, side, x, y, z);
+                    SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
+
                     if (value > 0 && in_screen_bounds(dest, screen)) {
                         handleFilledBlock(trans_state, source, dest, bbox_slices, list, value, tex, renderer, y);
                     }
@@ -343,18 +334,13 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             }
         }
         for (int i = 0; i<this_depth; i++ ) {
-            cached->slices[i].bounds = bbox(bbox_slices[i].tl.x,
-                                            bbox_slices[i].tl.y,
-                                            bbox_slices[i].br.x,
-                                            bbox_slices[i].br.y);
+            cached->slices[i].bounds = bbox_slices[i];
         }
 
         end_temporary_memory(scratch);
 
         break;
     case(left):
-        x_off = screen->width/2 - ((world->depth*16)/2);
-        y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
         draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
         this_depth = world->width;
 
@@ -376,9 +362,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, (world->width-1-x), y, z);
-                    SDL_Rect dest = {.x= x_off + y*16,
-                                     .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
-                                     .w=16, .h=24};
+                    Vec2 pos = get_screen_position(world, screen, side, x, y, z);
+                    SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
+
                     if (value > 0 && in_screen_bounds(dest, screen)) {
                         handleFilledBlock(trans_state, source, dest, bbox_slices, list, value, tex, renderer, x);
                     }
@@ -386,18 +372,12 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             }
         }
         for (int i = 0; i<this_depth; i++ ) {
-            cached->slices[i].bounds = bbox(bbox_slices[i].tl.x,
-                                            bbox_slices[i].tl.y,
-                                            bbox_slices[i].br.x,
-                                            bbox_slices[i].br.y);
+            cached->slices[i].bounds = bbox_slices[i];
         }
         end_temporary_memory(scratch);
         break;
 
     case(right):
-
-        x_off = screen->width/2 - ((world->depth*16)/2);
-        y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
         draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
         this_depth = world->width;
 
@@ -419,9 +399,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, x, (world->depth-1-y), z);
-                    SDL_Rect dest = {.x= x_off + y*16,
-                                     .y= y_off + (world->height*16) + (x*8)-(z*16) - 16,
-                                     .w=16, .h=24};
+                    Vec2 pos = get_screen_position(world, screen, side, x, y, z);
+                    SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
+
                     if (value > 0 && in_screen_bounds(dest, screen)) {
                         handleFilledBlock(trans_state, source, dest, bbox_slices, list, value, tex, renderer, x);
                     }
@@ -429,10 +409,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             }
         }
         for (int i = 0; i<this_depth; i++ ) {
-            cached->slices[i].bounds = bbox(bbox_slices[i].tl.x,
-                                            bbox_slices[i].tl.y,
-                                            bbox_slices[i].br.x,
-                                            bbox_slices[i].br.y);
+            cached->slices[i].bounds = bbox_slices[i];
         }
 
         end_temporary_memory(scratch);

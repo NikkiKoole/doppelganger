@@ -7,6 +7,7 @@
 #include "keyboard.h"
 #include "geom.h"
 #include "colors.h"
+#include "blockmap.h"
 #include <time.h>
 
 char texture1[] = "resources/image.png";
@@ -73,7 +74,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     ASSERT(sizeof(TransState) <= memory->transient_storage_size);
     TransState *trans_state = (TransState *)memory->transient_storage;
 
-    Side side_to_render = back;
+    Side side_to_render = front;
     int sliceCount;
 
 
@@ -120,8 +121,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     }
 
     for (int i = 0; i < entity_count; i++){
-        state->game_entities[i].position.x += state->game_entities[i].velocity.x;
-        state->game_entities[i].position.y += state->game_entities[i].velocity.y;
+        //state->game_entities[i].position.x += state->game_entities[i].velocity.x;
+        //state->game_entities[i].position.y += state->game_entities[i].velocity.y;
         int xPos = state->game_entities[i].position.x;
         int yPos = state->game_entities[i].position.y;
         if (xPos <= 0 || xPos >= screen->width) {
@@ -229,6 +230,12 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     state->game_entities = (Entity*) PUSH_ARRAY(&state->world_arena, entity_count, Entity);
     for (int i = 0; i< entity_count; i++){
         state->game_entities[i] = randomEntity();
+        int randX = randInt(0,state->world->width);
+        int randY = randInt(0,state->world->depth);
+        Vec2 pos = get_screen_position(state->world, screen, front, randX, randY, 0);
+
+        state->game_entities[i].position.x = pos.x;
+        state->game_entities[i].position.y = pos.y;
     }
 
 }
