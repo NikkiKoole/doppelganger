@@ -120,15 +120,18 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         //create_slice(state, renderer);
     }
 
+    Vec2 offset = get_screen_offset(state->world, screen, side_to_render);
+
+
     for (int i = 0; i < entity_count; i++){
-        //state->game_entities[i].position.x += state->game_entities[i].velocity.x;
-        //state->game_entities[i].position.y += state->game_entities[i].velocity.y;
-        int xPos = state->game_entities[i].position.x;
-        int yPos = state->game_entities[i].position.y;
-        if (xPos <= 0 || xPos >= screen->width) {
+        state->game_entities[i].x += state->game_entities[i].velocity.x;
+        state->game_entities[i].y += state->game_entities[i].velocity.y;
+        int xPos = state->game_entities[i].x;
+        int yPos = state->game_entities[i].y;
+        if (xPos <= offset.x || xPos >= screen->width - offset.x) {
             state->game_entities[i].velocity.x *= -1;
         }
-        if (yPos <= 0 || yPos >= screen->height) {
+        if (yPos <= offset.y || yPos >= screen->height - offset.y) {
             state->game_entities[i].velocity.y *= -1;
         }
     }
@@ -155,7 +158,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     for (int i = 0; i < entity_count; i++){
         Entity this =  state->game_entities[i];
-        SDL_Rect dest = {this.position.x, this.position.y, 16, 48};
+        SDL_Rect dest = {this.x, this.y, 16, 48};
         SDL_SetRenderDrawColor( renderer, this.red, this.green, this.blue,  0xFF );
         SDL_RenderFillRect(renderer, &dest);
     }
@@ -230,12 +233,13 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     state->game_entities = (Entity*) PUSH_ARRAY(&state->world_arena, entity_count, Entity);
     for (int i = 0; i< entity_count; i++){
         state->game_entities[i] = randomEntity();
-        int randX = randInt(0,state->world->width);
-        int randY = randInt(0,state->world->depth);
-        Vec2 pos = get_screen_position(state->world, screen, front, randX, randY, 0);
+        Entity e = state->game_entities[i];
+        //int randX = randInt(0,state->world->width);
+        //int randY = randInt(0,state->world->depth);
+        Vec2 pos = get_screen_position_single(state->world, screen, front, e.x, e.y, e.z);
 
-        state->game_entities[i].position.x = pos.x;
-        state->game_entities[i].position.y = pos.y;
+        state->game_entities[i].x = pos.x;
+        state->game_entities[i].y = pos.y;
     }
 
 }

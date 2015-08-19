@@ -2,7 +2,9 @@
 
 Entity randomEntity(void){
     Entity result;
-    result.position = (Vec2){randFloat()*500,randFloat()*500};
+    result.x = randFloat()*50*16;
+    result.y = randFloat()*50*16;
+    result.z = 0;
     result.velocity = (Vec2){-1.5 +randFloat()*3, -1.5 + randFloat()*3};
     result.red = randFloat()*0xFF;
     result.green = randFloat()*0xFF;

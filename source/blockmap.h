@@ -41,7 +41,9 @@ typedef enum Side
     right,
 } Side;
 
-Vec2 get_screen_position(World *world, Screen *screen, Side side, int x, int y, int z);
+Vec2 get_screen_offset(World *world, Screen *screen, Side side);
+Vec2 get_screen_position_block(World *world, Screen *screen, Side side, int x, int y, int z);
+Vec2 get_screen_position_single(World *world, Screen *screen, Side side, int x, int y, int z);
 
 void resetBlocks(World *world);
 void setBlockAt(World *w, int x, int y, int z, u8 type);

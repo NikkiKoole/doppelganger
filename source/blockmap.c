@@ -209,49 +209,66 @@ internal b32 in_screen_bounds(SDL_Rect dest, Screen *screen)
             dest.y < screen->height);
 }
 
+Vec2 get_screen_offset(World *world, Screen *screen, Side side){
+    Vec2 result;
+    if (side == front || side == back) {
+        result.x = screen->width/2 - ((world->width*16)/2);
+        result.y = screen->height/2 - ((world->depth*8 + world->height*16)/2);
 
-
-Vec2 get_screen_position(World *world, Screen *screen, Side side, int x, int y, int z){
-    int x_off;
-    int y_off;
-    int result_x;
-    int result_y;
-    switch(side){
-    case(front) :
-        x_off = screen->width/2 - ((world->width*16)/2);
-        y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
-        result_x = x_off + x*16;
-        result_y = y_off + (world->height*16)  + (y*8) - (z*16) - 16;
-        break;
-    case(back) :
-        x_off = screen->width/2 - ((world->width*16)/2);
-        y_off = screen->height/2 - ((world->depth*8 + world->height*16)/2);
-        result_x = x_off + x*16;
-        result_y = y_off + (world->height*16) + (y*8)-(z*16) - 16;
-        break;
-    case(left) :
-        x_off = screen->width/2 - ((world->depth*16)/2);
-        y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
-        result_x = x_off + y*16;
-        result_y = y_off + (world->height*16) + (x*8)-(z*16) - 16;
-        break;
-    case(right) :
-        x_off = screen->width/2 - ((world->depth*16)/2);
-        y_off = screen->height/2 - ((world->width*8 + world->height*16)/2);
-        result_x = x_off + y*16;
-        result_y = y_off + (world->height*16) + (x*8)-(z*16) - 16;
-        break;
-    default :
-        printf("Problems \n");
+    } else if (side == left || side == right) {
+        result.x = screen->width/2 - ((world->depth*16)/2);
+        result.y = screen->height/2 - ((world->width*8 + world->height*16)/2);
     }
+    return result;
+}
+
+internal Vec2 get_translated_block(int worldHeight, Side side, int x, int y, int z) {
+    Vec2 result;
+    if (side == front || side == back) {
+        result.x = x*16 ;
+        result.y = (worldHeight*16)  + (y*8) - (z*16) - 16;
+
+    } else if (side == left || side == right) {
+        result.x = y*16;
+        result.y = (worldHeight*16) + (x*8)-(z*16) - 16;
+    }
+    return result;
+
+}
+
+internal Vec2 get_translated_single(int worldHeight, Side side, int x, int y, int z) {
+    Vec2 result;
+    if (side == front || side == back) {
+        result.x = x*1;
+        result.y = (worldHeight*1)  + (y*0.5) - (z*1) - 1;
+
+    } else if (side == left || side == right) {
+        result.x = y*1;
+        result.y = (worldHeight*1) + (x*0.5)-(z*1) - 1;
+    }
+    return result;
+
+}
+
+
+Vec2 get_screen_position_block(World *world, Screen *screen, Side side, int x, int y, int z){
+    Vec2 offset = get_screen_offset(world, screen, side);
+    Vec2 translated = get_translated_block(world->height, side, x, y, z);
+    int result_x = offset.x + translated.x;
+    int result_y = offset.y + translated.y;
+    return vec2(result_x, result_y);
+}
+Vec2 get_screen_position_single(World *world, Screen *screen, Side side, int x, int y, int z){
+    Vec2 offset = get_screen_offset(world, screen, side);
+    Vec2 translated = get_translated_single(world->height, side, x, y, z);
+    int result_x = offset.x + translated.x;
+    int result_y = offset.y + translated.y;
     return vec2(result_x, result_y);
 }
 
 
 void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *screen, Texture *tex, TransState *trans_state, CachedSlices *cached)
 {
-    int x_off;
-    int y_off;
     int index = 6;
     SDL_Rect source = {.x=index*16, .y=0, .w=16, .h=24};
     TempMemory scratch;
@@ -285,7 +302,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 for (int z = 0; z < world->height; z++) {
 
                     int value = getBlockAt(world, x, y, z);
-                    Vec2 pos = get_screen_position(world, screen, side, x, y, z);
+                    Vec2 pos = get_screen_position_block(world, screen, side, x, y, z);
                     SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
 
                     if (value > 0 && in_screen_bounds(dest, screen)) {
@@ -324,7 +341,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[y].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, (world->width-1-x), (world->depth-1-y), z);
-                    Vec2 pos = get_screen_position(world, screen, side, x, y, z);
+                    Vec2 pos = get_screen_position_block(world, screen, side, x, y, z);
                     SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
 
                     if (value > 0 && in_screen_bounds(dest, screen)) {
@@ -362,7 +379,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, (world->width-1-x), y, z);
-                    Vec2 pos = get_screen_position(world, screen, side, x, y, z);
+                    Vec2 pos = get_screen_position_block(world, screen, side, x, y, z);
                     SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
 
                     if (value > 0 && in_screen_bounds(dest, screen)) {
@@ -399,7 +416,7 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, x, (world->depth-1-y), z);
-                    Vec2 pos = get_screen_position(world, screen, side, x, y, z);
+                    Vec2 pos = get_screen_position_block(world, screen, side, x, y, z);
                     SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
 
                     if (value > 0 && in_screen_bounds(dest, screen)) {
