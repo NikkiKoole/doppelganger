@@ -128,11 +128,20 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->game_entities[i].y += state->game_entities[i].velocity.y;
         int xPos = state->game_entities[i].x;
         int yPos = state->game_entities[i].y;
-        if (xPos <= offset.x || xPos >= screen->width - offset.x) {
-            state->game_entities[i].velocity.x *= -1;
-        }
-        if (yPos <= offset.y || yPos >= screen->height - offset.y) {
-            state->game_entities[i].velocity.y *= -1;
+        if (side_to_render == front || side_to_render == back) {
+            if (xPos <= offset.x || xPos >=  offset.x + state->world->width * 16) {
+                state->game_entities[i].velocity.x *= -1;
+            }
+            if (yPos <= offset.y || yPos >= offset.y + state->world->depth *8 ) {
+                state->game_entities[i].velocity.y *= -1;
+            }
+        } else if (side_to_render == left || side_to_render == right) {
+            if (xPos <= offset.x || xPos >= offset.x + state->world->depth * 16) {
+                state->game_entities[i].velocity.x *= -1;
+            }
+            if (yPos <= offset.y || yPos >= offset.y + state->world->width * 8 ) {
+                state->game_entities[i].velocity.y *= -1;
+            }
         }
     }
 
@@ -214,7 +223,7 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
 
-    state->world->width  = 50;
+    state->world->width  = 30;
     state->world->height = 4;
     state->world->depth  = 50;
 

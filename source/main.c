@@ -9,7 +9,7 @@
 #include "keyboard.h"
 
 
-#define FRAMERATE 1000/30
+#define FRAMERATE 1000/60
 
 
 const s32 SCREEN_WIDTH = 1024;

@@ -2,8 +2,8 @@
 
 Entity randomEntity(void){
     Entity result;
-    result.x = randFloat()*50*16;
-    result.y = randFloat()*50*16;
+    result.x = (10+randFloat()*20)*16;
+    result.y = (10+randFloat()*20)*16;
     result.z = 0;
     result.velocity = (Vec2){-1.5 +randFloat()*3, -1.5 + randFloat()*3};
     result.red = randFloat()*0xFF;
