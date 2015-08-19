@@ -254,8 +254,8 @@ internal Vec2 get_translated_single(int worldHeight, Side side, int x, int y, in
 Vec2 get_screen_position_block(World *world, Screen *screen, Side side, int x, int y, int z){
     Vec2 offset = get_screen_offset(world, screen, side);
     Vec2 translated = get_translated_block(world->height, side, x, y, z);
-    int result_x = offset.x + translated.x;
-    int result_y = offset.y + translated.y;
+    int result_x =  translated.x;
+    int result_y = translated.y;
     return vec2(result_x, result_y);
 }
 Vec2 get_screen_position_single(World *world, Screen *screen, Side side, int x, int y, int z){
@@ -275,13 +275,15 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
     List *list = 0;
     BBox *bbox_slices = 0;
     int this_depth = 0;
+    Vec2 offset;
+    scratch = begin_temporary_memory(&trans_state->scratch_arena);
+
 
     switch(side){
     case(front) :
-        draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
         this_depth = world->depth;
+        offset = get_screen_offset(world, screen, side);
 
-        scratch = begin_temporary_memory(&trans_state->scratch_arena);
         list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
         bbox_slices = (BBox*) PUSH_ARRAY(&trans_state->scratch_arena, this_depth, BBox ); //the actual depth at this view
         for (int i = 0; i<this_depth; i++ ) {
@@ -302,8 +304,8 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 for (int z = 0; z < world->height; z++) {
 
                     int value = getBlockAt(world, x, y, z);
-                    Vec2 pos = get_screen_position_block(world, screen, side, x, y, z);
-                    SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
+                    Vec2 translated = get_translated_block(world->height, side, x, y, z);
+                    SDL_Rect dest = {.x= translated.x +offset.x, .y= translated.y +offset.y, .w=16, .h=24};
 
                     if (value > 0 && in_screen_bounds(dest, screen)) {
                         handleFilledBlock(trans_state, source, dest, bbox_slices, list, value, tex, renderer, y);
@@ -316,13 +318,11 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             cached->slices[i].bounds = bbox_slices[i];
         }
 
-        end_temporary_memory(scratch);
         break;
     case(back) :
-        draw_3d_lines(world->width, world->height, world->depth, renderer, screen);
         this_depth = world->depth;
+        offset = get_screen_offset(world, screen, side);
 
-        scratch = begin_temporary_memory(&trans_state->scratch_arena);
         list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
         bbox_slices = (BBox*) PUSH_ARRAY(&trans_state->scratch_arena, this_depth, BBox ); //the actual depth at this view
         for (int i = 0; i<this_depth; i++ ) {
@@ -341,8 +341,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[y].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, (world->width-1-x), (world->depth-1-y), z);
-                    Vec2 pos = get_screen_position_block(world, screen, side, x, y, z);
-                    SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
+                    Vec2 translated = get_translated_block(world->height, side, x, y, z);
+                    SDL_Rect dest = {.x= translated.x +offset.x, .y= translated.y +offset.y, .w=16, .h=24};
+
 
                     if (value > 0 && in_screen_bounds(dest, screen)) {
                         handleFilledBlock(trans_state, source, dest, bbox_slices, list, value, tex, renderer, y);
@@ -354,14 +355,12 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             cached->slices[i].bounds = bbox_slices[i];
         }
 
-        end_temporary_memory(scratch);
-
         break;
     case(left):
-        draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
-        this_depth = world->width;
 
-        scratch = begin_temporary_memory(&trans_state->scratch_arena);
+        this_depth = world->width;
+        offset = get_screen_offset(world, screen, side);
+
         list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
         bbox_slices = (BBox*) PUSH_ARRAY(&trans_state->scratch_arena,this_depth, BBox ); //the actual depth at this view
         for (int i = 0; i<this_depth; i++ ) {
@@ -379,8 +378,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, (world->width-1-x), y, z);
-                    Vec2 pos = get_screen_position_block(world, screen, side, x, y, z);
-                    SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
+                    Vec2 translated = get_translated_block(world->height, side, x, y, z);
+                    SDL_Rect dest = {.x= translated.x +offset.x, .y= translated.y +offset.y, .w=16, .h=24};
+
 
                     if (value > 0 && in_screen_bounds(dest, screen)) {
                         handleFilledBlock(trans_state, source, dest, bbox_slices, list, value, tex, renderer, x);
@@ -391,14 +391,13 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
         for (int i = 0; i<this_depth; i++ ) {
             cached->slices[i].bounds = bbox_slices[i];
         }
-        end_temporary_memory(scratch);
         break;
 
     case(right):
-        draw_3d_lines(world->depth, world->height, world->width, renderer, screen);
-        this_depth = world->width;
 
-        scratch = begin_temporary_memory(&trans_state->scratch_arena);
+        this_depth = world->width;
+        offset = get_screen_offset(world, screen, side);
+
         list = (List*) PUSH_STRUCT(&trans_state->scratch_arena, List);
         bbox_slices = (BBox*) PUSH_ARRAY(&trans_state->scratch_arena,this_depth, BBox ); //the actual depth at this view
         for (int i = 0; i<this_depth; i++ ) {
@@ -416,8 +415,9 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
                 texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, x, (world->depth-1-y), z);
-                    Vec2 pos = get_screen_position_block(world, screen, side, x, y, z);
-                    SDL_Rect dest = {.x= pos.x,.y= pos.y, .w=16, .h=24};
+                    Vec2 translated = get_translated_block(world->height, side, x, y, z);
+                    SDL_Rect dest = {.x= translated.x +offset.x, .y= translated.y +offset.y, .w=16, .h=24};
+
 
                     if (value > 0 && in_screen_bounds(dest, screen)) {
                         handleFilledBlock(trans_state, source, dest, bbox_slices, list, value, tex, renderer, x);
@@ -429,10 +429,11 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             cached->slices[i].bounds = bbox_slices[i];
         }
 
-        end_temporary_memory(scratch);
         break;
 
     default:
         printf("shouldnt be here");
     }
+    end_temporary_memory(scratch);
+
 }

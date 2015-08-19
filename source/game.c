@@ -15,19 +15,14 @@ char terminal8[] = "resources/terminal8.png";
 char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
-#define entity_count 500
+#define entity_count 1000
 
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer, Screen* screen);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
 void game_update_and_render(Screen *screen, Memory *memory, Keyboard *keyboard, FrameTime *frametime);
 
-//void set_structured_values_in_world(World* world);
-
-
 internal void set_structured_values_in_world(World* world)
 {
-
-
     // bottom plateau
     for (int x = 0; x < world->width; x++) {
         for (int y = 0 ; y < world->depth; y++) {
@@ -43,7 +38,7 @@ internal void set_structured_values_in_world(World* world)
     // left wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            //setBlockAt(world, 0,y,z,3);
+            setBlockAt(world, 0,y,z,3);
         }
     }
     // front left column
@@ -54,7 +49,7 @@ internal void set_structured_values_in_world(World* world)
     // right wall
     for (int y = 0; y < world->depth; y++) {
         for (int z = 0 ; z < world->height; z++) {
-            //setBlockAt(world, world->width-1,y,z,4);
+            setBlockAt(world, world->width-1,y,z,4);
         }
     }
 }
@@ -66,28 +61,9 @@ internal int getSliceCount(Side side, World *world) {
     return world->depth;
 }
 
-extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
-{
-    SDL_Renderer* renderer = screen->renderer;
-    ASSERT(sizeof(State) <= memory->permanent_storage_size);
-    State *state = (State *)memory->permanent_storage;
-    ASSERT(sizeof(TransState) <= memory->transient_storage_size);
-    TransState *trans_state = (TransState *)memory->transient_storage;
-
-    Side side_to_render = front;
-    int sliceCount;
 
 
-    if (!memory->is_initialized) {
-
-        initialize_memory(state, memory, renderer, screen);
-
-        initialize_arena(&trans_state->scratch_arena,
-                         memory->transient_storage_size - sizeof(TransState),
-                         (u8 *)memory->transient_storage + sizeof(TransState));
-
-        memory->is_initialized = true;
-
+internal void create_world(State *state, SDL_Renderer* renderer, Screen* screen, Side side_to_render, TransState *trans_state) {
         resetBlocks(state->world);
         set_structured_values_in_world(state->world);
         SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
@@ -105,6 +81,35 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
         draw_3d_space(state->world, side_to_render, renderer, screen, state->blocks, trans_state, state->cached);
         SDL_SetRenderTarget( renderer, NULL );
+
+}
+
+
+
+extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
+{
+    SDL_Renderer* renderer = screen->renderer;
+    ASSERT(sizeof(State) <= memory->permanent_storage_size);
+    State *state = (State *)memory->permanent_storage;
+    ASSERT(sizeof(TransState) <= memory->transient_storage_size);
+    TransState *trans_state = (TransState *)memory->transient_storage;
+
+    Side side_to_render = front;
+    Vec2 offset;
+    int sliceCount;
+    // todo (when live editing) make side change rerender.
+
+    if (!memory->is_initialized) {
+        printf("initialize memory\n");
+
+        initialize_memory(state, memory, renderer, screen);
+
+        initialize_arena(&trans_state->scratch_arena,
+                         memory->transient_storage_size - sizeof(TransState),
+                         (u8 *)memory->transient_storage + sizeof(TransState));
+
+        memory->is_initialized = true;
+        create_world(state, renderer, screen, side_to_render, trans_state);
     }
 
     if (key_pressed(keyboard,KB_F5)){
@@ -113,17 +118,13 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         state->terminal8 = (Texture *) PUSH_STRUCT(&state->world_arena, Texture);
         texture_load_from_file((state->terminal8), terminal8, renderer);
         printf("reloaded textures! \n");
-
+        create_world(state, renderer, screen, side_to_render, trans_state);
     }
 
-    if (key_pressed(keyboard, KB_W)) {
-        //create_slice(state, renderer);
-    }
-
-    Vec2 offset = get_screen_offset(state->world, screen, side_to_render);
-
+    offset = get_screen_offset(state->world, screen, side_to_render);
 
     for (int i = 0; i < entity_count; i++){
+
         state->game_entities[i].x += state->game_entities[i].velocity.x;
         state->game_entities[i].y += state->game_entities[i].velocity.y;
         int xPos = state->game_entities[i].x;
@@ -223,16 +224,15 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
 
-    state->world->width  = 30;
-    state->world->height = 4;
-    state->world->depth  = 50;
+    state->world->width  = 60;
+    state->world->height = 40;
+    state->world->depth  = 15;
 
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);
 
     int slice_count = MAX(state->world->depth, state->world->width);
-    printf("slice count:  %d\n",slice_count);
     state->cached = (CachedSlices*)  PUSH_STRUCT(&state->world_arena, CachedSlices);
     state->cached->slices = (TextureWorldSlice*) PUSH_ARRAY(&state->world_arena, slice_count, TextureWorldSlice);
     for (int i = 0; i < slice_count; i++) {
@@ -243,10 +243,7 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     for (int i = 0; i< entity_count; i++){
         state->game_entities[i] = randomEntity();
         Entity e = state->game_entities[i];
-        //int randX = randInt(0,state->world->width);
-        //int randY = randInt(0,state->world->depth);
         Vec2 pos = get_screen_position_single(state->world, screen, front, e.x, e.y, e.z);
-
         state->game_entities[i].x = pos.x;
         state->game_entities[i].y = pos.y;
     }
