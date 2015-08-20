@@ -15,7 +15,7 @@ char terminal8[] = "resources/terminal8.png";
 char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
-#define entity_count 1000
+#define entity_count 2500
 
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer, Screen* screen);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
@@ -70,8 +70,10 @@ internal void create_world(State *state, SDL_Renderer* renderer, Screen* screen,
         SDL_RenderClear( renderer );
 
         for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) {
-            texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer);
-            texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND);
+            //texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer);
+            //texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND);
+            SDL_SetRenderTarget( renderer, state->cached->slices[i].tex.tex);
+            SDL_SetTextureBlendMode(state->cached->slices[i].tex.tex, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
             SDL_RenderClear( renderer );
         }
@@ -94,7 +96,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     ASSERT(sizeof(TransState) <= memory->transient_storage_size);
     TransState *trans_state = (TransState *)memory->transient_storage;
 
-    Side side_to_render = front;
+    Side side_to_render = back;
     Vec2 offset;
     int sliceCount;
     // todo (when live editing) make side change rerender.
@@ -122,11 +124,11 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     }
 
     offset = get_screen_offset(state->world, screen, side_to_render);
-
+    float timestep = 1000.0/frametime->duration;
     for (int i = 0; i < entity_count; i++){
 
-        state->game_entities[i].x += state->game_entities[i].velocity.x;
-        state->game_entities[i].y += state->game_entities[i].velocity.y;
+        state->game_entities[i].x += state->game_entities[i].velocity.x / timestep;
+        state->game_entities[i].y += state->game_entities[i].velocity.y / timestep;
         int xPos = state->game_entities[i].x;
         int yPos = state->game_entities[i].y;
         if (side_to_render == front || side_to_render == back) {
@@ -172,8 +174,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         SDL_SetRenderDrawColor( renderer, this.red, this.green, this.blue,  0xFF );
         SDL_RenderFillRect(renderer, &dest);
     }
-
-    texture_set_color(state->terminal8, GREY01);
+    SDL_SetTextureColorMod(state->terminal8->tex, GREY01);
+    //texture_set_color(state->terminal8, GREY01);
     texture_render_text((state->terminal8), 10, 10, frametime->fps_string, 3, renderer);
 
     SDL_RenderPresent( renderer );
@@ -223,11 +225,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-
     state->world->width  = 60;
-    state->world->height = 40;
-    state->world->depth  = 15;
-
+    state->world->height = 4;
+    state->world->depth  = 80;
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);

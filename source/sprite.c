@@ -11,8 +11,8 @@ void sprite_init(Sprite* spr, Texture* t, SDL_Rect clip,  s32 frame_width, s32 f
     spr->frame_height = frame_height;
     spr->elapsed_time = 0;
     spr->current_frame = 0;
-    printf("frame columns in sprite: %d\n",clip.w/frame_width);
-    printf("frame rows in sprite: %d\n",clip.h/frame_height);
+    //printf("frame columns in sprite: %d\n",clip.w/frame_width);
+    //printf("frame rows in sprite: %d\n",clip.h/frame_height);
 }
 
 SDL_Rect sprite_get_current_frame(Sprite* spr, Animation* anim)

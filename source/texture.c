@@ -107,32 +107,32 @@ void texture_destroy(Texture *t)
     texture_free(t);
 }
 
-void texture_set_color(Texture *t, u8 Red, u8 Green, u8 Blue)
-{
-    SDL_SetTextureColorMod(t->tex, Red, Green, Blue );
-}
+/* void texture_set_color(Texture *t, u8 Red, u8 Green, u8 Blue) */
+/* { */
+/*     SDL_SetTextureColorMod(t->tex, Red, Green, Blue ); */
+/* } */
 
-void texture_set_blend_mode(Texture *t, SDL_BlendMode mode)
-{
-    SDL_SetTextureBlendMode(t->tex, mode);
-}
-void texture_set_alpha(Texture *t, u8 alpha)
-{
-    SDL_SetTextureAlphaMod(t->tex, alpha);
-}
-
-
-void texture_render_part(Texture *t, SDL_Rect* source, SDL_Rect *dest, SDL_Renderer *renderer)
-{
-    SDL_RenderCopy(renderer, t->tex, source, dest);
-}
+/* void texture_set_blend_mode(Texture *t, SDL_BlendMode mode) */
+/* { */
+/*     SDL_SetTextureBlendMode(t->tex, mode); */
+/* } */
+/* void texture_set_alpha(Texture *t, u8 alpha) */
+/* { */
+/*     SDL_SetTextureAlphaMod(t->tex, alpha); */
+/* } */
 
 
-void texture_render(Texture *t, s32 x,s32 y, SDL_Renderer *renderer)
-{
-    SDL_Rect render_quad = {x,y, t->width, t->height};
-    SDL_RenderCopy(renderer, t->tex, NULL, &render_quad);
-}
+//void texture_render_part(Texture *t, SDL_Rect* source, SDL_Rect *dest, SDL_Renderer *renderer)
+//{
+//    SDL_RenderCopy(renderer, t->tex, source, dest);
+//}
+
+
+/* void texture_render(Texture *t, s32 x,s32 y, SDL_Renderer *renderer) */
+/* { */
+/*     SDL_Rect render_quad = {x,y, t->width, t->height}; */
+/*     SDL_RenderCopy(renderer, t->tex, NULL, &render_quad); */
+/* } */
 
 void texture_render_ex(Texture *t, s32 x, s32 y, SDL_Rect *clip, r32 angle, SDL_Point *center, SDL_RendererFlip flip, SDL_Renderer *renderer)
 {
@@ -200,7 +200,7 @@ b32 texture_create_blank(Texture *t, s32 width, s32 height, SDL_TextureAccess ac
     return (t->tex != NULL);
 }
 
-void texture_set_as_rendertarget(Texture *t, SDL_Renderer *renderer)
-{
-	SDL_SetRenderTarget( renderer, t->tex );
-}
+/* void texture_set_as_rendertarget(Texture *t, SDL_Renderer *renderer) */
+/* { */
+/* 	SDL_SetRenderTarget( renderer, t->tex ); */
+/* } */

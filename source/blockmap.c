@@ -147,26 +147,28 @@ inline internal void reset_list(List *list)
 internal void draw_3d_space_helper(int value, Texture *tex, SDL_Renderer *renderer, SDL_Rect source, SDL_Rect dest)
 {
     if (value == 1) {
-        texture_set_color((tex), 0xFF, 0x00, 0xFF);
+        //SDL_SetTextureColorMod(tex->tex, Red, Green, Blue );
+        SDL_SetTextureColorMod(tex->tex, 0xFF, 0x00, 0xFF);
     }
     if (value == 2) {
-        texture_set_color((tex), 0xFF, 0xFF, 0x00);
+        SDL_SetTextureColorMod(tex->tex, 0xFF, 0xFF, 0x00);
     }
     if (value == 3) {
-        texture_set_color((tex), 0x00, 0xFF, 0xFF);
+        SDL_SetTextureColorMod(tex->tex, 0x00, 0xFF, 0xFF);
     }
     if (value == 4) {
-        texture_set_color((tex), 0xff, 0x00, 0x00);
+        SDL_SetTextureColorMod(tex->tex, 0xff, 0x00, 0x00);
     }
     if (value == 5) {
-        texture_set_color((tex), 0x00, 0xFF, 0x00);
+        SDL_SetTextureColorMod(tex->tex, 0x00, 0xFF, 0x00);
     }
     if (value == 6) {
-        texture_set_color((tex), 0x00, 0x00, 0xFF);
+        SDL_SetTextureColorMod(tex->tex, 0x00, 0x00, 0xFF);
     }
 
     if (value > 0){
-        texture_render_part(tex, &source, &dest, renderer);
+        SDL_RenderCopy(renderer, tex->tex, &source, &dest);
+        //texture_render_part(tex, &source, &dest, renderer);
     }
 }
 
@@ -297,9 +299,10 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             reset_list(list);
             //for (int y = 0; y< world->depth; y++) {
             for (int y = world->depth-1; y>=0; y--) {
-
-                texture_set_blend_mode(&cached->slices[y].tex, SDL_BLENDMODE_BLEND);
-                texture_set_as_rendertarget(&cached->slices[y].tex, renderer);
+                SDL_SetTextureBlendMode(cached->slices[y].tex.tex, SDL_BLENDMODE_BLEND);
+                //texture_set_blend_mode(&cached->slices[y].tex, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderTarget( renderer, cached->slices[y].tex.tex);
+                //texture_set_as_rendertarget(&cached->slices[y].tex, renderer);
 
                 for (int z = 0; z < world->height; z++) {
 
@@ -337,8 +340,11 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             reset_list(list);
             //for (int y = 0; y< world->depth; y++) {
             for (int y = world->depth-1; y>=0; y--) {
-                texture_set_blend_mode(&cached->slices[y].tex, SDL_BLENDMODE_BLEND);
-                texture_set_as_rendertarget(&cached->slices[y].tex, renderer);
+                SDL_SetTextureBlendMode(cached->slices[y].tex.tex, SDL_BLENDMODE_BLEND);
+
+                //texture_set_blend_mode(&cached->slices[y].tex, SDL_BLENDMODE_BLEND);
+                //texture_set_as_rendertarget(&cached->slices[y].tex, renderer);
+                SDL_SetRenderTarget( renderer, cached->slices[y].tex.tex);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, (world->width-1-x), (world->depth-1-y), z);
                     Vec2 translated = get_translated_block(world->height, side, x, y, z);
@@ -374,8 +380,10 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             reset_list(list);
             //for (int x = 0; x < world->width; x++) {
             for (int x = world->width-1; x >= 0; x--) {
-                texture_set_blend_mode(&cached->slices[x].tex, SDL_BLENDMODE_BLEND);
-                texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
+                SDL_SetTextureBlendMode(cached->slices[x].tex.tex, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderTarget( renderer, cached->slices[x].tex.tex);
+                //texture_set_blend_mode(&cached->slices[x].tex, SDL_BLENDMODE_BLEND);
+                //texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, (world->width-1-x), y, z);
                     Vec2 translated = get_translated_block(world->height, side, x, y, z);
@@ -411,8 +419,10 @@ void draw_3d_space(World *world, Side side, SDL_Renderer *renderer, Screen *scre
             reset_list(list);
             for (int x = world->width-1; x >= 0; x--) {
                 //for (int x = 0; x < world->width; x++) {
-                texture_set_blend_mode(&cached->slices[x].tex, SDL_BLENDMODE_BLEND);
-                texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
+                SDL_SetTextureBlendMode(cached->slices[x].tex.tex, SDL_BLENDMODE_BLEND);
+                SDL_SetRenderTarget( renderer, cached->slices[x].tex.tex);
+                //texture_set_blend_mode(&cached->slices[x].tex, SDL_BLENDMODE_BLEND);
+                //texture_set_as_rendertarget(&cached->slices[x].tex, renderer);
                 for (int z = 0; z < world->height; z++) {
                     int value = getBlockAt(world, x, (world->depth-1-y), z);
                     Vec2 translated = get_translated_block(world->height, side, x, y, z);
