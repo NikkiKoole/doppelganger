@@ -7,7 +7,7 @@
 
 typedef struct Texture
 {
-    SDL_Texture *tex;
+    SDL_Texture *SDLtex;
     s32 width;
     s32 height;
     s32 pitch;

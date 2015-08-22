@@ -19,6 +19,7 @@ b32 texture_load_from_file(Texture *t, char *path, SDL_Renderer *renderer)
         if (formatted_surface == NULL) {
            SDL_WARN('Unable to convert loaded surface to display format');
         } else {
+            printf("formatted surface:  %d, %d  \n", formatted_surface->w, formatted_surface->h);
             new_texture = SDL_CreateTexture(renderer,
                                             SDL_PIXELFORMAT_RGBA8888,
                                             SDL_TEXTUREACCESS_STREAMING,
@@ -54,8 +55,8 @@ b32 texture_load_from_file(Texture *t, char *path, SDL_Renderer *renderer)
         }
         SDL_FreeSurface(loaded_surface);
     }
-    t->tex = new_texture;
-    return t->tex != NULL;
+    t->SDLtex = new_texture;
+    return t->SDLtex != NULL;
 }
 
 void texture_render_text(Texture *t, s32 x, s32 y,const char *text, r32 scale, SDL_Renderer* renderer)
@@ -76,7 +77,7 @@ void texture_render_text(Texture *t, s32 x, s32 y,const char *text, r32 scale, S
             SDL_Rect src_rect = {(u8) (ascii % 16)*8, (u8) (ascii / 16)*8, 8, 8};
             SDL_Rect dest_rect = {current_x, current_y, 8*scale, 8*scale};
 
-            SDL_RenderCopy(renderer, t->tex, &src_rect, &dest_rect);
+            SDL_RenderCopy(renderer, t->SDLtex, &src_rect, &dest_rect);
             current_x += 8*scale;
         }
     }
@@ -87,14 +88,14 @@ void texture_init(Texture *t)
 {
     t->width = 0;
     t->height = 0;
-    t->tex = NULL;
+    t->SDLtex = NULL;
 }
 
 void texture_free(Texture *t)
 {
-    if (t->tex != NULL){
-        SDL_DestroyTexture(t->tex);
-        t->tex = NULL;
+    if (t->SDLtex != NULL){
+        SDL_DestroyTexture(t->SDLtex);
+        t->SDLtex = NULL;
         t->width = 0;
         t->height = 0;
         t->pixels = NULL;
@@ -143,7 +144,7 @@ void texture_render_ex(Texture *t, s32 x, s32 y, SDL_Rect *clip, r32 angle, SDL_
         render_quad.h = clip->h;
     }
 
-    SDL_RenderCopyEx( renderer, t->tex, clip, &render_quad, angle, center, flip );
+    SDL_RenderCopyEx( renderer, t->SDLtex, clip, &render_quad, angle, center, flip );
 }
 
 b32 texture_lock(Texture *t)
@@ -153,7 +154,7 @@ b32 texture_lock(Texture *t)
         printf("Texture is already locked!\n");
         success = false;
     } else {
-        if (SDL_LockTexture(t->tex, NULL, &t->pixels, &t->pitch) != 0) {
+        if (SDL_LockTexture(t->SDLtex, NULL, &t->pixels, &t->pitch) != 0) {
             printf("Unable to lock texture! %s\n", SDL_GetError());
             success = false;
         }
@@ -167,7 +168,7 @@ b32 texture_unlock(Texture *t)
         printf("Texture is not locked!\n");
         success = false;
     } else {
-        SDL_UnlockTexture(t->tex);
+        SDL_UnlockTexture(t->SDLtex);
         t->pixels = NULL;
         t->pitch = 0;
     }
@@ -190,14 +191,14 @@ u32 texture_get_pixel32(Texture *t, s32 x, s32 y)
 
 b32 texture_create_blank(Texture *t, s32 width, s32 height, SDL_TextureAccess access,  SDL_Renderer *renderer)
 {
-    t->tex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, width, height);
-    if(t->tex == NULL) {
+    t->SDLtex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, access, width, height);
+    if(t->SDLtex == NULL) {
         SDL_WARN('Unable to create blank texture');
     } else {
         t->width = width;
         t->height = height;
     }
-    return (t->tex != NULL);
+    return (t->SDLtex != NULL);
 }
 
 /* void texture_set_as_rendertarget(Texture *t, SDL_Renderer *renderer) */

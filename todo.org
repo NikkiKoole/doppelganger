@@ -38,6 +38,11 @@
     The Entities will be animated using pre-drawn frames,
     so from their (AI)state and these vec3's and my current view I should be able to get at the current frame that ought to be visible
 
+    Currently I ought to be fixing the posiiton and how it ties into the World,
+    lets assume an Entity can never be outside the bounds of the world.
+
+
+
 
 *** Debug
     Make some very simple UI (Buttons, slider, panels) Use the ASCII

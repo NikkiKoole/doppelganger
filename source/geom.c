@@ -23,7 +23,7 @@ void bbox_to_buffer(BBox b, char *buffer)
     sprintf(buffer, "BBox(%.1f, %.1f, %.1f, %.1f)", b.tl.x, b.tl.y, b.br.x, b.br.y);
 }
 
-int vec2_eql(Vec2 v1, Vec2 v2)
+b32 vec2_eql(Vec2 v1, Vec2 v2)
 {
     return (v1.x == v2.x && v1.y == v2.y);
 }
@@ -139,7 +139,7 @@ void printBBox(BBox b) {
 }
 
 
-int bbox_eql(BBox b1, BBox b2)
+b32 bbox_eql(BBox b1, BBox b2)
 {
     return (b1.tl.x == b2.tl.x &&
             b1.tl.y == b2.tl.y &&

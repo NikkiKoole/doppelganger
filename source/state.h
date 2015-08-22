@@ -16,6 +16,7 @@ typedef struct State
 
     Memory_Arena world_arena;
     r64  angle1;
+    Side last_side;
     Texture *tex1;
     Texture *terminal8;
     Texture *render_target;

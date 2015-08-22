@@ -1,6 +1,8 @@
 #ifndef GEOM_H
 #define GEOM_H
 
+#include "defines.h"
+
 float randFloat(void);
 int randInt(int start, int end);
 
@@ -11,7 +13,7 @@ typedef struct Vec2
 } Vec2;
 
 void vec2_to_buffer(Vec2 v, char *buffer);
-int vec2_eql(Vec2 v1, Vec2 v2);
+b32 vec2_eql(Vec2 v1, Vec2 v2);
 
 Vec2 vec2(float x, float y);
 
@@ -45,7 +47,7 @@ typedef struct BBox
 void printBBox(BBox b);
 
 BBox bbox(float tlX, float tlY, float brX, float brY);
-int bbox_eql(BBox b1, BBox b2);
+b32 bbox_eql(BBox b1, BBox b2);
 int bbox_neighbour_vertically(BBox this, BBox other);
 void bbox_to_buffer(BBox b, char *buffer);
 int point_in_bbox(Point p, BBox b);
