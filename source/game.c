@@ -15,9 +15,9 @@ char terminal8[] = "resources/terminal8.png";
 char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
-Side side_to_render = front;
+Side side_to_render  = front;
 
-#define entity_count 1
+#define entity_count 500
 
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer, Screen* screen);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
@@ -31,29 +31,29 @@ internal void set_structured_values_in_world(World* world)
             setBlockAt(world, x,y,0,5);
         }
     }
-    // back wall
-    for (int x = 0; x < world->width; x++) {
-        for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, x,0,z,2);
-        }
-    }
-    // left wall
-    for (int y = 0; y < world->depth; y++) {
-        for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, 0,y,z,3);
-        }
-    }
-    // front left column
-    for (int z = 0 ; z < world->height; z++) {
-        setBlockAt(world, 0,world->depth-1,z,3);
-    }
+    /* // back wall */
+    /* for (int x = 0; x < world->width; x++) { */
+    /*     for (int z = 0 ; z < world->height; z++) { */
+    /*         setBlockAt(world, x,0,z,2); */
+    /*     } */
+    /* } */
+    /* // left wall */
+    /* for (int y = 0; y < world->depth; y++) { */
+    /*     for (int z = 0 ; z < world->height; z++) { */
+    /*         setBlockAt(world, 0,y,z,3); */
+    /*     } */
+    /* } */
+    /* // front left column */
+    /* for (int z = 0 ; z < world->height; z++) { */
+    /*     setBlockAt(world, 0,world->depth-1,z,3); */
+    /* } */
 
-    // right wall
-    for (int y = 0; y < world->depth; y++) {
-        for (int z = 0 ; z < world->height; z++) {
-            setBlockAt(world, world->width-1,y,z,4);
-        }
-    }
+    /* // right wall */
+    /* for (int y = 0; y < world->depth; y++) { */
+    /*     for (int z = 0 ; z < world->height; z++) { */
+    /*         setBlockAt(world, world->width-1,y,z,4); */
+    /*     } */
+    /* } */
 }
 
 internal int getSliceCount(Side side, World *world) {
@@ -87,29 +87,6 @@ internal void create_world(State *state, SDL_Renderer* renderer, Screen* screen,
         SDL_SetRenderTarget( renderer, NULL );
 
 }
-internal Vec2 get_translated_single2(World *world, Side side, int x, int y, int z) {
-    int worldHeight = world->height;
-    int worldDepth = world->depth;
-    int worldWidth = world->width;
-
-    Vec2 result;
-    if (side == front) {
-        result.x = x*1;
-        result.y =  (y*0.5) - (z*1);
-    } else if (side == back) {
-        result.x = (worldWidth*16) - x*1;
-        result.y = worldDepth*8  - (y*0.5) - (z*1);
-    } else if (side == left){
-        result.x = y*1;
-        result.y = (worldWidth*8) - (x*0.5)-(z*1);
-    } else if (side == right) {
-        result.x = (worldDepth*16) - y*1;
-        result.y = (worldWidth*8) -  (x*0.5)-(z*1);
-    }
-    return result;
-
-}
-
 
 
 extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* keyboard, FrameTime* frametime)
@@ -154,21 +131,22 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         //Then when rendering the wolrd or entites take note of the current side.
     offset = get_screen_offset(state->world, screen, side_to_render);
     float timestep = 1000.0/frametime->duration;
+    int entityWidth = 32;
+    int entityHeight = 100;
     for (int i = 0; i < entity_count; i++){
 
-        state->game_entities[i].x += 1;//state->game_entities[i].velocity.x / timestep;
-        state->game_entities[i].y += 1;//state->game_entities[i].velocity.y / timestep;
+        state->game_entities[i].x += state->game_entities[i].velocity.x / timestep;
+        state->game_entities[i].y += state->game_entities[i].velocity.y / timestep;
 
         int xPos = state->game_entities[i].x;
         int yPos = state->game_entities[i].y;
-        printf("xPos %d yPos: %d \n", xPos, yPos);
-        if (xPos <= 0 || xPos >= state->world->width * 16) {
+        BBox b = bbox(xPos, yPos, xPos+entityWidth, yPos+entityHeight);
+        if (b.tl.x <= 0 || b.br.x >= state->world->width * 16) {
             state->game_entities[i].velocity.x *= -1;
         }
-        if (yPos <= 0 || yPos >= state->world->depth *8 ) {
+        if (b.tl.y <= 0 || b.br.y   >= state->world->depth * 16 ) {
             state->game_entities[i].velocity.y *= -1;
         }
-
     }
 
     SDL_SetRenderDrawColor( renderer, GREY03,  0xFF );
@@ -195,13 +173,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
     for (int i = 0; i < entity_count; i++){
         Entity this =  state->game_entities[i];
-        printf("in %f, %f ", this.x, this.y);
         Vec2 translated = get_translated_single2(state->world, side_to_render, this.x, this.y, this.z);
-
-        printf("out %f, %f \n",translated.x,translated.y);
-        SDL_Rect dest = {translated.x+offset.x, translated.y+offset.y, 16, 48};
-        //printf("dest %f,%f \n", translated.x, translated.y);
-
+        SDL_Rect dest = {translated.x+offset.x, translated.y+offset.y, entityWidth, entityHeight};
         SDL_SetRenderDrawColor( renderer, this.red, this.green, this.blue,  0xFF );
         SDL_RenderFillRect(renderer, &dest);
     }
@@ -259,9 +232,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-    state->world->width  = 20;
-    state->world->height = 4;
-    state->world->depth  = 40;
+    state->world->width  = 60;
+    state->world->height = 1;
+    state->world->depth  = 60;
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);
@@ -277,12 +250,8 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     for (int i = 0; i< entity_count; i++){
         state->game_entities[i] = randomEntity();
         Entity *e = &state->game_entities[i];
-        e->x = 0;//state->world->width*16 / 2;//randInt(0, 16 * state->world->width);
-        e->y = 0;//state->world->depth*16/ 2;//randInt(0, 16 * state->world->depth);
-
-        //Vec2 pos = get_screen_position_single(state->world, screen, side_to_render, e.x, e.y, e.z);
-        //state->game_entities[i].x = 0;
-        //state->game_entities[i].y = 0;
+        e->x = (state->world->width)*8;
+        e->y = (state->world->depth)*8;
     }
 
 }

@@ -10,10 +10,3 @@ SDL backed featuring basic functionality from the ['lazy foo tutorials'](http://
 Dependancies:
 -------------
 SDL2, SDL2_image, inotify-tools (on linux), fswatch (on osx)
-
-
-Notes to self
--------------
-
-Compiling in Emacs (while working in the source folder):
-`make all --directory=../`
