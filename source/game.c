@@ -15,9 +15,9 @@ char terminal8[] = "resources/terminal8.png";
 char zelda[] = "resources/link.png"; // 24 x 26 px
 char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
-Side side_to_render  = front;
+Side side_to_render  = right;
 
-#define entity_count 500
+#define entity_count 300
 
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer, Screen* screen);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
@@ -31,29 +31,29 @@ internal void set_structured_values_in_world(World* world)
             setBlockAt(world, x,y,0,5);
         }
     }
-    /* // back wall */
-    /* for (int x = 0; x < world->width; x++) { */
-    /*     for (int z = 0 ; z < world->height; z++) { */
-    /*         setBlockAt(world, x,0,z,2); */
-    /*     } */
-    /* } */
-    /* // left wall */
-    /* for (int y = 0; y < world->depth; y++) { */
-    /*     for (int z = 0 ; z < world->height; z++) { */
-    /*         setBlockAt(world, 0,y,z,3); */
-    /*     } */
-    /* } */
-    /* // front left column */
-    /* for (int z = 0 ; z < world->height; z++) { */
-    /*     setBlockAt(world, 0,world->depth-1,z,3); */
-    /* } */
+    // back wall
+    for (int x = 0; x < world->width; x++) {
+        for (int z = 0 ; z < world->height; z++) {
+            setBlockAt(world, x,0,z,2);
+        }
+    }
+    // left wall
+    for (int y = 0; y < world->depth; y++) {
+        for (int z = 0 ; z < world->height; z++) {
+            setBlockAt(world, 0,y,z,3);
+        }
+    }
+    // front left column
+    for (int z = 0 ; z < world->height; z++) {
+        setBlockAt(world, 0,world->depth-1,z,3);
+    }
 
-    /* // right wall */
-    /* for (int y = 0; y < world->depth; y++) { */
-    /*     for (int z = 0 ; z < world->height; z++) { */
-    /*         setBlockAt(world, world->width-1,y,z,4); */
-    /*     } */
-    /* } */
+    // right wall
+    for (int y = 0; y < world->depth; y++) {
+        for (int z = 0 ; z < world->height; z++) {
+            setBlockAt(world, world->width-1,y,z,4);
+        }
+    }
 }
 
 internal int getSliceCount(Side side, World *world) {
@@ -66,25 +66,25 @@ internal int getSliceCount(Side side, World *world) {
 
 
 internal void create_world(State *state, SDL_Renderer* renderer, Screen* screen,  TransState *trans_state) {
-        resetBlocks(state->world);
-        set_structured_values_in_world(state->world);
-        SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
-        SDL_RenderClear( renderer );
+    resetBlocks(state->world);
+    set_structured_values_in_world(state->world);
+    SDL_SetRenderDrawColor( renderer, 0x00, 0xFF, 0xff, 0xFF );
+    SDL_RenderClear( renderer );
 
-        for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) {
-            //texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer);
-            //texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND);
-            SDL_SetRenderTarget( renderer, state->cached->slices[i].tex.SDLtex);
-            SDL_SetTextureBlendMode(state->cached->slices[i].tex.SDLtex, SDL_BLENDMODE_BLEND);
-            SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
-            SDL_RenderClear( renderer );
-        }
-
+    for (int i = 0; i < getSliceCount(side_to_render, state->world); i++) {
+        //texture_set_as_rendertarget(&state->cached->slices[i].tex, renderer);
+        //texture_set_blend_mode(&state->cached->slices[i].tex, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderTarget( renderer, state->cached->slices[i].tex.SDLtex);
+        SDL_SetTextureBlendMode(state->cached->slices[i].tex.SDLtex, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
         SDL_RenderClear( renderer );
+    }
 
-        draw_3d_space(state->world, side_to_render, renderer, screen, state->blocks, trans_state, state->cached);
-        SDL_SetRenderTarget( renderer, NULL );
+    SDL_SetRenderDrawColor( renderer, 0x00, 0x00, 0x00, 0x00 );
+    SDL_RenderClear( renderer );
+
+    draw_3d_space(state->world, side_to_render, renderer, screen, state->blocks, trans_state, state->cached);
+    SDL_SetRenderTarget( renderer, NULL );
 
 }
 
@@ -131,8 +131,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         //Then when rendering the wolrd or entites take note of the current side.
     offset = get_screen_offset(state->world, screen, side_to_render);
     float timestep = 1000.0/frametime->duration;
-    int entityWidth = 32;
-    int entityHeight = 100;
+    int entityWidth = 12;
+    int entityHeight = 12;
     for (int i = 0; i < entity_count; i++){
 
         state->game_entities[i].x += state->game_entities[i].velocity.x / timestep;
@@ -140,7 +140,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
 
         int xPos = state->game_entities[i].x;
         int yPos = state->game_entities[i].y;
-        BBox b = bbox(xPos, yPos, xPos+entityWidth, yPos+entityHeight);
+        BBox b = bbox(xPos-entityWidth/2, yPos-entityHeight/2, xPos+entityWidth/2, yPos+entityHeight/2);
         if (b.tl.x <= 0 || b.br.x >= state->world->width * 16) {
             state->game_entities[i].velocity.x *= -1;
         }
@@ -174,7 +174,7 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
     for (int i = 0; i < entity_count; i++){
         Entity this =  state->game_entities[i];
         Vec2 translated = get_translated_single2(state->world, side_to_render, this.x, this.y, this.z);
-        SDL_Rect dest = {translated.x+offset.x, translated.y+offset.y, entityWidth, entityHeight};
+        SDL_Rect dest = {translated.x+offset.x-entityWidth/2, translated.y+offset.y-entityHeight/2, entityWidth, entityHeight};
         SDL_SetRenderDrawColor( renderer, this.red, this.green, this.blue,  0xFF );
         SDL_RenderFillRect(renderer, &dest);
     }
@@ -232,9 +232,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-    state->world->width  = 60;
+    state->world->width  = 20;
     state->world->height = 1;
-    state->world->depth  = 60;
+    state->world->depth  = 20;
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);

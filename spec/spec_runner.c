@@ -8,9 +8,6 @@
 #include "../source/linkedlist.h"
 
 #define STRINGS_EQL(a, b) (strcmp((a),(b)) == 0)
-#define BBOX_HEIGHT(a) (a.br.y - a.tl.y)
-#define BBOX_WIDTH(a) (a.br.x - a.tl.x)
-
 
 describe(double_linked_list) {
     it (can add_last) {
