@@ -63,8 +63,6 @@ internal int getSliceCount(Side side, World *world) {
     return world->depth;
 }
 
-
-
 internal void create_world(State *state, SDL_Renderer* renderer, Screen* screen,  TransState *trans_state) {
     resetBlocks(state->world);
     set_structured_values_in_world(state->world);
@@ -127,8 +125,8 @@ extern void game_update_and_render(Screen* screen, Memory* memory, Keyboard* key
         create_world(state, renderer, screen, trans_state);
     }
 
-    //I// will always update the world as a front view.
-        //Then when rendering the wolrd or entites take note of the current side.
+    //I will always update the world as a front view.
+    //Then when rendering the wolrd or entites take note of the current side.
     offset = get_screen_offset(state->world, screen, side_to_render);
     float timestep = 1000.0/frametime->duration;
     int entityWidth = 12;
