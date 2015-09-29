@@ -17,7 +17,7 @@ char blocks[] = "resources/blocks.png"; // 16 x 24 px
 
 Side side_to_render  = right;
 
-#define entity_count 300
+#define entity_count 3000
 
 internal void initialize_memory(State *state,  Memory* memory, SDL_Renderer* renderer, Screen* screen);
 internal void create_slice(State *state, SDL_Renderer* renderer  );
@@ -230,9 +230,9 @@ internal void initialize_memory(State *state, Memory* memory, SDL_Renderer* rend
     sprite_init(state->walking_right, state->zelda, clip2, 24, 26);
 
     state->world = (World *) PUSH_STRUCT(&state->world_arena, World);
-    state->world->width  = 20;
+    state->world->width  = 50;
     state->world->height = 1;
-    state->world->depth  = 20;
+    state->world->depth  = 50;
     state->world->blocks = (Block*) PUSH_ARRAY(&state->world_arena,
                                                state->world->width * state->world->height * state->world->depth,
                                                Block);

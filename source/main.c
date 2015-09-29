@@ -9,7 +9,7 @@
 #include "keyboard.h"
 
 
-#define FRAMERATE 1000/100
+#define FRAMERATE 1000/1000
 
 
 
